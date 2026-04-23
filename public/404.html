@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AnyTour CRM</title>
+    <script>
+      // SPA fallback for GitHub Pages with HashRouter:
+      // preserve the original path as a hash and redirect to index.
+      var segmentCount = 1; // /travel-crm/
+      var l = window.location;
+      var path = l.pathname.split("/").slice(0, 1 + segmentCount).join("/") + "/";
+      var rest = l.pathname.slice(path.length).replace(/&/g, "~and~");
+      var hash = rest ? "#/" + rest : "";
+      l.replace(l.protocol + "//" + l.host + path + hash + l.search);
+    </script>
+  </head>
+  <body></body>
+</html>
