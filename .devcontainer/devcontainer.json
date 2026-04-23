@@ -6,7 +6,7 @@
   },
   "forwardPorts": [5173],
   "runArgs": ["--shm-size=1g"],
-  "initializeCommand": "mkdir -p \"${localEnv:HOME}/.claude\" \"${localEnv:HOME}/.codex\" \"${localEnv:HOME}/.gemini\" \"${localEnv:HOME}/.gnupg\" \"${localEnv:HOME}/.ssh\"",
+  "initializeCommand": "bash .devcontainer/init-host.sh",
   "mounts": [
     "source=travel-crm-bashhistory,target=/commandhistory,type=volume",
     "source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind",

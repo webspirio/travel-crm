@@ -14,7 +14,22 @@ sudo apt-get install -y --no-install-recommends \
   ca-certificates
 sudo rm -rf /var/lib/apt/lists/*
 
-echo "=== Phase 2: Project scaffold ==="
+echo "=== Phase 2: Global AI CLI tools ==="
+
+# Ensure npm global bin is in PATH (some base images miss this)
+NPM_GLOBAL_BIN="$(npm config get prefix)/bin"
+if [[ ":$PATH:" != *":$NPM_GLOBAL_BIN:"* ]]; then
+  export PATH="$NPM_GLOBAL_BIN:$PATH"
+  echo "export PATH=\"$NPM_GLOBAL_BIN:\$PATH\"" >> ~/.bashrc
+  echo "export PATH=\"$NPM_GLOBAL_BIN:\$PATH\"" >> ~/.zshrc 2>/dev/null || true
+fi
+
+npm install -g @anthropic-ai/claude-code || echo "ERROR: claude-code install failed"
+npm install -g @openai/codex || echo "WARN: codex install failed (optional)"
+npm install -g @google/gemini-cli || echo "WARN: gemini-cli install failed (optional)"
+npm install -g ralphy-cli || echo "WARN: ralphy-cli install failed (optional)"
+
+echo "=== Phase 3: Project scaffold ==="
 
 # Only scaffold if node_modules doesn't exist yet (first-time setup)
 if [ ! -d "node_modules" ]; then
@@ -65,9 +80,6 @@ else
   npm ci
 fi
 
-echo "=== Phase 3: Global AI CLI tools ==="
-npm install -g @anthropic-ai/claude-code @openai/codex @google/gemini-cli || true
-
 echo "=== Phase 4: Bash history persistence ==="
 sudo mkdir -p /commandhistory
 sudo chown node:node /commandhistory
@@ -89,3 +101,4 @@ echo "  chromium: $(chromium --version 2>/dev/null || echo 'not found')"
 echo "  node:     $(node --version)"
 echo "  npm:      $(npm --version)"
 echo "  claude:   $(claude --version 2>/dev/null || echo 'not found')"
+echo "  ralphy:   $(ralphy --version 2>/dev/null || echo 'not found')"
