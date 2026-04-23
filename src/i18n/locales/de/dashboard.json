@@ -1,0 +1,26 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Überblick über Geschäft und Kennzahlen",
+  "kpi": {
+    "totalRevenue": "Gesamtumsatz",
+    "activeTrips": "Aktive Reisen",
+    "totalClients": "Kunden",
+    "avgOccupancy": "Ø Auslastung",
+    "upcomingDepartures": "Abfahrten nächste 30 Tage",
+    "vsLastMonth": "vs Vormonat"
+  },
+  "charts": {
+    "revenueTitle": "Umsatz pro Monat",
+    "revenueSubtitle": "Aufgeschlüsselt nach Manager",
+    "topHotelsTitle": "Top-Hotels",
+    "topHotelsSubtitle": "Nach Buchungsanzahl"
+  },
+  "recent": {
+    "title": "Letzte Buchungen",
+    "empty": "Noch keine Buchungen",
+    "client": "Kunde",
+    "trip": "Reise",
+    "price": "Betrag",
+    "date": "Datum"
+  }
+}

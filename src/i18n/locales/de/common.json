@@ -1,0 +1,59 @@
+{
+  "app": {
+    "name": "AnyTour CRM",
+    "tagline": "Busreisen nach Italien"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "trips": "Reisen",
+    "clients": "Kunden",
+    "newBooking": "Neue Buchung"
+  },
+  "actions": {
+    "create": "Erstellen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "search": "Suchen"
+  },
+  "theme": {
+    "light": "Hell",
+    "dark": "Dunkel",
+    "toggle": "Theme umschalten"
+  },
+  "language": {
+    "uk": "Ukrainisch",
+    "de": "Deutsch"
+  },
+  "status": {
+    "planned": "Geplant",
+    "booking": "Buchbar",
+    "confirmed": "Bestätigt",
+    "in-progress": "Unterwegs",
+    "completed": "Abgeschlossen",
+    "cancelled": "Storniert"
+  },
+  "seat": {
+    "free": "Frei",
+    "selected": "Ausgewählt",
+    "reserved": "Reserviert",
+    "sold": "Verkauft",
+    "blocked": "Gesperrt",
+    "driver": "Fahrer",
+    "door": "Tür",
+    "toilet": "WC",
+    "stairs": "Treppe",
+    "kitchen": "Küche",
+    "number": "Platz Nr. {{n}}"
+  },
+  "room": {
+    "single": "Einzelzimmer",
+    "double": "Doppelzimmer",
+    "triple": "Dreibettzimmer",
+    "family": "Familienzimmer"
+  }
+}

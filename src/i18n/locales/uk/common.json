@@ -1,0 +1,59 @@
+{
+  "app": {
+    "name": "AnyTour CRM",
+    "tagline": "Автобусні тури в Італію"
+  },
+  "nav": {
+    "dashboard": "Дашборд",
+    "trips": "Тури",
+    "clients": "Клієнти",
+    "newBooking": "Нове бронювання"
+  },
+  "actions": {
+    "create": "Створити",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "confirm": "Підтвердити",
+    "back": "Назад",
+    "next": "Далі",
+    "search": "Пошук"
+  },
+  "theme": {
+    "light": "Світла",
+    "dark": "Темна",
+    "toggle": "Перемкнути тему"
+  },
+  "language": {
+    "uk": "Українська",
+    "de": "Німецька"
+  },
+  "status": {
+    "planned": "Заплановано",
+    "booking": "Продається",
+    "confirmed": "Підтверджено",
+    "in-progress": "В дорозі",
+    "completed": "Завершено",
+    "cancelled": "Скасовано"
+  },
+  "seat": {
+    "free": "Вільне",
+    "selected": "Обрано",
+    "reserved": "Заброньовано",
+    "sold": "Продано",
+    "blocked": "Заблоковано",
+    "driver": "Водій",
+    "door": "Двері",
+    "toilet": "Туалет",
+    "stairs": "Сходи",
+    "kitchen": "Кухня",
+    "number": "Місце №{{n}}"
+  },
+  "room": {
+    "single": "Одномісний",
+    "double": "Двомісний",
+    "triple": "Тримісний",
+    "family": "Сімейний"
+  }
+}

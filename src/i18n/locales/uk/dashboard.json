@@ -1,0 +1,26 @@
+{
+  "title": "Дашборд",
+  "subtitle": "Огляд бізнесу та ключових показників",
+  "kpi": {
+    "totalRevenue": "Загальний дохід",
+    "activeTrips": "Активні тури",
+    "totalClients": "Клієнтів",
+    "avgOccupancy": "Середнє заповнення",
+    "upcomingDepartures": "Виїздів найближчі 30 днів",
+    "vsLastMonth": "vs минулий місяць"
+  },
+  "charts": {
+    "revenueTitle": "Дохід за місяцями",
+    "revenueSubtitle": "Розподіл по менеджерах",
+    "topHotelsTitle": "Топ готелів",
+    "topHotelsSubtitle": "За кількістю бронювань"
+  },
+  "recent": {
+    "title": "Останні бронювання",
+    "empty": "Ще немає бронювань",
+    "client": "Клієнт",
+    "trip": "Тур",
+    "price": "Сума",
+    "date": "Дата"
+  }
+}
