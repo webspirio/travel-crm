@@ -1,0 +1,28 @@
+{
+  "title": "Reisen",
+  "subtitle": "Alle Busreisen und ihre Auslastung",
+  "search": "Nach Name suchen",
+  "columns": {
+    "name": "Reise",
+    "route": "Strecke",
+    "departure": "Abfahrt",
+    "busType": "Bus",
+    "occupancy": "Auslastung",
+    "status": "Status",
+    "price": "Preis"
+  },
+  "filters": {
+    "allDestinations": "Alle Ziele",
+    "allStatuses": "Alle Status"
+  },
+  "bus": {
+    "55": "55 Plätze",
+    "79": "79 Plätze (Doppeldecker)"
+  },
+  "tabs": {
+    "bus": "Bus",
+    "hotels": "Hotels",
+    "clients": "Passagiere"
+  },
+  "empty": "Keine Reisen gefunden"
+}
