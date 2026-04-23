@@ -1,0 +1,52 @@
+{
+  "title": "Neue Buchung",
+  "subtitle": "Buchung in 6 Schritten anlegen",
+  "steps": {
+    "client": "Kunde",
+    "trip": "Reise",
+    "seat": "Platz",
+    "hotel": "Hotel",
+    "pricing": "Preis",
+    "summary": "Bestätigung"
+  },
+  "client": {
+    "searchLabel": "Kunde suchen",
+    "searchPlaceholder": "Name oder E-Mail...",
+    "createNew": "+ Neuer Kunde",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "nationality": "Staatsangehörigkeit",
+    "selected": "Ausgewählt"
+  },
+  "trip": {
+    "pickLabel": "Reise auswählen",
+    "available": "Plätze frei",
+    "full": "Ausgebucht"
+  },
+  "seat": {
+    "pickLabel": "Platz auswählen"
+  },
+  "hotel": {
+    "pickHotel": "Hotel auswählen",
+    "pickRoom": "Zimmertyp"
+  },
+  "pricing": {
+    "basePrice": "Reisegrundpreis",
+    "hotelCost": "Hotel",
+    "total": "Gesamt",
+    "commission": "Provision (10%)"
+  },
+  "summary": {
+    "title": "Daten prüfen",
+    "confirmCta": "Buchung bestätigen",
+    "toast": "Buchung erstellt! 🎉"
+  },
+  "validation": {
+    "selectClient": "Kunden auswählen oder neu anlegen",
+    "pickTrip": "Reise auswählen",
+    "pickSeat": "Freien Platz auswählen",
+    "pickHotel": "Hotel auswählen"
+  }
+}

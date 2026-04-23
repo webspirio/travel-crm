@@ -1,0 +1,21 @@
+{
+  "title": "Kunden",
+  "subtitle": "Kundendatenbank und Buchungshistorie",
+  "search": "Nach Name oder E-Mail suchen",
+  "columns": {
+    "name": "Kunde",
+    "nationality": "Staatsangehörigkeit",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "bookings": "Buchungen",
+    "lastTrip": "Letzte Reise"
+  },
+  "details": {
+    "title": "Kundendetails",
+    "birthDate": "Geburtsdatum",
+    "createdAt": "In Datenbank seit",
+    "bookingHistory": "Buchungshistorie",
+    "noBookings": "Noch keine Buchungen"
+  },
+  "empty": "Keine Kunden gefunden"
+}

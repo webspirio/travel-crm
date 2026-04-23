@@ -1,0 +1,52 @@
+{
+  "title": "Нове бронювання",
+  "subtitle": "Створіть бронювання за 6 кроків",
+  "steps": {
+    "client": "Клієнт",
+    "trip": "Тур",
+    "seat": "Місце",
+    "hotel": "Готель",
+    "pricing": "Ціна",
+    "summary": "Підтвердження"
+  },
+  "client": {
+    "searchLabel": "Знайти клієнта",
+    "searchPlaceholder": "Прізвище, ім'я або email...",
+    "createNew": "+ Новий клієнт",
+    "firstName": "Ім'я",
+    "lastName": "Прізвище",
+    "email": "Email",
+    "phone": "Телефон",
+    "nationality": "Громадянство",
+    "selected": "Обрано"
+  },
+  "trip": {
+    "pickLabel": "Оберіть тур",
+    "available": "місць вільно",
+    "full": "Немає вільних місць"
+  },
+  "seat": {
+    "pickLabel": "Оберіть місце"
+  },
+  "hotel": {
+    "pickHotel": "Оберіть готель",
+    "pickRoom": "Тип номера"
+  },
+  "pricing": {
+    "basePrice": "Базова ціна туру",
+    "hotelCost": "Готель",
+    "total": "Разом",
+    "commission": "Комісія (10%)"
+  },
+  "summary": {
+    "title": "Перевірте дані",
+    "confirmCta": "Підтвердити бронювання",
+    "toast": "Бронювання створено! 🎉"
+  },
+  "validation": {
+    "selectClient": "Оберіть клієнта або створіть нового",
+    "pickTrip": "Оберіть тур",
+    "pickSeat": "Оберіть вільне місце",
+    "pickHotel": "Оберіть готель"
+  }
+}

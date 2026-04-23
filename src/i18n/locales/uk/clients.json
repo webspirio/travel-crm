@@ -1,0 +1,21 @@
+{
+  "title": "Клієнти",
+  "subtitle": "База клієнтів та історія бронювань",
+  "search": "Пошук за іменем або email",
+  "columns": {
+    "name": "Клієнт",
+    "nationality": "Громадянство",
+    "email": "Email",
+    "phone": "Телефон",
+    "bookings": "Бронювань",
+    "lastTrip": "Останній тур"
+  },
+  "details": {
+    "title": "Деталі клієнта",
+    "birthDate": "Дата народження",
+    "createdAt": "У базі з",
+    "bookingHistory": "Історія бронювань",
+    "noBookings": "Ще немає бронювань"
+  },
+  "empty": "Клієнтів не знайдено"
+}
