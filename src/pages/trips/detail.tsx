@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { bookings, clients, hotels, trips } from "@/data"
+import { bookings, hotels, trips } from "@/data"
 import { formatCurrency, formatDateRange } from "@/lib/format"
 import type { Locale, RoomType } from "@/types"
 
@@ -30,8 +30,6 @@ export default function TripDetailPage() {
     () => (trip ? hotels.filter((h) => trip.hotelIds.includes(h.id)) : []),
     [trip],
   )
-  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [])
-
   if (!trip) {
     return (
       <div className="space-y-2">
@@ -44,30 +42,54 @@ export default function TripDetailPage() {
     )
   }
 
-  const passengerCols: ColumnDef<(typeof tripBookings)[number]>[] = [
+  type PassengerRow = {
+    key: string
+    contractNumber: string
+    seatNumber: number
+    name: string
+    room: string
+    price: number
+    bookingId: string
+  }
+  const passengerRows: PassengerRow[] = tripBookings.flatMap((b) =>
+    b.passengers.map((p) => ({
+      key: p.id,
+      contractNumber: b.contractNumber,
+      seatNumber: p.seatNumber,
+      name: `${p.firstName} ${p.lastName}`,
+      room: p.roomType,
+      price: p.price,
+      bookingId: b.id,
+    })),
+  )
+  passengerRows.sort((a, b) => a.seatNumber - b.seatNumber)
+
+  const passengerCols: ColumnDef<PassengerRow>[] = [
     {
       id: "seat",
       header: "Seat",
       cell: ({ row }) => <span className="tabular-nums">#{row.original.seatNumber}</span>,
     },
     {
-      id: "client",
+      id: "contract",
+      header: "Contract",
+      cell: ({ row }) => <span className="tabular-nums">{row.original.contractNumber}</span>,
+    },
+    {
+      id: "name",
       header: t("tabs.clients"),
-      cell: ({ row }) => {
-        const c = clientById.get(row.original.clientId)
-        return c ? `${c.firstName} ${c.lastName}` : row.original.clientId
-      },
+      cell: ({ row }) => row.original.name,
     },
     {
       id: "room",
       header: "Room",
-      cell: ({ row }) => tc(`room.${row.original.roomType}`),
+      cell: ({ row }) => tc(`room.${row.original.room}`),
     },
     {
-      id: "total",
+      id: "price",
       header: t("columns.price"),
       cell: ({ row }) => (
-        <span className="tabular-nums">{formatCurrency(row.original.totalPrice, locale)}</span>
+        <span className="tabular-nums">{formatCurrency(row.original.price, locale)}</span>
       ),
     },
   ]
@@ -125,8 +147,10 @@ export default function TripDetailPage() {
             {tripHotels.map((h) => {
               const bookedByType: Partial<Record<RoomType, number>> = {}
               for (const b of tripBookings) {
-                if (b.hotelId !== h.id) continue
-                bookedByType[b.roomType] = (bookedByType[b.roomType] ?? 0) + 1
+                for (const p of b.passengers) {
+                  if (p.hotelId !== h.id) continue
+                  bookedByType[p.roomType] = (bookedByType[p.roomType] ?? 0) + 1
+                }
               }
               return <HotelCard key={h.id} hotel={h} bookedByType={bookedByType} />
             })}
@@ -136,7 +160,7 @@ export default function TripDetailPage() {
         <TabsContent value="clients" className="mt-4">
           <DataTable
             columns={passengerCols}
-            data={tripBookings}
+            data={passengerRows}
             emptyMessage={t("empty")}
           />
         </TabsContent>

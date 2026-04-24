@@ -15,7 +15,23 @@
     "birthDate": "Geburtsdatum",
     "createdAt": "In Datenbank seit",
     "bookingHistory": "Buchungshistorie",
-    "noBookings": "Noch keine Buchungen"
+    "noBookings": "Noch keine Buchungen",
+    "openFull": "Volles Profil"
+  },
+  "profile": {
+    "totalSpend": "Gesamtausgabe",
+    "bookingsCount": "Buchungen",
+    "lastTrip": "Letzte Reise",
+    "upcomingTrip": "Nächste Reise",
+    "noUpcoming": "keine",
+    "preferredHotels": "Lieblingshotels",
+    "noPreferredHotels": "Noch keine Daten",
+    "timeline": "Buchungshistorie",
+    "notes": "Notizen",
+    "notesPlaceholder": "Wichtige Details zum Kunden festhalten...",
+    "notesSaved": "Notizen gespeichert",
+    "notesSave": "Notizen speichern",
+    "back": "Zur Kundenliste"
   },
   "empty": "Keine Kunden gefunden"
 }

@@ -6,7 +6,11 @@
   "nav": {
     "dashboard": "Дашборд",
     "trips": "Тури",
+    "calendar": "Календар",
+    "hotels": "Готелі",
     "clients": "Клієнти",
+    "managers": "Менеджери",
+    "finance": "Фінанси",
     "newBooking": "Нове бронювання"
   },
   "actions": {
@@ -18,7 +22,26 @@
     "confirm": "Підтвердити",
     "back": "Назад",
     "next": "Далі",
-    "search": "Пошук"
+    "search": "Пошук",
+    "openProfile": "Відкрити профіль"
+  },
+  "palette": {
+    "placeholder": "Пошук турів, клієнтів, готелів...",
+    "trigger": "Пошук",
+    "empty": "Нічого не знайдено",
+    "groups": {
+      "trips": "Тури",
+      "clients": "Клієнти",
+      "hotels": "Готелі",
+      "managers": "Менеджери",
+      "actions": "Швидкі дії"
+    },
+    "actions": {
+      "goDashboard": "Відкрити дашборд",
+      "goCalendar": "Відкрити календар",
+      "goFinance": "Відкрити фінанси",
+      "newBooking": "Створити бронювання"
+    }
   },
   "theme": {
     "light": "Світла",
@@ -35,6 +58,12 @@
     "confirmed": "Підтверджено",
     "in-progress": "В дорозі",
     "completed": "Завершено",
+    "cancelled": "Скасовано"
+  },
+  "bookingStatus": {
+    "draft": "Чернетка",
+    "confirmed": "Підтверджено",
+    "paid": "Оплачено",
     "cancelled": "Скасовано"
   },
   "seat": {

@@ -1,7 +1,13 @@
 import { Bus, Euro, Users, TrendingUp, CalendarDays } from "lucide-react"
-import CountUp from "react-countup"
+import CountUpImport from "react-countup"
 import { useTranslation } from "react-i18next"
 import type { LucideIcon } from "lucide-react"
+
+// Vite/Rolldown CJS interop: react-countup's default export is wrapped in
+// a module object — unwrap the inner .default when present.
+const CountUp =
+  (CountUpImport as unknown as { default?: typeof CountUpImport }).default ??
+  CountUpImport
 
 import { RevenueChart } from "@/components/charts/revenue-chart"
 import {

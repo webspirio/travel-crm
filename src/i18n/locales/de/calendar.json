@@ -1,0 +1,31 @@
+{
+  "title": "Reisekalender",
+  "subtitle": "Abfahrten und Rückreisen auf einen Blick",
+  "today": "Heute",
+  "prev": "Vorheriger",
+  "next": "Nächster",
+  "nextDeparture": "Nächste Abfahrt",
+  "nextDepartureIn": "in {{days}} T.",
+  "noDeparturesSoon": "Keine anstehenden Abfahrten",
+  "weekdays": ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+  "legend": {
+    "departure": "Abfahrt",
+    "return": "Rückkehr"
+  },
+  "filters": {
+    "allDestinations": "Alle Ziele",
+    "allStatuses": "Alle Status",
+    "allManagers": "Alle Manager"
+  },
+  "agenda": {
+    "title": "Reisen diesen Monat",
+    "empty": "Keine Reisen in diesem Monat",
+    "departure": "Abfahrt",
+    "return": "Rückkehr"
+  },
+  "popover": {
+    "capacity": "Auslastung",
+    "manager": "Manager",
+    "openTrip": "Reise öffnen"
+  }
+}

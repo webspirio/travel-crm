@@ -6,7 +6,11 @@
   "nav": {
     "dashboard": "Dashboard",
     "trips": "Reisen",
+    "calendar": "Kalender",
+    "hotels": "Hotels",
     "clients": "Kunden",
+    "managers": "Manager",
+    "finance": "Finanzen",
     "newBooking": "Neue Buchung"
   },
   "actions": {
@@ -18,7 +22,26 @@
     "confirm": "Bestätigen",
     "back": "Zurück",
     "next": "Weiter",
-    "search": "Suchen"
+    "search": "Suchen",
+    "openProfile": "Profil öffnen"
+  },
+  "palette": {
+    "placeholder": "Reisen, Kunden, Hotels suchen...",
+    "trigger": "Suchen",
+    "empty": "Nichts gefunden",
+    "groups": {
+      "trips": "Reisen",
+      "clients": "Kunden",
+      "hotels": "Hotels",
+      "managers": "Manager",
+      "actions": "Schnellaktionen"
+    },
+    "actions": {
+      "goDashboard": "Zum Dashboard",
+      "goCalendar": "Kalender öffnen",
+      "goFinance": "Finanzen öffnen",
+      "newBooking": "Buchung erstellen"
+    }
   },
   "theme": {
     "light": "Hell",
@@ -35,6 +58,12 @@
     "confirmed": "Bestätigt",
     "in-progress": "Unterwegs",
     "completed": "Abgeschlossen",
+    "cancelled": "Storniert"
+  },
+  "bookingStatus": {
+    "draft": "Entwurf",
+    "confirmed": "Bestätigt",
+    "paid": "Bezahlt",
     "cancelled": "Storniert"
   },
   "seat": {

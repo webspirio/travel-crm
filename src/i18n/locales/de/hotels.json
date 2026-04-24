@@ -1,0 +1,49 @@
+{
+  "title": "Hotels",
+  "subtitle": "Partnerhotels und Zimmerauslastung",
+  "search": "Nach Name oder Stadt suchen",
+  "empty": "Keine Hotels gefunden",
+  "sort": {
+    "label": "Sortierung",
+    "nameAsc": "Name ↑",
+    "starsDesc": "Sterne ↓",
+    "occupancyDesc": "Auslastung ↓"
+  },
+  "filters": {
+    "allStars": "Alle Sterne",
+    "allCountries": "Alle Länder",
+    "stars3": "3 ★",
+    "stars4": "4 ★",
+    "stars5": "5 ★"
+  },
+  "stats": {
+    "totalRooms": "Zimmer insgesamt",
+    "trips": "Reisen mit Hotel",
+    "bookings": "Buchungen",
+    "revenue": "Umsatz"
+  },
+  "rooms": {
+    "title": "Zimmerangebot",
+    "type": "Typ",
+    "total": "Gesamt",
+    "price": "Preis/Nacht",
+    "booked": "Gebucht",
+    "occupancy": "Auslastung"
+  },
+  "sections": {
+    "trips": "Reisen mit diesem Hotel",
+    "bookings": "Buchungen in diesem Hotel",
+    "noTrips": "Derzeit nutzt keine Reise dieses Hotel",
+    "noBookings": "Noch keine Buchungen"
+  },
+  "columns": {
+    "client": "Kunde",
+    "trip": "Reise",
+    "room": "Zimmer",
+    "status": "Status",
+    "total": "Summe"
+  },
+  "stars_one": "{{count}} Stern",
+  "stars_other": "{{count}} Sterne",
+  "notFound": "Hotel nicht gefunden"
+}

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { layoutFor } from "@/data/seats"
-import { bookings as allBookings, clients as allClients } from "@/data"
+import { bookings as allBookings } from "@/data"
 import type { BusType, Cell, SeatStatus } from "@/types"
 
 import { SeatCellView } from "./seat-cell"
@@ -22,7 +22,12 @@ function applyBookings(
   selected: Set<number>,
 ): { deck: Cell[][]; totals: Record<SeatStatus, number> } {
   const tripBookings = allBookings.filter((b) => b.tripId === tripId)
-  const clientById = new Map(allClients.map((c) => [c.id, c]))
+  const seatIndex = new Map<number, { booking: (typeof tripBookings)[number]; passenger: (typeof tripBookings)[number]["passengers"][number] }>()
+  for (const b of tripBookings) {
+    for (const p of b.passengers) {
+      seatIndex.set(p.seatNumber, { booking: b, passenger: p })
+    }
+  }
   const totals: Record<SeatStatus, number> = {
     free: 0,
     selected: 0,
@@ -34,13 +39,12 @@ function applyBookings(
   const next = deck.map((row) =>
     row.map((cell) => {
       if (!cell || cell.type !== "seat") return cell
-      const booking = tripBookings.find((b) => b.seatNumber === cell.number)
+      const hit = seatIndex.get(cell.number)
       let status: SeatStatus = "free"
       let passengerName: string | undefined
-      if (booking) {
-        status = booking.status === "paid" ? "sold" : "reserved"
-        const c = clientById.get(booking.clientId)
-        if (c) passengerName = `${c.firstName} ${c.lastName}`
+      if (hit) {
+        status = hit.booking.status === "paid" ? "sold" : "reserved"
+        passengerName = `${hit.passenger.firstName} ${hit.passenger.lastName}`
       }
       if (selected.has(cell.number) && status === "free") status = "selected"
       totals[status]++

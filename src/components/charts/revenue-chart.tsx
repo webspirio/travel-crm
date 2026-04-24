@@ -41,7 +41,12 @@ export function RevenueChart() {
       <BarChart data={data} barCategoryGap="20%">
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis dataKey="month" tickLine={false} axisLine={false} />
-        <YAxis tickLine={false} axisLine={false} width={50} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          width={70}
+          tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : String(v))}
+        />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         {managers.map((m) => (

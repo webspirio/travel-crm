@@ -1,5 +1,6 @@
 import { Outlet } from "react-router"
 
+import { CommandPalette } from "@/components/command-palette"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
@@ -19,6 +20,7 @@ export function RootLayout() {
           </main>
         </SidebarInset>
       </SidebarProvider>
+      <CommandPalette />
       <Toaster richColors position="top-right" />
     </TooltipProvider>
   )

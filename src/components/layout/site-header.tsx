@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Link, useMatches } from "react-router"
 import { Fragment } from "react"
+import { Search } from "lucide-react"
 
 import {
   Breadcrumb,
@@ -10,8 +11,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { usePaletteStore } from "@/stores/palette-store"
 
 interface RouteHandle {
   titleKey?: string
@@ -19,6 +22,7 @@ interface RouteHandle {
 
 export function SiteHeader() {
   const { t } = useTranslation()
+  const setPaletteOpen = usePaletteStore((s) => s.setOpen)
   const matches = useMatches() as Array<{
     pathname: string
     handle?: RouteHandle
@@ -49,6 +53,18 @@ export function SiteHeader() {
           })}
         </BreadcrumbList>
       </Breadcrumb>
+      <Button
+        variant="outline"
+        size="sm"
+        className="ml-auto h-8 gap-2 text-muted-foreground"
+        onClick={() => setPaletteOpen(true)}
+      >
+        <Search className="size-3.5" />
+        <span className="hidden sm:inline">{t("palette.trigger")}</span>
+        <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium sm:inline">
+          ⌘K
+        </kbd>
+      </Button>
     </header>
   )
 }

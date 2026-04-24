@@ -12,6 +12,14 @@ import clientsUk from "./locales/uk/clients.json"
 import clientsDe from "./locales/de/clients.json"
 import bookingUk from "./locales/uk/booking.json"
 import bookingDe from "./locales/de/booking.json"
+import hotelsUk from "./locales/uk/hotels.json"
+import hotelsDe from "./locales/de/hotels.json"
+import calendarUk from "./locales/uk/calendar.json"
+import calendarDe from "./locales/de/calendar.json"
+import financeUk from "./locales/uk/finance.json"
+import financeDe from "./locales/de/finance.json"
+import managersUk from "./locales/uk/managers.json"
+import managersDe from "./locales/de/managers.json"
 
 export const SUPPORTED_LANGUAGES = ["uk", "de"] as const
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]
@@ -27,6 +35,10 @@ i18n
         trips: tripsUk,
         clients: clientsUk,
         booking: bookingUk,
+        hotels: hotelsUk,
+        calendar: calendarUk,
+        finance: financeUk,
+        managers: managersUk,
       },
       de: {
         common: commonDe,
@@ -34,12 +46,26 @@ i18n
         trips: tripsDe,
         clients: clientsDe,
         booking: bookingDe,
+        hotels: hotelsDe,
+        calendar: calendarDe,
+        finance: financeDe,
+        managers: managersDe,
       },
     },
     fallbackLng: "uk",
     supportedLngs: SUPPORTED_LANGUAGES,
     defaultNS: "common",
-    ns: ["common", "dashboard", "trips", "clients", "booking"],
+    ns: [
+      "common",
+      "dashboard",
+      "trips",
+      "clients",
+      "booking",
+      "hotels",
+      "calendar",
+      "finance",
+      "managers",
+    ],
     interpolation: { escapeValue: false },
     detection: {
       order: ["localStorage", "navigator"],

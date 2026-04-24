@@ -28,3 +28,6 @@ dist-ssr
 
 # DevContainer cache
 .devcontainer/.cache/
+
+# Local reference inputs (contain PII — never commit)
+.input/

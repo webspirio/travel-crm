@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router"
+import { ArrowRight } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { DataTable } from "@/components/data-table/data-table"
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
@@ -178,6 +181,18 @@ export default function ClientsListPage() {
                 <dd>{formatDate(openClient.createdAt, locale)}</dd>
               </dl>
               <Separator />
+              <div className="px-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  render={<Link to={`/clients/${openClient.id}`} />}
+                >
+                  {t("details.openFull")}
+                  <ArrowRight className="size-3.5" />
+                </Button>
+              </div>
+              <Separator />
               <div className="flex-1 overflow-y-auto px-4 pb-4">
                 <h3 className="mb-2 font-medium">{t("details.bookingHistory")}</h3>
                 {openClientBookings.length === 0 ? (
@@ -193,8 +208,8 @@ export default function ClientsListPage() {
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {b.trip && formatDate(b.trip.departureDate, locale)} · Seat #
-                          {b.seatNumber}
+                          {b.trip && formatDate(b.trip.departureDate, locale)} · Seats{" "}
+                          {b.passengers.map((p) => p.seatNumber).join(", ")}
                         </div>
                       </li>
                     ))}

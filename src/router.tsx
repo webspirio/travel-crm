@@ -8,7 +8,14 @@ const DashboardPage = lazy(() => import("@/pages/dashboard"))
 const TripsListPage = lazy(() => import("@/pages/trips/list"))
 const TripDetailPage = lazy(() => import("@/pages/trips/detail"))
 const ClientsListPage = lazy(() => import("@/pages/clients/list"))
+const ClientDetailPage = lazy(() => import("@/pages/clients/detail"))
 const NewBookingPage = lazy(() => import("@/pages/bookings/new"))
+const HotelsListPage = lazy(() => import("@/pages/hotels/list"))
+const HotelDetailPage = lazy(() => import("@/pages/hotels/detail"))
+const CalendarPage = lazy(() => import("@/pages/calendar"))
+const FinancePage = lazy(() => import("@/pages/finance"))
+const ManagersListPage = lazy(() => import("@/pages/managers/list"))
+const ManagerDetailPage = lazy(() => import("@/pages/managers/detail"))
 
 function PageFallback() {
   return (
@@ -50,8 +57,49 @@ export const router = createHashRouter([
       },
       {
         path: "clients",
-        element: lazyWrap(ClientsListPage),
         handle: { titleKey: "nav.clients" },
+        children: [
+          { index: true, element: lazyWrap(ClientsListPage) },
+          {
+            path: ":clientId",
+            element: lazyWrap(ClientDetailPage),
+            handle: { titleKey: "nav.clients" },
+          },
+        ],
+      },
+      {
+        path: "hotels",
+        handle: { titleKey: "nav.hotels" },
+        children: [
+          { index: true, element: lazyWrap(HotelsListPage) },
+          {
+            path: ":hotelId",
+            element: lazyWrap(HotelDetailPage),
+            handle: { titleKey: "nav.hotels" },
+          },
+        ],
+      },
+      {
+        path: "calendar",
+        element: lazyWrap(CalendarPage),
+        handle: { titleKey: "nav.calendar" },
+      },
+      {
+        path: "finance",
+        element: lazyWrap(FinancePage),
+        handle: { titleKey: "nav.finance" },
+      },
+      {
+        path: "managers",
+        handle: { titleKey: "nav.managers" },
+        children: [
+          { index: true, element: lazyWrap(ManagersListPage) },
+          {
+            path: ":managerId",
+            element: lazyWrap(ManagerDetailPage),
+            handle: { titleKey: "nav.managers" },
+          },
+        ],
       },
       {
         path: "bookings/new",

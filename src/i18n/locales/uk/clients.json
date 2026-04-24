@@ -15,7 +15,23 @@
     "birthDate": "Дата народження",
     "createdAt": "У базі з",
     "bookingHistory": "Історія бронювань",
-    "noBookings": "Ще немає бронювань"
+    "noBookings": "Ще немає бронювань",
+    "openFull": "Повний профіль"
+  },
+  "profile": {
+    "totalSpend": "Всього витрачено",
+    "bookingsCount": "Бронювань",
+    "lastTrip": "Останній тур",
+    "upcomingTrip": "Наступний тур",
+    "noUpcoming": "немає",
+    "preferredHotels": "Улюблені готелі",
+    "noPreferredHotels": "Поки немає даних",
+    "timeline": "Хронологія бронювань",
+    "notes": "Нотатки",
+    "notesPlaceholder": "Запишіть важливі деталі про клієнта...",
+    "notesSaved": "Нотатки збережено",
+    "notesSave": "Зберегти нотатки",
+    "back": "До списку клієнтів"
   },
   "empty": "Клієнтів не знайдено"
 }

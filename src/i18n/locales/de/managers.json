@@ -1,0 +1,32 @@
+{
+  "title": "Manager",
+  "subtitle": "Team-Leistung und Provisionen",
+  "search": "Nach Name suchen",
+  "empty": "Keine Manager gefunden",
+  "role": {
+    "owner": "Inhaber",
+    "manager": "Manager"
+  },
+  "columns": {
+    "name": "Manager",
+    "role": "Rolle",
+    "trips": "Reisen",
+    "bookings": "Buchungen",
+    "revenue": "Umsatz",
+    "commission": "Provision",
+    "conversion": "Conversion"
+  },
+  "stats": {
+    "trips": "Reisen",
+    "bookings": "Buchungen",
+    "revenue": "Umsatz",
+    "commission": "Provision"
+  },
+  "sections": {
+    "trips": "Reisen des Managers",
+    "bookings": "Buchungen des Managers",
+    "noTrips": "Noch keine Reisen",
+    "noBookings": "Noch keine Buchungen"
+  },
+  "notFound": "Manager nicht gefunden"
+}

@@ -1,0 +1,35 @@
+{
+  "title": "Фінанси",
+  "subtitle": "Дохід, платежі та комісії менеджерів",
+  "kpi": {
+    "totalRevenue": "Загальний дохід",
+    "outstanding": "Заборгованість",
+    "paidThisMonth": "Оплачено цього місяця",
+    "commission": "Комісія менеджерів"
+  },
+  "charts": {
+    "revenueTitle": "Дохід за місяцями",
+    "revenueSubtitle": "Розподіл по менеджерах",
+    "paidVsOutstandingTitle": "Оплачено vs заборгованість",
+    "paidVsOutstandingSubtitle": "По місяцях виїзду",
+    "paid": "Оплачено",
+    "outstanding": "Заборгованість"
+  },
+  "leaderboard": {
+    "title": "Лідери по комісії",
+    "manager": "Менеджер",
+    "bookings": "Бронювань",
+    "revenue": "Дохід",
+    "commission": "Комісія"
+  },
+  "upcoming": {
+    "title": "Найближчі платежі",
+    "subtitle": "Бронювання з терміном оплати у найближчі 30 днів",
+    "empty": "Немає платежів на найближчі 30 днів",
+    "client": "Клієнт",
+    "trip": "Тур",
+    "dueDate": "Дата оплати",
+    "balance": "Залишок",
+    "status": "Статус"
+  }
+}

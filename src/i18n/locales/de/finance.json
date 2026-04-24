@@ -1,0 +1,35 @@
+{
+  "title": "Finanzen",
+  "subtitle": "Umsatz, Zahlungen und Provisionen",
+  "kpi": {
+    "totalRevenue": "Gesamtumsatz",
+    "outstanding": "Offene Posten",
+    "paidThisMonth": "Diesen Monat bezahlt",
+    "commission": "Manager-Provision"
+  },
+  "charts": {
+    "revenueTitle": "Umsatz pro Monat",
+    "revenueSubtitle": "Aufgeschlüsselt nach Manager",
+    "paidVsOutstandingTitle": "Bezahlt vs. offen",
+    "paidVsOutstandingSubtitle": "Nach Abfahrtsmonat",
+    "paid": "Bezahlt",
+    "outstanding": "Offen"
+  },
+  "leaderboard": {
+    "title": "Provisions-Bestenliste",
+    "manager": "Manager",
+    "bookings": "Buchungen",
+    "revenue": "Umsatz",
+    "commission": "Provision"
+  },
+  "upcoming": {
+    "title": "Fällige Zahlungen",
+    "subtitle": "Buchungen mit Fälligkeit in den nächsten 30 Tagen",
+    "empty": "Keine fälligen Zahlungen in den nächsten 30 Tagen",
+    "client": "Kunde",
+    "trip": "Reise",
+    "dueDate": "Fälligkeit",
+    "balance": "Restbetrag",
+    "status": "Status"
+  }
+}

@@ -89,14 +89,26 @@ export interface Trip {
   bookedCount: number
 }
 
-export interface Booking {
+export interface Passenger {
   id: string
-  clientId: string
-  tripId: string
+  firstName: string
+  lastName: string
   seatNumber: number
   hotelId: string
   roomType: RoomType
+  price: number
+  extraFee?: number
+}
+
+export interface Booking {
+  id: string
+  contractNumber: string
+  clientId: string
+  tripId: string
+  passengers: Passenger[]
   totalPrice: number
+  paidAmount: number
+  dueDate: Date
   commission: number
   status: "draft" | "confirmed" | "paid" | "cancelled"
   managerId: string
