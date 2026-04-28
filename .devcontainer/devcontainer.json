@@ -4,7 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "forwardPorts": [5173],
+  "forwardPorts": [5174],
   "runArgs": ["--shm-size=1g"],
   "initializeCommand": "bash .devcontainer/init-host.sh",
   "mounts": [

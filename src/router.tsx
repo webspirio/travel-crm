@@ -16,6 +16,7 @@ const CalendarPage = lazy(() => import("@/pages/calendar"))
 const FinancePage = lazy(() => import("@/pages/finance"))
 const ManagersListPage = lazy(() => import("@/pages/managers/list"))
 const ManagerDetailPage = lazy(() => import("@/pages/managers/detail"))
+const ProposalPage = lazy(() => import("@/pages/proposal/proposal-page"))
 
 function PageFallback() {
   return (
@@ -107,5 +108,9 @@ export const router = createHashRouter([
         handle: { titleKey: "nav.newBooking" },
       },
     ],
+  },
+  {
+    path: "/proposal",
+    element: lazyWrap(ProposalPage),
   },
 ])

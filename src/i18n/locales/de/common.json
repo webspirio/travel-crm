@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "AnyTour CRM",
-    "tagline": "Busreisen nach Italien"
+    "tagline": "Busreisen — Italien, Spanien und weitere Ziele"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -11,7 +11,8 @@
     "clients": "Kunden",
     "managers": "Manager",
     "finance": "Finanzen",
-    "newBooking": "Neue Buchung"
+    "newBooking": "Neue Buchung",
+    "proposal": "Angebot"
   },
   "actions": {
     "create": "Erstellen",

@@ -7,6 +7,7 @@ import {
   CalendarDays,
   Wallet,
   UserRound,
+  FileText,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -25,4 +26,5 @@ export const navItems: NavItem[] = [
   { titleKey: "nav.managers", path: "/managers", icon: UserRound },
   { titleKey: "nav.finance", path: "/finance", icon: Wallet },
   { titleKey: "nav.newBooking", path: "/bookings/new", icon: PlusCircle },
+  { titleKey: "nav.proposal", path: "/proposal", icon: FileText },
 ]
