@@ -167,7 +167,7 @@ export function Investment() {
               <tr className="border-b">
                 <td className="px-4 py-3 lg:px-6 lg:py-4">
                   <span className="mr-1.5">🎁</span>
-                  Знижка 20% — лише при підписанні до 31 травня 2026
+                  Знижка 20% — лише при підписанні до 14 травня 2026
                 </td>
                 <td className="px-4 py-3 text-right font-semibold tabular-nums text-muted-foreground lg:px-6 lg:py-4">
                   −€1,625

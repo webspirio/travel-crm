@@ -101,11 +101,11 @@ export function NextSteps() {
               Що потрібно від вас зараз
             </p>
             <p className="font-heading mt-3 text-xl font-semibold leading-snug tracking-tight lg:text-2xl">
-              Дайте відповідь до 31 травня 2026 — обираємо дату 30-хв зустрічі, і за тиждень після
+              Дайте відповідь до 14 травня 2026 — обираємо дату 30-хв зустрічі, і за тиждень після
               підписання починаємо.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-background/70 lg:text-[0.95rem]">
-              Кожен день затримки — це місце в графіку, яке заблокує наступний клієнт. Після 31
+              Кожен день затримки — це місце в графіку, яке заблокує наступний клієнт. Після 14
               травня знижку 20% (€1,625) знято, і ціна Етапу 1 — €8,125.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -127,7 +127,9 @@ export function NextSteps() {
                 size="lg"
                 variant="ghost"
                 className="text-background hover:bg-background/10 hover:text-background"
-                render={<a href="#footer" />}
+                onClick={() =>
+                  document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 <Send className="size-4" />
                 Telegram
@@ -136,7 +138,9 @@ export function NextSteps() {
                 size="lg"
                 variant="ghost"
                 className="text-background hover:bg-background/10 hover:text-background"
-                render={<a href="#section-1" />}
+                onClick={() =>
+                  document.getElementById("section-1")?.scrollIntoView({ behavior: "smooth" })
+                }
               >
                 Перечитати
                 <ArrowRight className="size-4" />

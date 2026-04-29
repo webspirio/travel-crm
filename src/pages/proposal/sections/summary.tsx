@@ -33,7 +33,12 @@ export function Summary() {
             </p>
           </blockquote>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center print:hidden">
-            <Button size="lg" render={<a href="#footer" />}>
+            <Button
+              size="lg"
+              onClick={() =>
+                document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
               <Send className="size-4" />
               Зв'язатись у Telegram
             </Button>

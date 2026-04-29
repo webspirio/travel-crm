@@ -79,11 +79,23 @@ export function Hero() {
             <CalendarCheck className="size-4" />
             Записатись на 30-хв зустріч
           </Button>
-          <Button size="lg" variant="outline" render={<a href="#section-7" />}>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() =>
+              document.getElementById("section-7")?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
             <Send className="size-4" />
             Зв'язатись у Telegram
           </Button>
-          <Button size="lg" variant="ghost" render={<a href="#section-1" />}>
+          <Button
+            size="lg"
+            variant="ghost"
+            onClick={() =>
+              document.getElementById("section-1")?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
             Прокрутити деталі
             <ArrowDown className="size-4" />
           </Button>
