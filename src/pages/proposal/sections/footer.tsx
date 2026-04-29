@@ -36,7 +36,7 @@ export function Footer() {
             </a>
           </div>
           <p className="mt-4 max-w-xl text-balance text-xs italic text-muted-foreground">
-            Знижка 20% (€1,625) діє до 14 травня 2026. Після цієї дати вартість Етапу 1 — €8,125.
+            Знижка 20% (€1,625) діє до 14 травня 2026.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             © 2026 Webspirio · Агенція цифрових рішень для бізнесу

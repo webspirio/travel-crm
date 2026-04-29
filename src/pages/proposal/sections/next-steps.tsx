@@ -105,8 +105,7 @@ export function NextSteps() {
               підписання починаємо.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-background/70 lg:text-[0.95rem]">
-              Кожен день затримки — це місце в графіку, яке заблокує наступний клієнт. Після 14
-              травня знижку 20% (€1,625) знято, і ціна Етапу 1 — €8,125.
+              Кожен день затримки — це місце в графіку, яке заблокує наступний клієнт.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button
