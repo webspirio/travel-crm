@@ -45,10 +45,17 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton
                     render={
-                      <NavLink to={item.path} end={item.path === "/"}>
-                        <item.icon />
-                        <span>{t(item.titleKey)}</span>
-                      </NavLink>
+                      item.newTab ? (
+                        <a href={`#${item.path}`} target="_blank" rel="noopener noreferrer">
+                          <item.icon />
+                          <span>{t(item.titleKey)}</span>
+                        </a>
+                      ) : (
+                        <NavLink to={item.path} end={item.path === "/"}>
+                          <item.icon />
+                          <span>{t(item.titleKey)}</span>
+                        </NavLink>
+                      )
                     }
                   />
                 </SidebarMenuItem>

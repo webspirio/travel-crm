@@ -15,6 +15,7 @@ export interface NavItem {
   titleKey: string
   path: string
   icon: LucideIcon
+  newTab?: boolean
 }
 
 export const navItems: NavItem[] = [
@@ -26,5 +27,5 @@ export const navItems: NavItem[] = [
   { titleKey: "nav.managers", path: "/managers", icon: UserRound },
   { titleKey: "nav.finance", path: "/finance", icon: Wallet },
   { titleKey: "nav.newBooking", path: "/bookings/new", icon: PlusCircle },
-  { titleKey: "nav.proposal", path: "/proposal", icon: FileText },
+  { titleKey: "nav.proposal", path: "/proposal", icon: FileText, newTab: true },
 ]
