@@ -8,7 +8,10 @@ import { useTranslation } from "react-i18next"
 export function SplashScreen() {
   const { t } = useTranslation()
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div
+      role="status"
+      className="flex min-h-screen items-center justify-center bg-background"
+    >
       <div className="flex flex-col items-center gap-4">
         <div className="text-2xl font-semibold tracking-tight">
           {t("app.name")}
