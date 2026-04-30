@@ -35,6 +35,9 @@ dist-ssr
 # Local reference repos (read-only study material — never commit)
 .reference/
 
+# Sibling project drafts (UA Well — separate repo, do not commit here)
+.new-project/
+
 # Environment files (contain anon/service-role keys per developer)
 .env
 .env.local
