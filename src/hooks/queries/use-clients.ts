@@ -31,11 +31,12 @@ export function useClients() {
   return useQuery({
     queryKey: clientsKeys.lists(),
     queryFn: async (): Promise<Client[]> => {
-      // The clients_select_members policy already filters out
-      // deleted_at IS NOT NULL rows; no client-side filter needed.
+      // RLS allows owners to see deleted rows via the soft-delete branch
+      // of clients_select; the main list filters them client-side.
       const { data, error } = await supabase
         .from("clients")
         .select("*")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
       if (error) throw error
       return (data ?? []).map(toClient)

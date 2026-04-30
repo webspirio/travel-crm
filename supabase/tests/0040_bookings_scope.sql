@@ -3,8 +3,8 @@
 --
 -- The policy:
 --   private.has_role_on_tenant(owner|accountant)
---   OR sold_by_manager_id = current_manager_id()
---   OR trip_id in (private.bookings_visible_trip_ids())
+--   OR sold_by_manager_id = current_manager_id(tenant_id)
+--   OR trip_id in (private.bookings_visible_trip_ids(tenant_id))
 --
 -- Setup: one tenant. Three managers (A=trip-owner, B=trip-agent, C=seller).
 -- Plus one accountant. One booking sold by C on a trip owned by A with

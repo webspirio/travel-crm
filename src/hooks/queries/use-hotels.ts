@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 
+import { countryCodeToName } from "@/lib/countries"
 import { supabase } from "@/lib/supabase"
 import type { Hotel, RoomType } from "@/types"
 import type { Database } from "@/types/database"
@@ -28,7 +29,7 @@ function toHotel(row: HotelRow & { hotel_room_types: RoomTypeRow[] }): Hotel {
     id: row.id,
     name: row.name,
     city: row.city,
-    country: row.country === "IT" ? "Italy" : row.country,
+    country: countryCodeToName(row.country),
     stars: (row.stars ?? 3) as 3 | 4 | 5,
     rooms,
   }

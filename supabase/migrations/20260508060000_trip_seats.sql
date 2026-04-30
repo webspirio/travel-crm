@@ -45,9 +45,12 @@ create trigger trip_seats_aa_assert_tenant_id_immutable
   before update on public.trip_seats
   for each row execute function private.assert_tenant_id_immutable();
 
--- Same-tenant guard for trip_seats. booking_id is checked once that FK
--- exists (added in bookings migration). The held_by_manager_id is
--- checked here.
+-- Same-tenant guard for trip_seats. trip_id, held_by_manager_id, and
+-- booking_id all checked here. booking_id references public.bookings,
+-- which doesn't exist until the bookings migration runs — plpgsql
+-- resolves names at execution time so the forward reference is fine
+-- (trip_seats are first inserted via the materialise trigger with
+-- booking_id null, so this branch is never hit before bookings exists).
 create or replace function private.trip_seats_assert_same_tenant() returns trigger
 language plpgsql
 security definer
@@ -67,6 +70,14 @@ begin
     if ref_tenant is null or ref_tenant <> new.tenant_id then
       raise exception 'cross-tenant FK: managers.id=% (tenant=%) on trip_seats.tenant_id=%',
         new.held_by_manager_id, ref_tenant, new.tenant_id;
+    end if;
+  end if;
+
+  if new.booking_id is not null then
+    select tenant_id into ref_tenant from public.bookings where id = new.booking_id;
+    if ref_tenant is null or ref_tenant <> new.tenant_id then
+      raise exception 'cross-tenant FK: bookings.id=% (tenant=%) on trip_seats.tenant_id=%',
+        new.booking_id, ref_tenant, new.tenant_id;
     end if;
   end if;
 

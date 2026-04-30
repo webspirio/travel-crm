@@ -17,8 +17,8 @@
 -- Per-entity overrides:
 --   - bookings: scope = seller OR trip-owner OR trip-agent (managers);
 --     owners + accountants see all. Driven by
---     private.bookings_visible_trip_ids() so the planner evaluates the
---     visible-trips set as an InitPlan.
+--     private.bookings_visible_trip_ids(tenant_id) so the planner evaluates
+--     the visible-trips set as an InitPlan.
 --   - payments: scoped via bookings (same shape).
 --   - commission_ledger: managers see own rows only.
 --   - booking_counters: owners SELECT only.
@@ -31,10 +31,12 @@
 -- Helper for bookings/payments scope.
 -- ===================================================================
 
--- Returns the set of trip_ids the current manager owns OR is assigned to
--- as a trip_agent. Used by bookings_select_scoped (and the equivalent
--- payments policy via the inherited bookings filter).
-create or replace function private.bookings_visible_trip_ids()
+-- Returns the set of trip_ids in the given tenant that the current
+-- manager owns OR is assigned to as a trip_agent. Used by
+-- bookings_select_scoped (and the equivalent payments policy via the
+-- inherited bookings filter). Tenant-scoped so multi-tenant users
+-- resolve to the right manager row per-tenant.
+create or replace function private.bookings_visible_trip_ids(_tenant_id uuid)
 returns setof uuid
 language sql
 security definer
@@ -43,15 +45,61 @@ set search_path = ''
 as $$
   select t.id
     from public.trips t
-   where t.owner_manager_id = (select private.current_manager_id())
+   where t.tenant_id = _tenant_id
+     and t.owner_manager_id = (select private.current_manager_id(_tenant_id))
    union
   select ta.trip_id
     from public.trip_agents ta
-   where ta.manager_id = (select private.current_manager_id());
+   where ta.tenant_id = _tenant_id
+     and ta.manager_id = (select private.current_manager_id(_tenant_id));
 $$;
 
-revoke all on function private.bookings_visible_trip_ids() from public;
-grant execute on function private.bookings_visible_trip_ids() to authenticated;
+revoke all on function private.bookings_visible_trip_ids(uuid) from public;
+grant execute on function private.bookings_visible_trip_ids(uuid) to authenticated;
+
+-- ===================================================================
+-- Trip occupancy — opaque view for the seat map.
+-- ===================================================================
+--
+-- bookings_select_scoped restricts which booking rows a manager can read.
+-- The seat map needs to render true occupancy regardless of booking
+-- visibility — a manager who is neither the seller nor a trip_agent on a
+-- given trip must still see "this seat is taken" so they don't try to
+-- sell it. SECURITY DEFINER lets this function bypass bookings RLS, but
+-- the explicit has_role_on_tenant check keeps cross-tenant calls out.
+-- The function returns only seat_number + paid flag — no PII.
+create or replace function public.trip_occupied_seat_numbers(_trip_id uuid)
+returns table(seat_number smallint, paid boolean)
+language plpgsql
+security definer
+stable
+set search_path = ''
+as $$
+declare
+  trip_tenant uuid;
+begin
+  select tenant_id into trip_tenant from public.trips where id = _trip_id;
+  if trip_tenant is null then
+    raise exception 'trip not found' using errcode = 'P0002';
+  end if;
+  if not (select private.has_role_on_tenant(trip_tenant)) then
+    raise exception 'access denied' using errcode = '42501';
+  end if;
+
+  return query
+    select bp.seat_number, (b.status = 'paid')::boolean
+      from public.booking_passengers bp
+      join public.bookings b on b.id = bp.booking_id
+     where bp.trip_id = _trip_id
+       and bp.seat_number is not null
+       and b.deleted_at is null
+       and b.status in ('confirmed', 'partially_paid', 'paid');
+end;
+$$;
+
+revoke all on function public.trip_occupied_seat_numbers(uuid) from public;
+revoke all on function public.trip_occupied_seat_numbers(uuid) from anon;
+grant execute on function public.trip_occupied_seat_numbers(uuid) to authenticated;
 
 -- ===================================================================
 -- Booking lifecycle state-machine.
@@ -60,7 +108,8 @@ grant execute on function private.bookings_visible_trip_ids() to authenticated;
 -- Encodes the documented status graph. Terminal: cancelled, no_show.
 -- partially_paid → confirmed is NOT allowed: once money has been taken,
 -- backing out requires a refund flow (payments reversal), not a status
--- flip.
+-- flip. INSERT is constrained to status='draft' — every booking must
+-- enter the lifecycle through the documented starting state.
 
 create or replace function private.bookings_assert_status_transition() returns trigger
 language plpgsql
@@ -68,6 +117,17 @@ security definer
 set search_path = ''
 as $$
 begin
+  -- INSERT: only 'draft' is a legal starting state. Without this guard,
+  -- a caller could INSERT directly into 'paid' / 'no_show' / etc. and
+  -- skip the state machine entirely.
+  if tg_op = 'INSERT' then
+    if new.status <> 'draft' then
+      raise exception 'bookings must start in status=draft, got %', new.status
+        using errcode = '42501';
+    end if;
+    return new;
+  end if;
+
   if old.status = new.status then
     return new;
   end if;
@@ -88,7 +148,7 @@ end;
 $$;
 
 create trigger bookings_assert_status_transition
-  before update of status on public.bookings
+  before insert or update of status on public.bookings
   for each row execute function private.bookings_assert_status_transition();
 
 -- ===================================================================
@@ -307,8 +367,8 @@ create policy bookings_select_scoped on public.bookings
     deleted_at is null
     and (
       (select private.has_role_on_tenant(tenant_id, array['owner','accountant']::public.tenant_role[]))
-      OR sold_by_manager_id = (select private.current_manager_id())
-      OR trip_id in (select private.bookings_visible_trip_ids())
+      OR sold_by_manager_id = (select private.current_manager_id(tenant_id))
+      OR trip_id in (select private.bookings_visible_trip_ids(tenant_id))
     )
   );
 
@@ -391,7 +451,7 @@ create policy commission_ledger_select_scoped on public.commission_ledger
   for select to authenticated
   using (
     (select private.has_role_on_tenant(tenant_id, array['owner','accountant']::public.tenant_role[]))
-    OR manager_id = (select private.current_manager_id())
+    OR manager_id = (select private.current_manager_id(tenant_id))
   );
 
 -- Append-only: INSERT goes through the Phase-3 accrual trigger (security

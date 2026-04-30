@@ -15,6 +15,16 @@ select plan(8);
 
 create temp table _ids (k text primary key, v uuid);
 
+-- The booking-counter generator builds numbers as
+-- `to_char(year(now()) % 100, 'FM00') || lpad(seq, 3, '0')` — '26001'
+-- for year 2026, '27001' for 2027, etc. Tests derive the expected
+-- numbers the same way so they don't break on Jan 1.
+create or replace function pg_temp.bn(_seq int) returns text
+language sql stable as $$
+  select pg_catalog.to_char(pg_catalog.date_part('year', pg_catalog.now())::smallint % 100, 'FM00')
+      || pg_catalog.lpad(_seq::text, 3, '0');
+$$;
+
 do $$
 declare r record;
 begin
@@ -79,8 +89,9 @@ end $$;
 
 select results_eq(
   $$select array_agg(booking_number order by created_at) from public.bookings where tenant_id = (select v from _ids where k='tid_a')$$,
-  $$values (array['26001'::text, '26002', '26003', '26004', '26005'])$$,
-  'tenant A booking_numbers are gapless 26001..26005'
+  format($$values (array[%L::text, %L, %L, %L, %L])$$,
+         pg_temp.bn(1), pg_temp.bn(2), pg_temp.bn(3), pg_temp.bn(4), pg_temp.bn(5)),
+  'tenant A booking_numbers are gapless seq 1..5 with year-derived prefix'
 );
 
 -- 2: tenant B's counter is independent — first INSERT in tenant B is 26001.
@@ -94,8 +105,8 @@ values (
 
 select results_eq(
   $$select booking_number from public.bookings where tenant_id = (select v from _ids where k='tid_b')$$,
-  $$values ('26001'::text)$$,
-  'tenant B counter is independent — first booking is 26001'
+  format($$values (%L::text)$$, pg_temp.bn(1)),
+  'tenant B counter is independent — first booking is seq 1'
 );
 
 -- 3: booking_counters has one row per tenant-year (scoped to this test's
@@ -130,11 +141,11 @@ select results_eq(
 -- 6: status = 'confirmed' transition allocates contract_number.
 update public.bookings set status = 'confirmed'
  where tenant_id = (select v from _ids where k='tid_a')
-   and booking_number = '26001';
+   and booking_number = pg_temp.bn(1);
 
 select results_eq(
-  $$select contract_number from public.bookings where booking_number = '26001' and tenant_id = (select v from _ids where k='tid_a')$$,
-  $$values ('26006'::text)$$,
+  format($$select contract_number from public.bookings where booking_number = %L and tenant_id = (select v from _ids where k='tid_a')$$, pg_temp.bn(1)),
+  format($$values (%L::text)$$, pg_temp.bn(6)),
   'confirmed transition allocates next contract_number from same tenant counter'
 );
 
@@ -154,12 +165,12 @@ select results_eq(
 -- when the trigger re-fires on an unrelated UPDATE.
 update public.bookings
    set notes = 'updated', status = 'partially_paid'
- where booking_number = '26001'
+ where booking_number = pg_temp.bn(1)
    and tenant_id = (select v from _ids where k='tid_a');
 
 select results_eq(
-  $$select contract_number from public.bookings where booking_number = '26001' and tenant_id = (select v from _ids where k='tid_a')$$,
-  $$values ('26006'::text)$$,
+  format($$select contract_number from public.bookings where booking_number = %L and tenant_id = (select v from _ids where k='tid_a')$$, pg_temp.bn(1)),
+  format($$values (%L::text)$$, pg_temp.bn(6)),
   'contract_number is stable across subsequent status transitions'
 );
 

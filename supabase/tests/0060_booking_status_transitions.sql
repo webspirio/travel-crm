@@ -12,7 +12,7 @@
 
 begin;
 
-select plan(8);
+select plan(10);
 
 create temp table _ids (k text primary key, v uuid);
 
@@ -124,6 +124,23 @@ select throws_ok(
   end $body$$sql$, pg_temp.fresh_booking()),
   '42501', null,
   'cancelled is terminal: cancelled → confirmed rejected'
+);
+
+-- 9: INSERT must start in 'draft' — direct INSERT into 'paid' rejected.
+select throws_ok(
+  $sql$insert into public.bookings (tenant_id, client_id, trip_id, sold_by_manager_id, status)
+        values ((select v from _ids where k='tid'), (select v from _ids where k='client'),
+                (select v from _ids where k='trip'), (select v from _ids where k='mid'), 'paid')$sql$,
+  '42501', null,
+  'INSERT bookings with status=paid rejected by state machine'
+);
+
+-- 10: INSERT into 'draft' is the only legal starting state.
+select lives_ok(
+  $sql$insert into public.bookings (tenant_id, client_id, trip_id, sold_by_manager_id, status)
+        values ((select v from _ids where k='tid'), (select v from _ids where k='client'),
+                (select v from _ids where k='trip'), (select v from _ids where k='mid'), 'draft')$sql$,
+  'INSERT bookings with status=draft accepted'
 );
 
 select * from finish();

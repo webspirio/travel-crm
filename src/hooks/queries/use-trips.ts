@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query"
 
 import { fromDbBusType, fromDbTripStatus } from "@/lib/bus"
+import { OCCUPYING_STATUSES } from "@/lib/booking-status"
 import { supabase } from "@/lib/supabase"
 import type { Trip } from "@/types"
 import type { Database } from "@/types/database"
 
 type TripRow = Database["public"]["Tables"]["trips"]["Row"]
-type TripAgentRow = Database["public"]["Tables"]["trip_agents"]["Row"]
 type HotelBlockRow = Database["public"]["Tables"]["hotel_blocks"]["Row"]
 
 // Adapter that re-shapes a DB row into the UI Trip type. Mock data
@@ -15,7 +15,7 @@ type HotelBlockRow = Database["public"]["Tables"]["hotel_blocks"]["Row"]
 // `bookedCount` is computed client-side from booking_passengers length
 // where the consuming page needs it (cheap at AnyTour scale).
 function toTrip(
-  row: TripRow & { trip_agents?: TripAgentRow[] | null; hotel_blocks?: HotelBlockRow[] | null },
+  row: TripRow & { hotel_blocks?: HotelBlockRow[] | null },
   bookedCount: number,
 ): Trip {
   const hotelIds = Array.from(new Set((row.hotel_blocks ?? []).map((b) => b.hotel_id)))
@@ -44,15 +44,18 @@ export const tripsKeys = {
   byHotel: (hotelId: string) => [...tripsKeys.all, "by-hotel", hotelId] as const,
 }
 
-// Helper: fetch booked-passenger counts for a list of trip ids.
-// AnyTour scale (≤8 trips × 80 seats) makes a single round-trip + TS
-// aggregation cheaper than a per-trip count() call.
+// Helper: fetch booked-passenger counts for a list of trip ids. Only
+// passengers attached to bookings whose status is "occupying" (confirmed,
+// partially_paid, paid) — cancelled / no_show / draft bookings don't
+// hold a seat. AnyTour scale (≤8 trips × 80 seats) makes a single
+// round-trip + TS aggregation cheaper than a per-trip count() call.
 async function loadBookedCounts(tripIds: string[]): Promise<Map<string, number>> {
   if (tripIds.length === 0) return new Map()
   const { data, error } = await supabase
     .from("booking_passengers")
-    .select("trip_id")
+    .select("trip_id, bookings!inner(status)")
     .in("trip_id", tripIds)
+    .in("bookings.status", [...OCCUPYING_STATUSES])
   if (error) throw error
   const counts = new Map<string, number>()
   for (const p of data ?? []) counts.set(p.trip_id, (counts.get(p.trip_id) ?? 0) + 1)
@@ -65,7 +68,7 @@ export function useTrips() {
     queryFn: async (): Promise<Trip[]> => {
       const { data, error } = await supabase
         .from("trips")
-        .select("*, trip_agents(*), hotel_blocks(*)")
+        .select("*, hotel_blocks(*)")
         .order("departure_at", { ascending: true })
       if (error) throw error
       const counts = await loadBookedCounts((data ?? []).map((t) => t.id))
@@ -82,7 +85,7 @@ export function useTripById(id: string | undefined) {
     queryFn: async (): Promise<Trip | null> => {
       const { data, error } = await supabase
         .from("trips")
-        .select("*, trip_agents(*), hotel_blocks(*)")
+        .select("*, hotel_blocks(*)")
         .eq("id", id!)
         .maybeSingle()
       if (error) throw error
@@ -105,7 +108,7 @@ export function useTripsForManager(managerId: string | undefined) {
     queryFn: async (): Promise<Trip[]> => {
       const { data, error } = await supabase
         .from("trips")
-        .select("*, trip_agents(*), hotel_blocks(*)")
+        .select("*, hotel_blocks(*)")
         .eq("owner_manager_id", managerId!)
         .order("departure_at", { ascending: true })
       if (error) throw error
@@ -133,7 +136,7 @@ export function useTripsForHotel(hotelId: string | undefined) {
 
       const { data, error } = await supabase
         .from("trips")
-        .select("*, trip_agents(*), hotel_blocks(*)")
+        .select("*, hotel_blocks(*)")
         .in("id", tripIds)
         .order("departure_at", { ascending: true })
       if (error) throw error
@@ -143,5 +146,35 @@ export function useTripsForHotel(hotelId: string | undefined) {
       )
     },
     enabled: !!hotelId,
+  })
+}
+
+// Returns the set of seat numbers occupied on a trip by any
+// "occupying" booking, regardless of whether the caller can read those
+// booking rows via RLS. Backed by the SECURITY DEFINER RPC
+// public.trip_occupied_seat_numbers — used by the seat map so a manager
+// who is neither seller, trip-owner, nor trip-agent still sees true
+// occupancy and doesn't try to sell an already-taken seat.
+export const tripOccupancyKeys = {
+  all: ["trip-occupancy"] as const,
+  byTrip: (tripId: string) => [...tripOccupancyKeys.all, tripId] as const,
+}
+
+export interface OccupiedSeat {
+  seatNumber: number
+  paid: boolean
+}
+
+export function useOccupiedSeats(tripId: string | undefined) {
+  return useQuery({
+    queryKey: tripOccupancyKeys.byTrip(tripId ?? ""),
+    queryFn: async (): Promise<OccupiedSeat[]> => {
+      const { data, error } = await supabase.rpc("trip_occupied_seat_numbers", {
+        _trip_id: tripId!,
+      })
+      if (error) throw error
+      return (data ?? []).map((r) => ({ seatNumber: r.seat_number, paid: r.paid }))
+    },
+    enabled: !!tripId,
   })
 }

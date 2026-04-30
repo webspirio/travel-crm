@@ -108,13 +108,14 @@ create policy bookings_select on public.bookings
   for select to authenticated
   using (
     -- Live rows: scoped to seller, trip-owner, trip-agent, or
-    -- owner+accountant fast path. private.bookings_visible_trip_ids()
-    -- evaluates as InitPlan once per query.
+    -- owner+accountant fast path. private.bookings_visible_trip_ids() and
+    -- private.current_manager_id() are tenant-scoped so multi-tenant
+    -- managers resolve to the right manager row per-tenant.
     (deleted_at is null
        and (
          (select private.has_role_on_tenant(tenant_id, array['owner','accountant']::public.tenant_role[]))
-         or sold_by_manager_id = (select private.current_manager_id())
-         or trip_id in (select private.bookings_visible_trip_ids())
+         or sold_by_manager_id = (select private.current_manager_id(tenant_id))
+         or trip_id in (select private.bookings_visible_trip_ids(tenant_id))
        ))
     or
     -- Soft-deleted rows visible only to owners (restoration UI).

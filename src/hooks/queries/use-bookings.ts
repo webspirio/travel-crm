@@ -53,9 +53,12 @@ export function useBookings() {
   return useQuery({
     queryKey: bookingsKeys.lists(),
     queryFn: async (): Promise<Booking[]> => {
+      // RLS allows owners to see deleted rows via the soft-delete branch
+      // of bookings_select; the main list filters them client-side.
       const { data, error } = await supabase
         .from("bookings")
         .select("*, booking_passengers(*)")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
       if (error) throw error
       return (data ?? []).map((r) =>
@@ -73,6 +76,7 @@ export function useBookingById(id: string | undefined) {
         .from("bookings")
         .select("*, booking_passengers(*)")
         .eq("id", id!)
+        .is("deleted_at", null)
         .maybeSingle()
       if (error) throw error
       return data
@@ -91,6 +95,7 @@ export function useBookingsByTrip(tripId: string | undefined) {
         .from("bookings")
         .select("*, booking_passengers(*)")
         .eq("trip_id", tripId!)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
       if (error) throw error
       return (data ?? []).map((r) =>
@@ -109,6 +114,7 @@ export function useBookingsByClient(clientId: string | undefined) {
         .from("bookings")
         .select("*, booking_passengers(*)")
         .eq("client_id", clientId!)
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
       if (error) throw error
       return (data ?? []).map((r) =>

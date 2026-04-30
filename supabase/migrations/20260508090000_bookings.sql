@@ -210,9 +210,9 @@ create trigger booking_passengers_aa_assert_tenant_id_immutable
 -- a separate assert trigger named alphabetically before set_trip_id
 -- would see a null trip_id and raise.
 --
--- On UPDATE, trip_id is immutable in practice (booking_passengers don't
--- migrate between trips), so the same-tenant function only re-validates
--- the static FK shape.
+-- On UPDATE, trip_id is immutable: a passenger doesn't migrate between
+-- trips. The same-tenant function re-validates the static FK shape and
+-- explicitly rejects trip_id changes.
 create or replace function private.booking_passengers_set_and_assert() returns trigger
 language plpgsql
 security definer
@@ -223,7 +223,7 @@ declare
   ref_tenant uuid;
 begin
   -- 1. Copy trip_id from the parent booking on INSERT (or verify match
-  --    if the caller pre-set it).
+  --    if the caller pre-set it). On UPDATE, trip_id is immutable.
   if tg_op = 'INSERT' then
     select trip_id into parent_trip_id from public.bookings where id = new.booking_id;
     if parent_trip_id is null then
@@ -234,6 +234,11 @@ begin
     elsif new.trip_id <> parent_trip_id then
       raise exception 'booking_passengers.trip_id=% must match bookings.trip_id=%',
         new.trip_id, parent_trip_id;
+    end if;
+  elsif tg_op = 'UPDATE' then
+    if new.trip_id is distinct from old.trip_id then
+      raise exception 'booking_passengers.trip_id is immutable'
+        using errcode = '42501';
     end if;
   end if;
 

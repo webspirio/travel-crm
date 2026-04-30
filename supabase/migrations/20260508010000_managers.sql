@@ -1,4 +1,4 @@
--- Phase 2.3 — managers table + swap private.current_manager_id() body.
+-- Phase 2.3 — managers table + swap private.current_manager_id(_tenant_id) body.
 --
 -- `managers` is the per-tenant profile attached to an auth.users row. We
 -- keep auth.users as the identity source of truth and managers as the
@@ -10,10 +10,10 @@
 -- them in sync. No automatic auth.users → managers trigger — explicit
 -- creation lets owner setup stay deterministic and easy to test.
 --
--- private.current_manager_id() was declared as a stub in Phase 1 (returns
--- NULL) so the bookings_select_scoped policy could be authored without a
--- forward-reference. CREATE OR REPLACE swaps in the production body now
--- that public.managers exists.
+-- private.current_manager_id(_tenant_id) was declared as a stub in Phase 1
+-- (returns NULL) so the bookings_select_scoped policy could be authored
+-- without a forward-reference. CREATE OR REPLACE swaps in the production
+-- body now that public.managers exists.
 
 create table public.managers (
   id              uuid primary key default gen_random_uuid(),
@@ -58,10 +58,11 @@ alter table public.managers enable row level security;
 
 -- Swap the Phase-1 stub for the production body. The function is called
 -- from bookings_select_scoped and the per-tenant scope of payments /
--- commissions; extracting the lookup into a stable, security-definer
--- function lets the planner evaluate it as an initPlan (once per query)
--- rather than re-running the sub-select per row.
-create or replace function private.current_manager_id()
+-- commissions; the tenant_id parameter pins the lookup to the row's
+-- tenant so a user who is a manager in multiple tenants always resolves
+-- to the right row. Within a tenant the (tenant_id, user_id) unique
+-- constraint guarantees at most one match.
+create or replace function private.current_manager_id(_tenant_id uuid)
 returns uuid
 language sql
 security definer
@@ -70,7 +71,8 @@ set search_path = ''
 as $$
   select id
   from public.managers
-  where user_id   = (select auth.uid())
+  where tenant_id = _tenant_id
+    and user_id   = (select auth.uid())
     and is_active
   limit 1;
 $$;

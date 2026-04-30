@@ -56,7 +56,12 @@ $$;
 -- bookings_select_scoped policy can be authored without an import order
 -- dependency. Phase 2's managers migration does CREATE OR REPLACE on this
 -- to swap in the production body.
-create or replace function private.current_manager_id()
+--
+-- Tenant-scoped: callers pass the row's tenant_id explicitly. The
+-- managers table has unique(tenant_id, user_id), so within a tenant the
+-- result is unambiguous; the parameter forces correctness for users who
+-- are managers in more than one tenant.
+create or replace function private.current_manager_id(_tenant_id uuid)
 returns uuid
 language sql
 security definer
@@ -85,10 +90,10 @@ end;
 $$;
 
 revoke all on function private.has_role_on_tenant(uuid, public.tenant_role[]) from public;
-revoke all on function private.current_tenant_ids()  from public;
-revoke all on function private.current_manager_id()  from public;
+revoke all on function private.current_tenant_ids()    from public;
+revoke all on function private.current_manager_id(uuid) from public;
 
 grant execute on function private.has_role_on_tenant(uuid, public.tenant_role[]) to authenticated;
-grant execute on function private.current_tenant_ids()  to authenticated;
-grant execute on function private.current_manager_id()  to authenticated;
+grant execute on function private.current_tenant_ids()    to authenticated;
+grant execute on function private.current_manager_id(uuid) to authenticated;
 -- assert_tenant_id_immutable is only invoked from triggers; no grant needed.
