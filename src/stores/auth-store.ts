@@ -130,8 +130,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (!tenant) {
       // No active tenant_users row — revoke the session we just created
       // so the deactivated/unprovisioned user doesn't keep a JWT in
-      // localStorage, then surface a typed error.
-      await supabase.auth.signOut()
+      // localStorage, then surface a typed error. If signOut itself
+      // rejects (e.g. network blip), swallow the failure so the form
+      // still receives a structured { error } return — the unrevoked
+      // JWT is the lesser harm than an uncaught promise rejection
+      // breaking the form's error handling.
+      await supabase.auth.signOut().catch((err) => {
+        console.error("auth-store: signOut after no-tenant failed", err)
+      })
       return { error: new NoTenantError() }
     }
 
