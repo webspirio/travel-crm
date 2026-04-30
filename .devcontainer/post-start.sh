@@ -32,6 +32,7 @@ echo "  npm:      $(npm --version)"
 echo "  chromium: $(chromium --version 2>/dev/null || echo 'not found')"
 echo "  claude:   $(claude --version 2>/dev/null || echo 'not found')"
 echo "  ralphy:   $(ralphy --version 2>/dev/null || echo 'not found')"
+echo "  supabase: $(supabase --version 2>/dev/null || echo 'not found')"
 echo ""
 
 if command -v chromium &>/dev/null; then

@@ -80,7 +80,10 @@ else
   npm ci
 fi
 
-echo "=== Phase 4: Bash history persistence ==="
+echo "=== Phase 4: Reference repositories ==="
+bash "$(dirname "$0")/clone-references.sh" || echo "WARN: reference clone partially failed (network?)"
+
+echo "=== Phase 5: Bash history persistence ==="
 sudo mkdir -p /commandhistory
 sudo chown node:node /commandhistory
 touch /commandhistory/.bash_history
@@ -95,6 +98,17 @@ export PROMPT_COMMAND="history -a; ${PROMPT_COMMAND:-}"
 shopt -s histappend
 HIST
 
+echo "=== Phase 6: Supabase tooling ==="
+# Image prefetch was intentionally dropped: hardcoding a tag here drifts from
+# whatever image the supabase-cli feature ships with, leading to a silent
+# bandwidth waste with no actual cache hit. `supabase start` pulls on demand
+# the first time it runs, which is good enough.
+if command -v supabase >/dev/null 2>&1; then
+  echo "  supabase: $(supabase --version)"
+else
+  echo "  WARN: supabase CLI not on PATH after devcontainer feature install"
+fi
+
 echo ""
 echo "=== Post-create setup complete! ==="
 echo "  chromium: $(chromium --version 2>/dev/null || echo 'not found')"
@@ -102,3 +116,4 @@ echo "  node:     $(node --version)"
 echo "  npm:      $(npm --version)"
 echo "  claude:   $(claude --version 2>/dev/null || echo 'not found')"
 echo "  ralphy:   $(ralphy --version 2>/dev/null || echo 'not found')"
+echo "  supabase: $(supabase --version 2>/dev/null || echo 'not found')"

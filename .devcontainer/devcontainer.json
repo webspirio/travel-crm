@@ -2,16 +2,30 @@
   "name": "AnyTour CRM",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": false,
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers-extra/features/supabase-cli:1": {}
   },
-  "forwardPorts": [5174],
-  "runArgs": ["--shm-size=1g"],
+  "forwardPorts": [5174, 54321, 54322, 54323, 54324],
+  "portsAttributes": {
+    "5174":  { "label": "Vite" },
+    "54321": { "label": "Supabase API" },
+    "54322": { "label": "Supabase DB (Postgres)" },
+    "54323": { "label": "Supabase Studio" },
+    "54324": { "label": "Inbucket (mail)" }
+  },
+  "runArgs": ["--shm-size=2g"],
   "initializeCommand": "bash .devcontainer/init-host.sh",
   "mounts": [
     "source=travel-crm-bashhistory,target=/commandhistory,type=volume",
     "source=${localEnv:HOME}/.claude,target=/home/node/.claude,type=bind",
     "source=${localEnv:HOME}/.codex,target=/home/node/.codex,type=bind",
-    "source=${localEnv:HOME}/.gemini,target=/home/node/.gemini,type=bind"
+    "source=${localEnv:HOME}/.gemini,target=/home/node/.gemini,type=bind",
+    "source=${localEnv:HOME}/.gnupg,target=/home/node/.gnupg,type=bind,consistency=cached"
   ],
   "containerEnv": {
     "CLAUDE_CONFIG_DIR": "/home/node/.claude",
@@ -28,7 +42,8 @@
         "esbenp.prettier-vscode",
         "ms-vscode.vscode-typescript-next",
         "antfu.vite",
-        "anthropic.claude-code"
+        "anthropic.claude-code",
+        "supabase.vscode-supabase-extension"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

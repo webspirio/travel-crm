@@ -31,3 +31,20 @@ dist-ssr
 
 # Local reference inputs (contain PII — never commit)
 .input/
+
+# Local reference repos (read-only study material — never commit)
+.reference/
+
+# Environment files (contain anon/service-role keys per developer)
+.env
+.env.local
+.env.*.local
+
+# Supabase local state (per-developer)
+supabase/.branches/
+supabase/.temp/
+supabase/seed.local.sql
+
+# Generated DB types (regenerated via `npm run db:types`)
+src/types/database.ts
+src/types/database.ts.tmp
