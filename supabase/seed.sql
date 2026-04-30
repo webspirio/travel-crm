@@ -290,50 +290,89 @@ begin
   end loop;
 
   -- ~24 bookings, 1 passenger each, distributed across trips.
+  --
+  -- All bookings are inserted as 'draft' first. The target status is
+  -- then applied via UPDATE so the bookings_set_contract_number trigger
+  -- (BEFORE UPDATE OF status) fires and allocates contract_number on
+  -- transitions into 'confirmed'. paid_amount_eur is set consistently
+  -- with the final status: paid → total, partially_paid → ~half, others → 0.
+  --
   -- Variable names are v_* to avoid shadowing column names of the same
   -- name in WHERE / RETURNING clauses (#variable_conflict use_column
   -- already directs plpgsql to prefer columns, but explicit naming is
   -- still clearer for the next maintainer).
-  for i in 1..24 loop
-    v_trip_id := trip_ids[1 + ((i - 1) % 8)];
-    v_client_id := client_ids[1 + ((i - 1) % 30)];
-    v_hotel_id := hotel_ids[1 + ((i - 1) % 10)];
+  declare
+    target_status public.booking_status;
+    final_paid    numeric(10,2);
+    booking_total numeric(10,2) := 720;
+  begin
+    for i in 1..24 loop
+      v_trip_id := trip_ids[1 + ((i - 1) % 8)];
+      v_client_id := client_ids[1 + ((i - 1) % 30)];
+      v_hotel_id := hotel_ids[1 + ((i - 1) % 10)];
 
-    -- Pick lowest free seat on the trip.
-    select ts.seat_number into free_seat
-      from public.trip_seats ts
-     where ts.trip_id = v_trip_id and ts.status = 'free'
-     order by ts.seat_number
-     limit 1;
+      -- Pick lowest free seat on the trip.
+      select ts.seat_number into free_seat
+        from public.trip_seats ts
+       where ts.trip_id = v_trip_id and ts.status = 'free'
+       order by ts.seat_number
+       limit 1;
 
-    if free_seat is null then
-      continue;
-    end if;
+      if free_seat is null then
+        continue;
+      end if;
 
-    insert into public.bookings (tenant_id, client_id, trip_id, sold_by_manager_id,
-                                 status, total_price_eur, paid_amount_eur, commission_eur)
-    values (tid, v_client_id, v_trip_id,
-            (array[owner_mid, mid_olena, mid_andreas, mid_petra])[1 + ((i-1) % 4)],
-            (array['draft','confirmed','partially_paid','paid','confirmed','paid'])[1 + ((i-1) % 6)]::public.booking_status,
-            720, 0, 72)
-    returning id into v_booking_id;
+      target_status := (array['draft','confirmed','partially_paid','paid','confirmed','paid'])[1 + ((i-1) % 6)]::public.booking_status;
+      final_paid := case
+                      when target_status = 'paid'           then booking_total
+                      when target_status = 'partially_paid' then booking_total / 2
+                      else 0
+                    end;
 
-    -- One passenger occupying the free seat.
-    insert into public.booking_passengers (
-      tenant_id, booking_id, kind, first_name, last_name,
-      seat_number, hotel_id, room_type, price_total_eur
-    ) values (
-      tid, v_booking_id, 'adult',
-      (select first_name from public.clients where id = v_client_id),
-      (select last_name  from public.clients where id = v_client_id),
-      free_seat, v_hotel_id, 'double', 720
-    );
+      -- 1) INSERT as draft so the lifecycle trigger fires on the UPDATE.
+      insert into public.bookings (tenant_id, client_id, trip_id, sold_by_manager_id,
+                                   status, total_price_eur, paid_amount_eur, commission_eur)
+      values (tid, v_client_id, v_trip_id,
+              (array[owner_mid, mid_olena, mid_andreas, mid_petra])[1 + ((i-1) % 4)],
+              'draft', booking_total, 0, 72)
+      returning id into v_booking_id;
 
-    -- Mark seat sold.
-    update public.trip_seats ts
-       set status = 'sold', booking_id = v_booking_id
-     where ts.trip_id = v_trip_id and ts.seat_number = free_seat;
-  end loop;
+      -- 2) Transition to the target status. For partially_paid/paid we
+      --    must first pass through 'confirmed' (the state machine forbids
+      --    'draft' → 'partially_paid' or 'draft' → 'paid' directly).
+      if target_status in ('partially_paid', 'paid') then
+        update public.bookings set status = 'confirmed' where id = v_booking_id;
+        if target_status = 'partially_paid' then
+          update public.bookings
+             set status = 'partially_paid', paid_amount_eur = final_paid
+           where id = v_booking_id;
+        else
+          update public.bookings
+             set status = 'paid', paid_amount_eur = final_paid
+           where id = v_booking_id;
+        end if;
+      elsif target_status = 'confirmed' then
+        update public.bookings set status = 'confirmed' where id = v_booking_id;
+      end if;
+      -- 'draft' stays as inserted; no UPDATE needed.
+
+      -- One passenger occupying the free seat.
+      insert into public.booking_passengers (
+        tenant_id, booking_id, kind, first_name, last_name,
+        seat_number, hotel_id, room_type, price_total_eur
+      ) values (
+        tid, v_booking_id, 'adult',
+        (select first_name from public.clients where id = v_client_id),
+        (select last_name  from public.clients where id = v_client_id),
+        free_seat, v_hotel_id, 'double', booking_total
+      );
+
+      -- Mark seat sold.
+      update public.trip_seats ts
+         set status = 'sold', booking_id = v_booking_id
+       where ts.trip_id = v_trip_id and ts.seat_number = free_seat;
+    end loop;
+  end;
 
   raise notice 'AnyTour dev seed complete: 1 tenant, 4 managers, 10 hotels, 8 trips, 30 clients, ~24 bookings';
 end;

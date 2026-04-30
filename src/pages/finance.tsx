@@ -32,14 +32,12 @@ import {
 } from "@/components/ui/table"
 import { useBookings } from "@/hooks/queries/use-bookings"
 import { useClients } from "@/hooks/queries/use-clients"
+import { useHotels } from "@/hooks/queries/use-hotels"
 import { useManagers } from "@/hooks/queries/use-managers"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
-import { getManagerStats } from "@/lib/stats"
+import { computeDashboardStats, getManagerStats } from "@/lib/stats"
 import type { Locale } from "@/types"
-
-const TODAY = new Date("2026-04-23")
-const IN_30_DAYS = new Date(TODAY.getTime() + 30 * 24 * 60 * 60 * 1000)
 
 export default function FinancePage() {
   const { t, i18n } = useTranslation("finance")
@@ -48,8 +46,23 @@ export default function FinancePage() {
 
   const { data: trips = [] } = useTrips()
   const { data: clients = [] } = useClients()
+  const { data: hotels = [] } = useHotels()
   const { data: managers = [] } = useManagers()
   const { data: bookings = [] } = useBookings()
+
+  // Computed once, reused for the leaderboard, KPI strips, and the
+  // RevenueChart component (no double-aggregation).
+  const dashboardStats = useMemo(
+    () => computeDashboardStats(trips, bookings, hotels, managers),
+    [trips, bookings, hotels, managers],
+  )
+
+  // Stable identity across renders.
+  const today = useMemo(() => new Date(), [])
+  const in30Days = useMemo(
+    () => new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000),
+    [today],
+  )
 
   const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
   const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients])
@@ -59,7 +72,7 @@ export default function FinancePage() {
     let outstanding = 0
     let commission = 0
     let paidThisMonth = 0
-    const thisMonth = TODAY.toISOString().slice(0, 7)
+    const thisMonth = today.toISOString().slice(0, 7)
     for (const b of bookings) {
       revenue += b.totalPrice
       outstanding += Math.max(0, b.totalPrice - b.paidAmount)
@@ -106,12 +119,12 @@ export default function FinancePage() {
         .filter(
           (b) =>
             b.paidAmount < b.totalPrice &&
-            b.dueDate >= TODAY &&
-            b.dueDate <= IN_30_DAYS &&
+            b.dueDate >= today &&
+            b.dueDate <= in30Days &&
             b.status !== "cancelled",
         )
         .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime()),
-    [bookings],
+    [bookings, today, in30Days],
   )
 
   return (
@@ -153,7 +166,7 @@ export default function FinancePage() {
             <CardDescription>{t("charts.revenueSubtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <RevenueChart />
+            <RevenueChart data={dashboardStats.revenueByMonth} managers={managers} />
           </CardContent>
         </Card>
 

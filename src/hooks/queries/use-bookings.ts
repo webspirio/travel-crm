@@ -7,16 +7,10 @@ import type { Database } from "@/types/database"
 type BookingRow = Database["public"]["Tables"]["bookings"]["Row"]
 type BookingPassengerRow = Database["public"]["Tables"]["booking_passengers"]["Row"]
 
-// Adapter: DB row + passengers → UI Booking. The DB normalises status
-// to 6 values (draft / confirmed / partially_paid / paid / cancelled /
-// no_show) but the UI Booking type currently only knows 4 — we collapse
-// partially_paid → confirmed and no_show → cancelled at the boundary
-// so the UI doesn't need a status-rendering rewrite in Phase 2.
-function dbStatusToUi(s: BookingRow["status"]): Booking["status"] {
-  if (s === "partially_paid") return "confirmed"
-  if (s === "no_show") return "cancelled"
-  return s as Booking["status"]
-}
+// Adapter: DB row + passengers → UI Booking. The DB and UI status
+// unions are aligned (6 values); the adapter passes status through
+// directly so the UI can distinguish partially_paid from confirmed
+// and no_show from cancelled (relevant for finance dashboards).
 
 function toPassenger(row: BookingPassengerRow): Passenger {
   return {
@@ -41,7 +35,7 @@ function toBooking(row: BookingRow & { booking_passengers: BookingPassengerRow[]
     paidAmount: Number(row.paid_amount_eur),
     dueDate: row.due_date ? new Date(row.due_date) : new Date(row.created_at),
     commission: Number(row.commission_eur),
-    status: dbStatusToUi(row.status),
+    status: row.status,
     managerId: row.sold_by_manager_id,
     createdAt: new Date(row.created_at),
   }

@@ -127,7 +127,7 @@ export default function DashboardPage() {
             <CardDescription>{t("charts.revenueSubtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <RevenueChart />
+            <RevenueChart data={stats.revenueByMonth} managers={managers} />
           </CardContent>
         </Card>
 

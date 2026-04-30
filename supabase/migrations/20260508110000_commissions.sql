@@ -34,7 +34,7 @@ create index commission_ledger_status_idx      on public.commission_ledger(tenan
 -- timestamps (paid_at, reversed_at) are set explicitly when the
 -- corresponding row is inserted.
 
-create trigger commission_ledger_assert_tenant_id_immutable
+create trigger commission_ledger_aa_assert_tenant_id_immutable
   before update on public.commission_ledger
   for each row execute function private.assert_tenant_id_immutable();
 

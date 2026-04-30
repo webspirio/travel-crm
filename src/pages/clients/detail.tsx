@@ -34,7 +34,7 @@ export default function ClientDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const { data: client } = useClientById(clientId)
+  const { data: client, isLoading: clientLoading } = useClientById(clientId)
   const { data: trips = [] } = useTrips()
   const { data: hotels = [] } = useHotels()
   const { data: bookings = [] } = useBookingsByClient(clientId)
@@ -74,6 +74,17 @@ export default function ClientDetailPage() {
     setDraftNote(persistedNote)
   }
 
+  if (clientLoading) {
+    return (
+      <div className="space-y-2">
+        <Button variant="ghost" size="sm" render={<Link to="/clients" />}>
+          <ArrowLeft className="size-4" />
+          {t("title")}
+        </Button>
+        <p className="text-muted-foreground">{tc("loading")}</p>
+      </div>
+    )
+  }
   if (!client || !stats) {
     return (
       <div className="space-y-2">

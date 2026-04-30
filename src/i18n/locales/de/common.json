@@ -3,6 +3,7 @@
     "name": "AnyTour CRM",
     "tagline": "Busreisen — Italien, Spanien und weitere Ziele"
   },
+  "loading": "Wird geladen…",
   "nav": {
     "dashboard": "Dashboard",
     "trips": "Reisen",
@@ -64,8 +65,10 @@
   "bookingStatus": {
     "draft": "Entwurf",
     "confirmed": "Bestätigt",
+    "partially_paid": "Teilweise bezahlt",
     "paid": "Bezahlt",
-    "cancelled": "Storniert"
+    "cancelled": "Storniert",
+    "no_show": "Nicht erschienen"
   },
   "seat": {
     "free": "Frei",

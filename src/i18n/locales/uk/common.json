@@ -3,6 +3,7 @@
     "name": "AnyTour CRM",
     "tagline": "Автобусні тури — Італія, Іспанія та інші напрямки"
   },
+  "loading": "Завантаження…",
   "nav": {
     "dashboard": "Дашборд",
     "trips": "Тури",
@@ -64,8 +65,10 @@
   "bookingStatus": {
     "draft": "Чернетка",
     "confirmed": "Підтверджено",
+    "partially_paid": "Частково оплачено",
     "paid": "Оплачено",
-    "cancelled": "Скасовано"
+    "cancelled": "Скасовано",
+    "no_show": "Не з'явився"
   },
   "seat": {
     "free": "Вільне",

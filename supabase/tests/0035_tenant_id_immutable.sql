@@ -38,28 +38,33 @@ select throws_ok(
   'clients UPDATE that flips tenant_id raises 42501'
 );
 
--- 2: hotels UPDATE that flips tenant_id raises 42501.
--- Picked over trips because trips also has trips_assert_same_tenant which
--- fires alphabetically first and masks the immutability trigger (raises
--- P0001 on the FK mismatch instead). hotels has no other trigger
--- competing for the BEFORE UPDATE slot, so we directly observe the
--- immutability trigger's 42501.
+-- 2: trips UPDATE that flips tenant_id raises 42501.
+-- The immutability triggers are named `<table>_aa_assert_tenant_id_immutable`
+-- so they sort alphabetically before `<table>_assert_same_tenant` and fire
+-- first. Result: 42501 (immutability) raises before P0001 (cross-tenant FK)
+-- has a chance, so the user sees a consistent error code regardless of
+-- which table they hit.
 with new_row as (
-  insert into public.hotels (tenant_id, name, city, country)
-  values ((select v from _ids where k='tid_a'), 'Imm Hotel', 'Rimini', 'IT')
-  returning id
+  insert into public.trips (
+    tenant_id, name, destination, origin, owner_manager_id, bus_type, capacity,
+    departure_at, return_at, base_price_eur, child_price_eur
+  ) values (
+    (select v from _ids where k='tid_a'), 'Imm Trip', 'Rimini', 'Prague',
+    (select v from _ids where k='mid_a'), 'bus_55', 4,
+    now() + interval '7 days', now() + interval '14 days', 100, 50
+  ) returning id
 )
-insert into _ids select 'hotel_a', id from new_row;
+insert into _ids select 'trip_a', id from new_row;
 
 select throws_ok(
   format(
-    $sql$update public.hotels set tenant_id = '%s' where id = '%s'$sql$,
+    $sql$update public.trips set tenant_id = '%s' where id = '%s'$sql$,
     (select v from _ids where k='tid_b'),
-    (select v from _ids where k='hotel_a')
+    (select v from _ids where k='trip_a')
   ),
   '42501',
   null,
-  'hotels UPDATE that flips tenant_id raises 42501'
+  'trips UPDATE that flips tenant_id raises 42501 (multi-FK table)'
 );
 
 -- 3: managers UPDATE that flips tenant_id raises.

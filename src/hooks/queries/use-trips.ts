@@ -88,13 +88,12 @@ export function useTripById(id: string | undefined) {
       if (error) throw error
       if (!data) return null
 
-      const { count, error: pxErr } = await supabase
-        .from("booking_passengers")
-        .select("*", { count: "exact", head: true })
-        .eq("trip_id", id!)
-      if (pxErr) throw pxErr
-
-      return toTrip(data as TripRow & { hotel_blocks: HotelBlockRow[] }, count ?? 0)
+      // bookedCount intentionally not fetched here — the trip detail
+      // page already loads passenger rows via useBookingsByTrip and can
+      // compute the count locally (via passengers.length sum) without
+      // an extra count(*) round-trip. List pages use loadBookedCounts()
+      // batched for the same reason.
+      return toTrip(data as TripRow & { hotel_blocks: HotelBlockRow[] }, 0)
     },
     enabled: !!id,
   })

@@ -28,7 +28,7 @@ create trigger routes_touch_updated_at
   before update on public.routes
   for each row execute function private.touch_updated_at();
 
-create trigger routes_assert_tenant_id_immutable
+create trigger routes_aa_assert_tenant_id_immutable
   before update on public.routes
   for each row execute function private.assert_tenant_id_immutable();
 
@@ -52,7 +52,7 @@ create table public.route_stops (
 create index route_stops_tenant_id_idx on public.route_stops(tenant_id);
 create index route_stops_route_id_idx  on public.route_stops(route_id);
 
-create trigger route_stops_assert_tenant_id_immutable
+create trigger route_stops_aa_assert_tenant_id_immutable
   before update on public.route_stops
   for each row execute function private.assert_tenant_id_immutable();
 

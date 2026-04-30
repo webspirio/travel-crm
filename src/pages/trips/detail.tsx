@@ -23,7 +23,7 @@ export default function TripDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const { data: trip } = useTripById(tripId)
+  const { data: trip, isLoading: tripLoading } = useTripById(tripId)
   const { data: tripBookings = [] } = useBookingsByTrip(tripId)
   const { data: hotels = [] } = useHotels()
 
@@ -31,6 +31,17 @@ export default function TripDetailPage() {
     () => (trip ? hotels.filter((h) => trip.hotelIds.includes(h.id)) : []),
     [trip, hotels],
   )
+  if (tripLoading) {
+    return (
+      <div className="space-y-2">
+        <Button variant="ghost" size="sm" render={<Link to="/trips" />}>
+          <ArrowLeft className="size-4" />
+          {t("title")}
+        </Button>
+        <p className="text-muted-foreground">{tc("loading")}</p>
+      </div>
+    )
+  }
   if (!trip) {
     return (
       <div className="space-y-2">

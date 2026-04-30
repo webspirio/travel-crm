@@ -64,6 +64,7 @@ grant execute on function private.bookings_visible_trip_ids() to authenticated;
 
 create or replace function private.bookings_assert_status_transition() returns trigger
 language plpgsql
+security definer
 set search_path = ''
 as $$
 begin
@@ -333,12 +334,15 @@ create policy bookings_delete_owners on public.bookings
   using ((select private.has_role_on_tenant(tenant_id, array['owner']::public.tenant_role[])));
 
 -- booking_passengers: scope inherited via the booking_id sub-select.
--- The same-tenant trigger and the FK already constrain cross-tenant
--- writes. Read scope = the booking is visible to the user.
+-- The has_role_on_tenant predicate is defense-in-depth alongside the
+-- same-tenant trigger (which catches cross-tenant FKs at write time);
+-- without it, the SELECT policy would be one layer thinner than every
+-- other domain table.
 create policy booking_passengers_select_scoped on public.booking_passengers
   for select to authenticated
   using (
-    booking_id in (select id from public.bookings)
+    (select private.has_role_on_tenant(tenant_id))
+    and booking_id in (select id from public.bookings)
   );
 
 create policy booking_passengers_insert_managers on public.booking_passengers
@@ -361,7 +365,8 @@ create policy booking_passengers_delete_managers on public.booking_passengers
 create policy payments_select_scoped on public.payments
   for select to authenticated
   using (
-    booking_id in (select id from public.bookings)
+    (select private.has_role_on_tenant(tenant_id))
+    and booking_id in (select id from public.bookings)
   );
 
 create policy payments_insert_managers on public.payments

@@ -41,7 +41,7 @@ create trigger trip_seats_touch_updated_at
   before update on public.trip_seats
   for each row execute function private.touch_updated_at();
 
-create trigger trip_seats_assert_tenant_id_immutable
+create trigger trip_seats_aa_assert_tenant_id_immutable
   before update on public.trip_seats
   for each row execute function private.assert_tenant_id_immutable();
 

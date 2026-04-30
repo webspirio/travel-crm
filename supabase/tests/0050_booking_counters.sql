@@ -115,11 +115,16 @@ select results_eq(
   'tenant A counter last_seq = 5 after 5 INSERTs'
 );
 
--- 5: contract_number is null on draft bookings.
+-- 5: contract_number is null on draft bookings (scoped to this test's
+-- tenants — the dev seed's anytour-dev tenant transitions some bookings
+-- to confirmed, which legitimately allocates contract_numbers).
 select results_eq(
-  $$select count(*)::int from public.bookings where contract_number is not null$$,
+  $$select count(*)::int from public.bookings
+       where contract_number is not null
+         and tenant_id in ((select v from _ids where k='tid_a'),
+                           (select v from _ids where k='tid_b'))$$,
   $$values (0)$$,
-  'no draft bookings have contract_number set'
+  'no draft bookings have contract_number set (scoped to this test)'
 );
 
 -- 6: status = 'confirmed' transition allocates contract_number.

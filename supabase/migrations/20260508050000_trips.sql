@@ -58,7 +58,7 @@ create trigger trips_touch_updated_at
   before update on public.trips
   for each row execute function private.touch_updated_at();
 
-create trigger trips_assert_tenant_id_immutable
+create trigger trips_aa_assert_tenant_id_immutable
   before update on public.trips
   for each row execute function private.assert_tenant_id_immutable();
 
@@ -133,7 +133,7 @@ create table public.trip_agents (
 create index trip_agents_tenant_id_idx  on public.trip_agents(tenant_id);
 create index trip_agents_manager_id_idx on public.trip_agents(manager_id);
 
-create trigger trip_agents_assert_tenant_id_immutable
+create trigger trip_agents_aa_assert_tenant_id_immutable
   before update on public.trip_agents
   for each row execute function private.assert_tenant_id_immutable();
 

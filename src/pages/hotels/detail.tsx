@@ -37,8 +37,10 @@ function bookingStatusVariant(
     case "paid":
       return "default"
     case "confirmed":
+    case "partially_paid":
       return "secondary"
     case "cancelled":
+    case "no_show":
       return "destructive"
     default:
       return "outline"
@@ -56,7 +58,7 @@ export default function HotelDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const { data: hotels = [] } = useHotels()
+  const { data: hotels = [], isLoading: hotelsLoading } = useHotels()
   const { data: trips = [] } = useTrips()
   const { data: bookings = [] } = useBookings()
 
@@ -150,6 +152,17 @@ export default function HotelDetailPage() {
     [t, tc, locale],
   )
 
+  if (hotelsLoading) {
+    return (
+      <div className="space-y-2">
+        <Button variant="ghost" size="sm" render={<Link to="/hotels" />}>
+          <ArrowLeft className="size-4" />
+          {t("title")}
+        </Button>
+        <p className="text-muted-foreground">{tc("loading")}</p>
+      </div>
+    )
+  }
   if (!hotel || !stats) {
     return (
       <div className="space-y-2">

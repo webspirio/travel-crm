@@ -40,7 +40,7 @@ export default function ManagerDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const { data: managers = [] } = useManagers()
+  const { data: managers = [], isLoading: managersLoading } = useManagers()
   const { data: trips = [] } = useTrips()
   const { data: bookings = [] } = useBookings()
   const { data: clients = [] } = useClients()
@@ -101,6 +101,17 @@ export default function ManagerDetailPage() {
     [tc, clientById, tripById, locale],
   )
 
+  if (managersLoading) {
+    return (
+      <div className="space-y-2">
+        <Button variant="ghost" size="sm" render={<Link to="/managers" />}>
+          <ArrowLeft className="size-4" />
+          {t("title")}
+        </Button>
+        <p className="text-muted-foreground">{tc("loading")}</p>
+      </div>
+    )
+  }
   if (!manager || !stats) {
     return (
       <div className="space-y-2">

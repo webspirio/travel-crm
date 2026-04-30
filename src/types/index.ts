@@ -110,7 +110,7 @@ export interface Booking {
   paidAmount: number
   dueDate: Date
   commission: number
-  status: "draft" | "confirmed" | "paid" | "cancelled"
+  status: "draft" | "confirmed" | "partially_paid" | "paid" | "cancelled" | "no_show"
   managerId: string
   createdAt: Date
 }

@@ -57,7 +57,7 @@ async function hydrateFromSession(session: Session | null): Promise<{
   }
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   user: null,
   tenant: null,
@@ -74,7 +74,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!authSubscription) {
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+        // TOKEN_REFRESHED and USER_UPDATED fire on silent token refreshes
+        // and metadata updates. Tenant + role can't change mid-session in
+        // Etap 1, so we skip the tenant_users SELECT and just update the
+        // session/user fields. SIGNED_IN / SIGNED_OUT / INITIAL_SESSION /
+        // PASSWORD_RECOVERY all need the full hydrate.
+        if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+          set({ session: newSession, user: newSession?.user ?? null })
+          return
+        }
+
         const { tenant, role } = await hydrateFromSession(newSession)
         set({
           session: newSession,
@@ -89,8 +99,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signIn: async (email, password) => {
+    // signInWithPassword fires onAuthStateChange('SIGNED_IN', session) on
+    // success; the subscription installed in init() handles the hydrate.
+    // No explicit get().init() — that would duplicate hydrateFromSession
+    // (and re-call getSession()) for no benefit.
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error) await get().init()
     return { error }
   },
 

@@ -36,7 +36,7 @@ create trigger hotel_blocks_touch_updated_at
   before update on public.hotel_blocks
   for each row execute function private.touch_updated_at();
 
-create trigger hotel_blocks_assert_tenant_id_immutable
+create trigger hotel_blocks_aa_assert_tenant_id_immutable
   before update on public.hotel_blocks
   for each row execute function private.assert_tenant_id_immutable();
 

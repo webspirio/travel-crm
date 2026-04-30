@@ -9,11 +9,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { useBookings } from "@/hooks/queries/use-bookings"
-import { useHotels } from "@/hooks/queries/use-hotels"
-import { useManagers } from "@/hooks/queries/use-managers"
-import { useTrips } from "@/hooks/queries/use-trips"
-import { computeDashboardStats } from "@/lib/stats"
+import type { DashboardStats, Manager } from "@/types"
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -23,12 +19,14 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ]
 
-export function RevenueChart() {
-  const { data: managers = [] } = useManagers()
-  const { data: trips = [] } = useTrips()
-  const { data: bookings = [] } = useBookings()
-  const { data: hotels = [] } = useHotels()
+type RevenueByMonth = DashboardStats["revenueByMonth"]
 
+interface RevenueChartProps {
+  data: RevenueByMonth
+  managers: Pick<Manager, "id" | "name">[]
+}
+
+export function RevenueChart({ data, managers }: RevenueChartProps) {
   const chartConfig: ChartConfig = useMemo(
     () =>
       Object.fromEntries(
@@ -43,19 +41,20 @@ export function RevenueChart() {
     [managers],
   )
 
-  const data = useMemo(() => {
-    const stats = computeDashboardStats(trips, bookings, hotels, managers)
-    return stats.revenueByMonth.map((row) => ({
-      ...row,
-      month: new Date(row.month + "-01").toLocaleDateString("en-US", {
-        month: "short",
-      }),
-    }))
-  }, [trips, bookings, hotels, managers])
+  const chartData = useMemo(
+    () =>
+      data.map((row) => ({
+        ...row,
+        month: new Date(row.month + "-01").toLocaleDateString("en-US", {
+          month: "short",
+        }),
+      })),
+    [data],
+  )
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[280px] w-full">
-      <BarChart data={data} barCategoryGap="20%">
+      <BarChart data={chartData} barCategoryGap="20%">
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis dataKey="month" tickLine={false} axisLine={false} />
         <YAxis
