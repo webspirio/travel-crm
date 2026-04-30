@@ -4,6 +4,8 @@ import { initReactI18next } from "react-i18next"
 
 import commonUk from "./locales/uk/common.json"
 import commonDe from "./locales/de/common.json"
+import authUk from "./locales/uk/auth.json"
+import authDe from "./locales/de/auth.json"
 import dashboardUk from "./locales/uk/dashboard.json"
 import dashboardDe from "./locales/de/dashboard.json"
 import tripsUk from "./locales/uk/trips.json"
@@ -30,6 +32,7 @@ i18n
   .init({
     resources: {
       uk: {
+        auth: authUk,
         common: commonUk,
         dashboard: dashboardUk,
         trips: tripsUk,
@@ -41,6 +44,7 @@ i18n
         managers: managersUk,
       },
       de: {
+        auth: authDe,
         common: commonDe,
         dashboard: dashboardDe,
         trips: tripsDe,
@@ -56,6 +60,7 @@ i18n
     supportedLngs: SUPPORTED_LANGUAGES,
     defaultNS: "common",
     ns: [
+      "auth",
       "common",
       "dashboard",
       "trips",
