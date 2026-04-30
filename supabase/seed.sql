@@ -84,3 +84,46 @@ begin
   return uid;
 end;
 $$;
+
+-- Create an auth.users row + tenant_users membership + managers row in
+-- one shot, returning the managers.id. Used by Phase 2 tests that need a
+-- manager for FK targets (bookings.sold_by_manager_id, trips.owner_manager_id).
+create or replace function tests.make_manager(
+  _tenant_id uuid,
+  _email text,
+  _role public.tenant_role default 'manager',
+  _display_name text default null
+) returns uuid
+language plpgsql
+as $$
+declare
+  uid uuid;
+  mid uuid;
+begin
+  uid := tests.make_member(_tenant_id, _email, _role, true);
+  insert into public.managers (tenant_id, user_id, display_name, email)
+  values (_tenant_id, uid, coalesce(_display_name, split_part(_email, '@', 1)), _email)
+  returning id into mid;
+  return mid;
+end;
+$$;
+
+-- Create a tenant + owner-membership + manager row in one shot, returning
+-- the new manager_id. Convenience for tests that don't care about the
+-- intermediate ids.
+create or replace function tests.make_tenant_with_owner(
+  _slug text,
+  _name text,
+  _owner_email text
+) returns table (tenant_id uuid, owner_manager_id uuid)
+language plpgsql
+as $$
+declare
+  tid uuid;
+  mid uuid;
+begin
+  tid := tests.make_tenant(_slug, _name);
+  mid := tests.make_manager(tid, _owner_email, 'owner');
+  return query select tid, mid;
+end;
+$$;
