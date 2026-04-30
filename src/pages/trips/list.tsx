@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { trips } from "@/data"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { ALL_TRIP_STATUSES } from "@/lib/trip-status"
 
 import { useTripColumns } from "./columns"
@@ -23,9 +23,11 @@ export default function TripsListPage() {
   const [destination, setDestination] = useState<string>("all")
   const [status, setStatus] = useState<string>("all")
 
+  const { data: trips = [] } = useTrips()
+
   const destinations = useMemo(
     () => [...new Set(trips.map((tr) => tr.destination))].sort(),
-    [],
+    [trips],
   )
 
   const filtered = useMemo(
@@ -35,7 +37,7 @@ export default function TripsListPage() {
           (destination === "all" || tr.destination === destination) &&
           (status === "all" || tr.status === status),
       ),
-    [destination, status],
+    [trips, destination, status],
   )
 
   const columns = useTripColumns()

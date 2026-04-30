@@ -8,9 +8,11 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { bookings, managers, trips } from "@/data"
-import { getManagerStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
+import { getManagerStats } from "@/lib/stats"
 import type { Locale, Manager } from "@/types"
 
 interface ManagerRow extends Manager {
@@ -35,13 +37,17 @@ export default function ManagersListPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const navigate = useNavigate()
 
+  const { data: managers = [] } = useManagers()
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+
   const rows: ManagerRow[] = useMemo(
     () =>
       managers.map((m) => ({
         ...m,
         ...getManagerStats(m.id, trips, bookings),
       })),
-    [],
+    [managers, trips, bookings],
   )
 
   const columns: ColumnDef<ManagerRow>[] = useMemo(

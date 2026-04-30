@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
-import { hotels, trips } from "@/data"
+import { useHotelById } from "@/hooks/queries/use-hotels"
+import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
 import { useBookingStore } from "@/stores/booking-store"
 import type { Locale } from "@/types"
@@ -11,8 +12,8 @@ export function StepPricing() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const { tripId, hotelId, roomType, update } = useBookingStore()
 
-  const trip = trips.find((tr) => tr.id === tripId)
-  const hotel = hotels.find((h) => h.id === hotelId)
+  const { data: trip } = useTripById(tripId ?? undefined)
+  const { data: hotel } = useHotelById(hotelId ?? undefined)
 
   const pricing = useMemo(() => {
     if (!trip || !hotel || !roomType) return null

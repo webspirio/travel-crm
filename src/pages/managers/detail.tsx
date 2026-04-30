@@ -14,9 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { bookings, clients, managers, trips } from "@/data"
-import { getManagerStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { getManagerStats } from "@/lib/stats"
 import type { Booking, Locale } from "@/types"
 
 import { useTripColumns } from "../trips/columns"
@@ -37,23 +40,28 @@ export default function ManagerDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const manager = useMemo(() => managers.find((m) => m.id === managerId), [managerId])
+  const { data: managers = [] } = useManagers()
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+  const { data: clients = [] } = useClients()
+
+  const manager = useMemo(() => managers.find((m) => m.id === managerId), [managers, managerId])
   const stats = useMemo(
     () => (manager ? getManagerStats(manager.id, trips, bookings) : null),
-    [manager],
+    [manager, trips, bookings],
   )
   const mgrTrips = useMemo(
     () => (manager ? trips.filter((tr) => tr.managerId === manager.id) : []),
-    [manager],
+    [manager, trips],
   )
   const mgrBookings = useMemo(
     () => (manager ? bookings.filter((b) => b.managerId === manager.id) : []),
-    [manager],
+    [manager, bookings],
   )
 
   const tripColumns = useTripColumns()
-  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [])
-  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [])
+  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients])
+  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
 
   const bookingColumns: ColumnDef<Booking>[] = useMemo(
     () => [

@@ -23,7 +23,7 @@ export function generate55SeatLayout(): BusLayout {
   for (let row = 0; row < 13; row++) {
     deck.push([makeSeat(seatNum++), makeSeat(seatNum++), null, makeSeat(seatNum++), makeSeat(seatNum++)])
   }
-  deck.push([makeSeat(seatNum++), makeSeat(seatNum++), makeSeat(seatNum++), null, special("toilet")])
+  deck.push([makeSeat(seatNum), makeSeat(seatNum + 1), makeSeat(seatNum + 2), null, special("toilet")])
 
   return { busType: "55", decks: [deck] }
 }
@@ -43,7 +43,7 @@ export function generate79SeatLayout(): BusLayout {
   for (let row = 0; row < 4; row++) {
     lower.push([makeSeat(seatNum++), makeSeat(seatNum++), null, makeSeat(seatNum++), makeSeat(seatNum++)])
   }
-  lower.push([makeSeat(seatNum++), makeSeat(seatNum++), makeSeat(seatNum++), null, special("toilet")])
+  lower.push([makeSeat(seatNum), makeSeat(seatNum + 1), makeSeat(seatNum + 2), null, special("toilet")])
 
   return { busType: "79", decks: [upper, lower] }
 }

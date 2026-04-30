@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
@@ -8,7 +9,11 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { managers, stats } from "@/data"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
+import { computeDashboardStats } from "@/lib/stats"
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -18,23 +23,35 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ]
 
-const chartConfig: ChartConfig = Object.fromEntries(
-  managers.map((m, i) => [
-    m.id,
-    {
-      label: m.name,
-      color: CHART_COLORS[i % CHART_COLORS.length],
-    },
-  ]),
-) satisfies ChartConfig
-
 export function RevenueChart() {
-  const data = stats.revenueByMonth.map((row) => ({
-    ...row,
-    month: new Date(row.month + "-01").toLocaleDateString("en-US", {
-      month: "short",
-    }),
-  }))
+  const { data: managers = [] } = useManagers()
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+  const { data: hotels = [] } = useHotels()
+
+  const chartConfig: ChartConfig = useMemo(
+    () =>
+      Object.fromEntries(
+        managers.map((m, i) => [
+          m.id,
+          {
+            label: m.name,
+            color: CHART_COLORS[i % CHART_COLORS.length],
+          },
+        ]),
+      ),
+    [managers],
+  )
+
+  const data = useMemo(() => {
+    const stats = computeDashboardStats(trips, bookings, hotels, managers)
+    return stats.revenueByMonth.map((row) => ({
+      ...row,
+      month: new Date(row.month + "-01").toLocaleDateString("en-US", {
+        month: "short",
+      }),
+    }))
+  }, [trips, bookings, hotels, managers])
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[280px] w-full">

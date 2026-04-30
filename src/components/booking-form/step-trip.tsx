@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { trips } from "@/data"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { useBookingStore } from "@/stores/booking-store"
@@ -15,10 +15,11 @@ export function StepTrip() {
   const { t: tt } = useTranslation("trips")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const { tripId, update } = useBookingStore()
+  const { data: trips = [] } = useTrips()
 
   const available = useMemo(
     () => trips.filter((tr) => tr.bookedCount < tr.capacity && tr.status !== "cancelled"),
-    [],
+    [trips],
   )
 
   return (

@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next"
 
-import { clients, hotels, trips } from "@/data"
+import { useClientById } from "@/hooks/queries/use-clients"
+import { useHotelById } from "@/hooks/queries/use-hotels"
+import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDateRange } from "@/lib/format"
 import { useBookingStore } from "@/stores/booking-store"
 import type { Locale } from "@/types"
@@ -12,9 +14,9 @@ export function StepSummary() {
   const { clientId, newClient, tripId, seatNumber, hotelId, roomType, pricing } =
     useBookingStore()
 
-  const client = clients.find((c) => c.id === clientId)
-  const trip = trips.find((tr) => tr.id === tripId)
-  const hotel = hotels.find((h) => h.id === hotelId)
+  const { data: client } = useClientById(clientId ?? undefined)
+  const { data: trip } = useTripById(tripId ?? undefined)
+  const { data: hotel } = useHotelById(hotelId ?? undefined)
 
   const clientLabel = client
     ? `${client.firstName} ${client.lastName} · ${client.email}`

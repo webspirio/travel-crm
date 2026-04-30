@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next"
 
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { hotels, trips } from "@/data"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useTripById } from "@/hooks/queries/use-trips"
 import { cn } from "@/lib/utils"
 import { useBookingStore } from "@/stores/booking-store"
 import type { RoomType } from "@/types"
@@ -13,7 +14,8 @@ export function StepHotel() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
   const { tripId, hotelId, roomType, update } = useBookingStore()
-  const trip = trips.find((tr) => tr.id === tripId)
+  const { data: trip } = useTripById(tripId ?? undefined)
+  const { data: hotels = [] } = useHotels()
 
   if (!trip) {
     return <p className="text-muted-foreground">{t("validation.pickTrip")}</p>

@@ -98,11 +98,14 @@ select results_eq(
   'tenant B counter is independent — first booking is 26001'
 );
 
--- 3: booking_counters has one row per tenant-year.
+-- 3: booking_counters has one row per tenant-year (scoped to this test's
+-- two tenants — the dev seed adds its own counter row for anytour-dev).
 select results_eq(
-  $$select count(*)::int from public.booking_counters$$,
+  $$select count(*)::int from public.booking_counters
+       where tenant_id in ((select v from _ids where k='tid_a'),
+                           (select v from _ids where k='tid_b'))$$,
   $$values (2)$$,
-  'booking_counters has one row per tenant-year'
+  'booking_counters has one row per tenant-year (scoped to this test)'
 );
 
 -- 4: tenant A counter shows last_seq = 5.

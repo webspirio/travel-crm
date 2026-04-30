@@ -30,9 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { bookings, clients, managers, trips } from "@/data"
-import { getManagerStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { getManagerStats } from "@/lib/stats"
 import type { Locale } from "@/types"
 
 const TODAY = new Date("2026-04-23")
@@ -43,8 +46,13 @@ export default function FinancePage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [])
-  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [])
+  const { data: trips = [] } = useTrips()
+  const { data: clients = [] } = useClients()
+  const { data: managers = [] } = useManagers()
+  const { data: bookings = [] } = useBookings()
+
+  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
+  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients])
 
   const totals = useMemo(() => {
     let revenue = 0
@@ -62,7 +70,7 @@ export default function FinancePage() {
       }
     }
     return { revenue, outstanding, commission, paidThisMonth }
-  }, [tripById])
+  }, [bookings, tripById])
 
   const paidVsOutstanding = useMemo(() => {
     const map = new Map<string, { paid: number; outstanding: number }>()
@@ -82,14 +90,14 @@ export default function FinancePage() {
         paid: v.paid,
         outstanding: v.outstanding,
       }))
-  }, [tripById])
+  }, [bookings, tripById])
 
   const leaderboard = useMemo(
     () =>
       managers
         .map((m) => ({ manager: m, ...getManagerStats(m.id, trips, bookings) }))
         .sort((a, b) => b.commission - a.commission),
-    [],
+    [managers, trips, bookings],
   )
 
   const upcoming = useMemo(
@@ -103,7 +111,7 @@ export default function FinancePage() {
             b.status !== "cancelled",
         )
         .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime()),
-    [],
+    [bookings],
   )
 
   return (

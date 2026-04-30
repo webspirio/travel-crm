@@ -203,43 +203,41 @@ create trigger booking_passengers_assert_tenant_id_immutable
   before update on public.booking_passengers
   for each row execute function private.assert_tenant_id_immutable();
 
--- BEFORE INSERT: copy trip_id from the parent bookings row. Idempotent —
--- if the caller pre-set trip_id matching bookings.trip_id, no change.
--- Mismatch raises (defense-in-depth alongside the same-tenant trigger).
-create or replace function private.booking_passengers_set_trip_id() returns trigger
+-- BEFORE INSERT: copy trip_id from the parent bookings row, then check
+-- every FK lives in the same tenant. Combined into a single trigger
+-- function so the trip_id assignment necessarily runs before the
+-- same-tenant validation — Postgres fires triggers in name order, and
+-- a separate assert trigger named alphabetically before set_trip_id
+-- would see a null trip_id and raise.
+--
+-- On UPDATE, trip_id is immutable in practice (booking_passengers don't
+-- migrate between trips), so the same-tenant function only re-validates
+-- the static FK shape.
+create or replace function private.booking_passengers_set_and_assert() returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
   parent_trip_id uuid;
-begin
-  select trip_id into parent_trip_id from public.bookings where id = new.booking_id;
-  if parent_trip_id is null then
-    raise exception 'booking_passengers.booking_id=% references missing booking', new.booking_id;
-  end if;
-  if new.trip_id is null then
-    new.trip_id := parent_trip_id;
-  elsif new.trip_id <> parent_trip_id then
-    raise exception 'booking_passengers.trip_id=% must match bookings.trip_id=%',
-      new.trip_id, parent_trip_id;
-  end if;
-  return new;
-end;
-$$;
-
-create trigger booking_passengers_set_trip_id
-  before insert on public.booking_passengers
-  for each row execute function private.booking_passengers_set_trip_id();
-
-create or replace function private.booking_passengers_assert_same_tenant() returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
   ref_tenant uuid;
 begin
+  -- 1. Copy trip_id from the parent booking on INSERT (or verify match
+  --    if the caller pre-set it).
+  if tg_op = 'INSERT' then
+    select trip_id into parent_trip_id from public.bookings where id = new.booking_id;
+    if parent_trip_id is null then
+      raise exception 'booking_passengers.booking_id=% references missing booking', new.booking_id;
+    end if;
+    if new.trip_id is null then
+      new.trip_id := parent_trip_id;
+    elsif new.trip_id <> parent_trip_id then
+      raise exception 'booking_passengers.trip_id=% must match bookings.trip_id=%',
+        new.trip_id, parent_trip_id;
+    end if;
+  end if;
+
+  -- 2. Same-tenant guards across booking, trip, and (optional) hotel.
   select tenant_id into ref_tenant from public.bookings where id = new.booking_id;
   if ref_tenant is null or ref_tenant <> new.tenant_id then
     raise exception 'cross-tenant FK: bookings.id=% (tenant=%) on booking_passengers.tenant_id=%',
@@ -264,8 +262,8 @@ begin
 end;
 $$;
 
-create trigger booking_passengers_assert_same_tenant
+create trigger booking_passengers_set_and_assert
   before insert or update on public.booking_passengers
-  for each row execute function private.booking_passengers_assert_same_tenant();
+  for each row execute function private.booking_passengers_set_and_assert();
 
 alter table public.booking_passengers enable row level security;

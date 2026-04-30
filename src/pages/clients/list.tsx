@@ -17,7 +17,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { bookings, clients, trips } from "@/data"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import type { Client, Locale } from "@/types"
 
@@ -36,6 +38,10 @@ export default function ClientsListPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const [openId, setOpenId] = useState<string | null>(null)
 
+  const { data: clients = [] } = useClients()
+  const { data: bookings = [] } = useBookings()
+  const { data: trips = [] } = useTrips()
+
   const enriched: EnrichedClient[] = useMemo(() => {
     const tripById = new Map(trips.map((tr) => [tr.id, tr]))
     return clients.map((c) => {
@@ -51,7 +57,7 @@ export default function ClientsListPage() {
         lastTripDate: last?.departureDate ?? null,
       }
     })
-  }, [])
+  }, [clients, bookings, trips])
 
   const columns: ColumnDef<EnrichedClient>[] = useMemo(
     () => [
@@ -132,7 +138,7 @@ export default function ClientsListPage() {
       .filter((b) => b.clientId === openClient.id)
       .map((b) => ({ ...b, trip: tripById.get(b.tripId) ?? null }))
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-  }, [openClient])
+  }, [openClient, bookings, trips])
 
   return (
     <div className="space-y-4">

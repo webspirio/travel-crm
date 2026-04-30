@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
 import {
@@ -35,7 +35,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { managers, trips } from "@/data"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { ALL_TRIP_STATUSES, tripStatusVariant } from "@/lib/trip-status"
@@ -56,10 +57,25 @@ export default function CalendarPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const dateFnsLocale = locale === "uk" ? uk : de
 
-  const [anchor, setAnchor] = useState(() => defaultMonthAnchor(trips))
+  const { data: trips = [] } = useTrips()
+  const { data: managers = [] } = useManagers()
+
+  const [anchor, setAnchor] = useState<Date>(() => startOfMonth(TODAY))
   const [destination, setDestination] = useState<string>("all")
   const [status, setStatus] = useState<string>("all")
   const [managerId, setManagerId] = useState<string>("all")
+
+  // Re-anchor once trips arrive so the calendar opens on the next
+  // upcoming-trip's month rather than a hard-coded TODAY (preserves
+  // the mock-data behavior of jumping to where the data lives). Only
+  // do this once, on first arrival of trips data.
+  const anchoredRef = useRef(false)
+  useEffect(() => {
+    if (!anchoredRef.current && trips.length > 0) {
+      setAnchor(defaultMonthAnchor(trips))
+      anchoredRef.current = true
+    }
+  }, [trips])
 
   const filtered = useMemo(
     () =>
@@ -69,12 +85,12 @@ export default function CalendarPage() {
           (status === "all" || tr.status === status) &&
           (managerId === "all" || tr.managerId === managerId),
       ),
-    [destination, status, managerId],
+    [trips, destination, status, managerId],
   )
 
   const destinations = useMemo(
     () => [...new Set(trips.map((tr) => tr.destination))].sort(),
-    [],
+    [trips],
   )
 
   const nextDeparture = useMemo(
@@ -170,7 +186,7 @@ export default function CalendarPage() {
           >
             <ChevronLeft />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setAnchor(defaultMonthAnchor(trips))}>
+          <Button variant="outline" size="sm" onClick={() => setAnchor(startOfMonth(TODAY))}>
             {t("today")}
           </Button>
           <Button

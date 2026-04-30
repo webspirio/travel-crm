@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { clients } from "@/data"
+import { useClients } from "@/hooks/queries/use-clients"
 import { useBookingStore } from "@/stores/booking-store"
 
 function initials(first: string, last: string) {
@@ -24,6 +24,8 @@ export function StepClient() {
   const { clientId, newClient, update } = useBookingStore()
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(Boolean(newClient))
+
+  const { data: clients = [] } = useClients()
 
   const filtered = query
     ? clients

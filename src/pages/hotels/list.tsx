@@ -12,8 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { bookings, hotels, trips } from "@/data"
-import { getHotelStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useTrips } from "@/hooks/queries/use-trips"
+import { getHotelStats } from "@/lib/stats"
 
 type SortKey = "nameAsc" | "starsDesc" | "occupancyDesc"
 
@@ -24,9 +26,13 @@ export default function HotelsListPage() {
   const [country, setCountry] = useState<string>("all")
   const [sortKey, setSortKey] = useState<SortKey>("occupancyDesc")
 
+  const { data: hotels = [] } = useHotels()
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+
   const countries = useMemo(
     () => [...new Set(hotels.map((h) => h.country))].sort(),
-    [],
+    [hotels],
   )
 
   const enriched = useMemo(
@@ -35,7 +41,7 @@ export default function HotelsListPage() {
         hotel: h,
         stats: getHotelStats(h.id, trips, bookings, hotels),
       })),
-    [],
+    [hotels, trips, bookings],
   )
 
   const filtered = useMemo(() => {

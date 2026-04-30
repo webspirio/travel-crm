@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { bookings, hotels, trips } from "@/data"
+import { useBookingsByTrip } from "@/hooks/queries/use-bookings"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDateRange } from "@/lib/format"
 import type { Locale, RoomType } from "@/types"
 
@@ -21,14 +23,13 @@ export default function TripDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const trip = useMemo(() => trips.find((tr) => tr.id === tripId), [tripId])
-  const tripBookings = useMemo(
-    () => (tripId ? bookings.filter((b) => b.tripId === tripId) : []),
-    [tripId],
-  )
+  const { data: trip } = useTripById(tripId)
+  const { data: tripBookings = [] } = useBookingsByTrip(tripId)
+  const { data: hotels = [] } = useHotels()
+
   const tripHotels = useMemo(
     () => (trip ? hotels.filter((h) => trip.hotelIds.includes(h.id)) : []),
-    [trip],
+    [trip, hotels],
   )
   if (!trip) {
     return (

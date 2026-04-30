@@ -2,8 +2,8 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { layoutFor } from "@/data/seats"
-import { bookings as allBookings } from "@/data"
+import { useBookingsByTrip } from "@/hooks/queries/use-bookings"
+import { layoutFor } from "@/lib/bus-layouts"
 import type { BusType, Cell, SeatStatus } from "@/types"
 
 import { SeatCellView } from "./seat-cell"
@@ -16,13 +16,17 @@ interface SeatMapProps {
   selected?: number[]
 }
 
+type TripBooking = NonNullable<ReturnType<typeof useBookingsByTrip>["data"]>[number]
+
 function applyBookings(
   deck: Cell[][],
-  tripId: string,
+  tripBookings: TripBooking[],
   selected: Set<number>,
 ): { deck: Cell[][]; totals: Record<SeatStatus, number> } {
-  const tripBookings = allBookings.filter((b) => b.tripId === tripId)
-  const seatIndex = new Map<number, { booking: (typeof tripBookings)[number]; passenger: (typeof tripBookings)[number]["passengers"][number] }>()
+  const seatIndex = new Map<
+    number,
+    { booking: TripBooking; passenger: TripBooking["passengers"][number] }
+  >()
   for (const b of tripBookings) {
     for (const p of b.passengers) {
       seatIndex.set(p.seatNumber, { booking: b, passenger: p })
@@ -58,10 +62,11 @@ export function SeatMap({ busType, tripId, onSelect, selected }: SeatMapProps) {
   const { t } = useTranslation()
   const selectedSet = useMemo(() => new Set(selected ?? []), [selected])
   const layout = useMemo(() => layoutFor(busType), [busType])
+  const { data: tripBookings = [] } = useBookingsByTrip(tripId)
 
   const processed = useMemo(
-    () => layout.decks.map((d) => applyBookings(d, tripId, selectedSet)),
-    [layout, tripId, selectedSet],
+    () => layout.decks.map((d) => applyBookings(d, tripBookings, selectedSet)),
+    [layout, tripBookings, selectedSet],
   )
 
   const renderDeck = (deck: Cell[][]) => (

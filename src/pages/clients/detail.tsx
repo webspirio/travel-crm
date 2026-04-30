@@ -15,9 +15,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { bookings, clients, hotels, trips } from "@/data"
-import { getClientStats } from "@/data/stats"
+import { useBookingsByClient } from "@/hooks/queries/use-bookings"
+import { useClientById } from "@/hooks/queries/use-clients"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { getClientStats } from "@/lib/stats"
 import { useClientNotesStore } from "@/stores/client-notes-store"
 import type { Locale } from "@/types"
 
@@ -31,17 +34,20 @@ export default function ClientDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const client = useMemo(() => clients.find((c) => c.id === clientId), [clientId])
+  const { data: client } = useClientById(clientId)
+  const { data: trips = [] } = useTrips()
+  const { data: hotels = [] } = useHotels()
+  const { data: bookings = [] } = useBookingsByClient(clientId)
+
   const stats = useMemo(
     () => (client ? getClientStats(client.id, trips, bookings, hotels) : null),
-    [client],
+    [client, trips, bookings, hotels],
   )
   const clientBookings = useMemo(() => {
     if (!client) return []
     const tripById = new Map(trips.map((tr) => [tr.id, tr]))
     const hotelById = new Map(hotels.map((h) => [h.id, h]))
     return bookings
-      .filter((b) => b.clientId === client.id)
       .map((b) => {
         const firstHotelId = b.passengers[0]?.hotelId
         const firstRoom = b.passengers[0]?.roomType
@@ -55,7 +61,7 @@ export default function ClientDetailPage() {
         }
       })
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-  }, [client])
+  }, [client, trips, hotels, bookings])
 
   const persistedNote = useClientNotesStore(
     (s) => (client ? s.notes[client.id] ?? "" : ""),

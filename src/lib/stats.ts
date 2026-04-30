@@ -1,10 +1,21 @@
+// Client-side stat aggregation. Mirrors the shape of the
+// `getXxxStats()` helpers from the deleted src/data/stats.ts so the
+// pages migrate from "import getManagerStats from '@/data/stats'" to
+// "import { getManagerStats } from '@/lib/stats'" with no logic change.
+//
+// Stat aggregation lives on the client (per the Phase 2 plan): pages
+// fetch raw rows via react-query and pass them in here. Postgres
+// views/RPCs are deferred to Etap 2 unless a screen is measurably slow
+// at 4-tenant scale.
+
 import type { Booking, DashboardStats, Hotel, Manager, RoomType, Trip } from "@/types"
 
-export function computeStats(
+export function computeDashboardStats(
   trips: Trip[],
   bookings: Booking[],
   hotels: Hotel[],
   managers: Manager[],
+  today: Date = new Date(),
 ): DashboardStats {
   const totalRevenue = bookings.reduce((sum, b) => sum + b.totalPrice, 0)
   const activeTripsCount = trips.filter((t) =>
@@ -15,7 +26,6 @@ export function computeStats(
     trips.length > 0
       ? trips.reduce((sum, t) => sum + t.bookedCount / t.capacity, 0) / trips.length
       : 0
-  const today = new Date("2026-04-23")
   const in30Days = new Date(today)
   in30Days.setDate(in30Days.getDate() + 30)
   const upcomingDepartures = trips.filter(
@@ -165,7 +175,7 @@ export function getClientStats(
   trips: Trip[],
   bookings: Booking[],
   hotels: Hotel[],
-  today: Date = new Date("2026-04-23"),
+  today: Date = new Date(),
 ): ClientStats {
   const clientBookings = bookings.filter((b) => b.clientId === clientId)
   const tripById = new Map(trips.map((t) => [t.id, t]))

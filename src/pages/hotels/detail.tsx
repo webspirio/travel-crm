@@ -23,9 +23,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { bookings, hotels, trips } from "@/data"
-import { getHotelStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
+import { getHotelStats } from "@/lib/stats"
 import type { Booking, Locale, RoomType } from "@/types"
 
 function bookingStatusVariant(
@@ -54,14 +56,18 @@ export default function HotelDetailPage() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const hotel = useMemo(() => hotels.find((h) => h.id === hotelId), [hotelId])
+  const { data: hotels = [] } = useHotels()
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+
+  const hotel = useMemo(() => hotels.find((h) => h.id === hotelId), [hotels, hotelId])
   const stats = useMemo(
     () => (hotel ? getHotelStats(hotel.id, trips, bookings, hotels) : null),
-    [hotel],
+    [hotel, trips, bookings, hotels],
   )
   const hotelTrips = useMemo(
     () => (hotel ? trips.filter((tr) => tr.hotelIds.includes(hotel.id)) : []),
-    [hotel],
+    [hotel, trips],
   )
   type HotelPassengerRow = {
     key: string
@@ -76,10 +82,10 @@ export default function HotelDetailPage() {
   }
   const hotelBookings = useMemo(
     () => (hotel ? bookings.filter((b) => b.passengers.some((p) => p.hotelId === hotel.id)) : []),
-    [hotel],
+    [hotel, bookings],
   )
   const tripColumns = useTripColumns()
-  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [])
+  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
 
   const hotelPassengerRows: HotelPassengerRow[] = useMemo(() => {
     if (!hotel) return []
