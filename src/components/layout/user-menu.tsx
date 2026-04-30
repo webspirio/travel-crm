@@ -46,7 +46,7 @@ export function UserMenu() {
             variant="ghost"
             size="icon"
             className="size-8 rounded-full"
-            aria-label={t("signOut")}
+            aria-label={t("menu.trigger")}
           >
             <Avatar className="size-8">
               <AvatarFallback className="text-xs">{initials}</AvatarFallback>
