@@ -2,6 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { useEffect } from "react"
 import { RouterProvider } from "react-router"
 
+import { AuthGate } from "@/components/auth/auth-gate"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { queryClient } from "@/lib/query-client"
 import { router } from "@/router"
@@ -20,7 +21,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+        <AuthGate>
+          <RouterProvider router={router} />
+        </AuthGate>
       </ThemeProvider>
     </QueryClientProvider>
   )
