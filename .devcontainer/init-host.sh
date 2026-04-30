@@ -5,8 +5,7 @@
 set -euo pipefail
 
 # Create bind-mount directories if missing
-mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini" "$HOME/.gnupg"
-chmod 700 "$HOME/.gnupg" 2>/dev/null || true
+mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini"
 
 # Extract Claude Code OAuth token from macOS Keychain → file
 # (Inside the container, ~/.claude is bind-mounted, so the file is accessible)

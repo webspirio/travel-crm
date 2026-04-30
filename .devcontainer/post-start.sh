@@ -5,18 +5,6 @@ set -euo pipefail
 NPM_GLOBAL_BIN="$(npm config get prefix)/bin"
 export PATH="$NPM_GLOBAL_BIN:$PATH"
 
-# GPG sockets: ~/.gnupg is a bind mount that doesn't support Unix sockets
-# ("Operation not supported"). Point GnuPG at /run/user/$UID instead, which
-# lives on container tmpfs. /run/user is empty on container start, so the
-# directory has to be (re)created here every boot.
-USER_RUN="/run/user/$(id -u)"
-if [ ! -d "$USER_RUN" ]; then
-  sudo mkdir -p "$USER_RUN"
-  sudo chown "$(id -u):$(id -g)" "$USER_RUN"
-  sudo chmod 700 "$USER_RUN"
-fi
-gpgconf --create-socketdir >/dev/null 2>&1 || true
-
 # Fallback: if claude wasn't installed via npm, symlink from VS Code extension
 if ! command -v claude &>/dev/null; then
   VSCODE_CLAUDE=$(find /home/node/.vscode-server/extensions/anthropic.claude-code-*/resources/native-binary/claude 2>/dev/null | head -1)

@@ -109,35 +109,6 @@ else
   echo "  WARN: supabase CLI not on PATH after devcontainer feature install"
 fi
 
-echo "=== Phase 7: GPG signing ==="
-# The host's ~/.gnupg is bind-mounted (Mac/Linux/WSL alike). Two issues
-# show up inside the container:
-#   1. pinentry-program in gpg-agent.conf may point to a host-only path
-#      (e.g. /opt/homebrew/bin/pinentry-mac on macOS). gpg-agent execs that
-#      path verbatim — if missing, signing fails with "No passphrase given".
-#   2. pinentry-curses needs to know which TTY to prompt on, via $GPG_TTY.
-HOST_PINENTRY=$(grep -E '^\s*pinentry-program' ~/.gnupg/gpg-agent.conf 2>/dev/null | awk '{print $2}')
-if [ -n "$HOST_PINENTRY" ] && [ ! -e "$HOST_PINENTRY" ]; then
-  CONTAINER_PINENTRY=$(command -v pinentry-curses || command -v pinentry || true)
-  if [ -n "$CONTAINER_PINENTRY" ]; then
-    sudo mkdir -p "$(dirname "$HOST_PINENTRY")"
-    sudo ln -sf "$CONTAINER_PINENTRY" "$HOST_PINENTRY"
-    echo "  pinentry shim: $HOST_PINENTRY -> $CONTAINER_PINENTRY"
-  else
-    echo "  WARN: no pinentry binary found in container; install pinentry-curses"
-  fi
-fi
-
-GPG_INIT='
-# GPG: pinentry needs to know the controlling TTY (set per-shell, not in env)
-export GPG_TTY=$(tty)
-gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1 || true'
-grep -q "GPG_TTY=" ~/.bashrc 2>/dev/null || echo "$GPG_INIT" >> ~/.bashrc
-grep -q "GPG_TTY=" ~/.zshrc 2>/dev/null || echo "$GPG_INIT" >> ~/.zshrc 2>/dev/null || true
-
-# Repo-local user.signingkey can override ~/.gitconfig — if commits push as
-# "unverified" on GitHub, check `git config --show-origin user.signingkey`.
-
 echo ""
 echo "=== Post-create setup complete! ==="
 echo "  chromium: $(chromium --version 2>/dev/null || echo 'not found')"
