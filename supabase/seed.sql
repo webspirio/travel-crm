@@ -30,6 +30,7 @@ revoke all on schema tests from public, anon, authenticated;
 create or replace function tests.impersonate_user(_email text)
 returns void
 language plpgsql
+set search_path = ''
 as $$
 declare
   uid uuid;
@@ -39,9 +40,9 @@ begin
   if uid is null then
     raise exception 'tests.impersonate_user: no auth.users row for email=%', _email;
   end if;
-  claims := jsonb_build_object('sub', uid::text, 'role', 'authenticated');
-  perform set_config('request.jwt.claims', claims::text, true);
-  perform set_config('role', 'authenticated', true);
+  claims := pg_catalog.jsonb_build_object('sub', uid::text, 'role', 'authenticated');
+  perform pg_catalog.set_config('request.jwt.claims', claims::text, true);
+  perform pg_catalog.set_config('role', 'authenticated', true);
 end;
 $$;
 
@@ -50,6 +51,7 @@ $$;
 create or replace function tests.make_tenant(_slug text, _name text)
 returns uuid
 language plpgsql
+set search_path = ''
 as $$
 declare
   tid uuid;
@@ -71,12 +73,15 @@ create or replace function tests.make_member(
   _is_active boolean default true
 ) returns uuid
 language plpgsql
+set search_path = ''
 as $$
 declare
-  uid uuid := gen_random_uuid();
+  uid uuid := pg_catalog.gen_random_uuid();
 begin
   insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
-  values (uid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', _email, crypt('test-password', gen_salt('bf')), now(), now(), now());
+  values (uid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', _email,
+          extensions.crypt('test-password', extensions.gen_salt('bf')),
+          pg_catalog.now(), pg_catalog.now(), pg_catalog.now());
 
   insert into public.tenant_users (tenant_id, user_id, role, is_active)
   values (_tenant_id, uid, _role, _is_active);
@@ -95,6 +100,7 @@ create or replace function tests.make_manager(
   _display_name text default null
 ) returns uuid
 language plpgsql
+set search_path = ''
 as $$
 declare
   uid uuid;
@@ -102,7 +108,9 @@ declare
 begin
   uid := tests.make_member(_tenant_id, _email, _role, true);
   insert into public.managers (tenant_id, user_id, display_name, email)
-  values (_tenant_id, uid, coalesce(_display_name, split_part(_email, '@', 1)), _email)
+  values (_tenant_id, uid,
+          coalesce(_display_name, pg_catalog.split_part(_email, '@', 1)),
+          _email)
   returning id into mid;
   return mid;
 end;
@@ -117,6 +125,7 @@ create or replace function tests.make_tenant_with_owner(
   _owner_email text
 ) returns table (tenant_id uuid, owner_manager_id uuid)
 language plpgsql
+set search_path = ''
 as $$
 declare
   tid uuid;
