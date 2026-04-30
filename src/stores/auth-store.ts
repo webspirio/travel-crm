@@ -4,6 +4,20 @@ import { create } from "zustand"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
+/**
+ * Thrown when authentication succeeds but the user has no active
+ * tenant_users row. The store treats this as a login failure: the
+ * just-created session is revoked via signOut() and this typed error is
+ * returned so the UI can render a specific banner instead of the generic
+ * "invalid credentials" one.
+ */
+export class NoTenantError extends Error {
+  constructor() {
+    super("no_tenant")
+    this.name = "NoTenantError"
+  }
+}
+
 type TenantRow = Database["public"]["Tables"]["tenants"]["Row"]
 type TenantUserRole = Database["public"]["Enums"]["tenant_role"]
 
@@ -99,12 +113,36 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   signIn: async (email, password) => {
-    // signInWithPassword fires onAuthStateChange('SIGNED_IN', session) on
-    // success; the subscription installed in init() handles the hydrate.
-    // No explicit get().init() — that would duplicate hydrateFromSession
-    // (and re-call getSession()) for no benefit.
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error }
+    // Hydrate inline (rather than waiting for onAuthStateChange) so the
+    // caller can navigate deterministically after this resolves. The
+    // subscription will still fire SIGNED_IN shortly after and re-run
+    // hydrateFromSession idempotently — accepted cost for simpler control
+    // flow at the call site.
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error }
+    if (!data.session) {
+      // signInWithPassword resolves with either error or session; this
+      // branch is defensive against future supabase-js shape changes.
+      return { error: new Error("no_session") }
+    }
+
+    const { tenant, role } = await hydrateFromSession(data.session)
+    if (!tenant) {
+      // No active tenant_users row — revoke the session we just created
+      // so the deactivated/unprovisioned user doesn't keep a JWT in
+      // localStorage, then surface a typed error.
+      await supabase.auth.signOut()
+      return { error: new NoTenantError() }
+    }
+
+    set({
+      session: data.session,
+      user: data.session.user,
+      tenant,
+      role,
+      isLoading: false,
+    })
+    return { error: null }
   },
 
   signOut: async () => {
