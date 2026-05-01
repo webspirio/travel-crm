@@ -36,7 +36,10 @@ function applyBookings(
   for (const b of tripBookings) {
     if (!isOccupying(b.status)) continue
     for (const p of b.passengers) {
-      seatIndex.set(p.seatNumber, { booking: b, passenger: p })
+      // Lap-infants (seatNumber === null) don't occupy a seat slot — skip.
+      if (p.seatNumber !== null) {
+        seatIndex.set(p.seatNumber, { booking: b, passenger: p })
+      }
     }
   }
   const totals: Record<SeatStatus, number> = {

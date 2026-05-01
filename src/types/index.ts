@@ -110,7 +110,8 @@ export interface Passenger {
   firstName: string
   lastName: string
   kind: PassengerKind
-  seatNumber: number
+  /** null for lap-infants and passengers without an assigned seat */
+  seatNumber: number | null
   hotelId: string
   roomType: RoomType
   price: number

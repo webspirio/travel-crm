@@ -18,7 +18,7 @@ function toPassenger(row: BookingPassengerRow): Passenger {
     firstName: row.first_name,
     lastName: row.last_name,
     kind: (row.kind ?? "adult") as PassengerKind,
-    seatNumber: row.seat_number ?? 0,
+    seatNumber: row.seat_number ?? null,
     hotelId: row.hotel_id ?? "",
     roomType: (row.room_type ?? "double") as RoomType,
     price: Number(row.price_total_eur),

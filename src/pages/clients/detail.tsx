@@ -52,7 +52,10 @@ export default function ClientDetailPage() {
       .map((b) => {
         const firstHotelId = b.passengers[0]?.hotelId
         const firstRoom = b.passengers[0]?.roomType
-        const seatList = b.passengers.map((p) => p.seatNumber).join(", ")
+        const seatList = b.passengers
+          .map((p) => p.seatNumber)
+          .filter((n): n is number => n !== null)
+          .join(", ")
         return {
           ...b,
           trip: tripById.get(b.tripId) ?? null,

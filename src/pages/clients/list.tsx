@@ -251,7 +251,10 @@ export default function ClientsListPage() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {b.trip && formatDate(b.trip.departureDate, locale)} · {t("details.seats")}{" "}
-                          {b.passengers.map((p) => p.seatNumber).join(", ")}
+                          {b.passengers
+                            .map((p) => p.seatNumber)
+                            .filter((n): n is number => n !== null)
+                            .join(", ") || "—"}
                         </div>
                       </li>
                     ))}

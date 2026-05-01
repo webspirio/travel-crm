@@ -14,12 +14,15 @@ import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
-import { useLegacyBookingDraft } from "@/stores/booking-store"
+import { useBookingStore, useLegacyBookingDraft } from "@/stores/booking-store"
 
 export default function NewBookingPage() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
   const navigate = useNavigate()
+  // Legacy selector drives all UI state in this page until Tasks 6-9 rewrite
+  // the step components. The mutation receives the NEW BookingDraft shape via
+  // useBookingStore.getState() at submit time. TODO(Task 9): migrate fully.
   const state = useLegacyBookingDraft()
   const { step, setStep, reset } = state
 
@@ -68,14 +71,14 @@ export default function NewBookingPage() {
       return
     }
 
-    // Last step — submit the booking.
+    // Last step — submit the booking using the new BookingDraft shape.
     createBooking.mutate(
-      { draft: state },
+      { draft: useBookingStore.getState() },
       {
-        onSuccess: ({ booking }) => {
-          toast.success(t("summary.toast", { bookingNumber: booking.booking_number }))
+        onSuccess: ({ bookingId, bookingNumber }) => {
+          toast.success(t("summary.toast", { bookingNumber }))
           reset()
-          void navigate(`/bookings/${booking.id}`)
+          void navigate(`/bookings/${bookingId}`)
         },
         onError: (err) => {
           toast.error(err.message)

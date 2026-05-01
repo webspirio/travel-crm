@@ -82,7 +82,7 @@ export default function TripDetailPage() {
   type PassengerRow = {
     key: string
     displayNumber: string
-    seatNumber: number
+    seatNumber: number | null
     name: string
     room: string
     price: number
@@ -99,13 +99,19 @@ export default function TripDetailPage() {
       bookingId: b.id,
     })),
   )
-  passengerRows.sort((a, b) => a.seatNumber - b.seatNumber)
+  // Null seat numbers (lap-infants) sort to the end.
+  passengerRows.sort((a, b) => (a.seatNumber ?? Infinity) - (b.seatNumber ?? Infinity))
 
   const passengerCols: ColumnDef<PassengerRow>[] = [
     {
       id: "seat",
       header: t("passengers.columns.seat"),
-      cell: ({ row }) => <span className="tabular-nums">#{row.original.seatNumber}</span>,
+      cell: ({ row }) =>
+        row.original.seatNumber !== null ? (
+          <span className="tabular-nums">#{row.original.seatNumber}</span>
+        ) : (
+          "—"
+        ),
     },
     {
       id: "contract",
