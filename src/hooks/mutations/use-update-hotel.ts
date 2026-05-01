@@ -38,7 +38,8 @@ export interface UpdateHotelInput {
  * - The composite trigger `hotel_room_types_assert_same_tenant`
  *   guarantees tenant isolation even if a stale ID slipped through.
  *
- * On success: invalidates hotelsKeys.detail(id) and hotelsKeys.all.
+ * On success: invalidates hotelsKeys.all (prefix-match covers all descendant
+ * keys, including detail(id)).
  */
 export function useUpdateHotel() {
   const queryClient = useQueryClient()
@@ -111,8 +112,10 @@ export function useUpdateHotel() {
       return data
     },
 
-    onSuccess: (_data, { id }) => {
-      void queryClient.invalidateQueries({ queryKey: hotelsKeys.detail(id) })
+    onSuccess: () => {
+      // hotelsKeys.all is ["hotels"] — react-query prefix-match invalidation
+      // covers all descendant keys including detail(id), so no explicit
+      // detail invalidation is needed.
       void queryClient.invalidateQueries({ queryKey: hotelsKeys.all })
     },
   })

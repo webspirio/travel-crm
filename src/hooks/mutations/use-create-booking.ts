@@ -1,17 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { requireTenant, resolveManagerId } from "@/lib/auth-guard"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { clientsKeys } from "@/hooks/queries/use-clients"
 import { tripsKeys, tripOccupancyKeys } from "@/hooks/queries/use-trips"
 import { tripSeatsKeys } from "@/hooks/queries/use-trip-seats"
-import { useAuthStore } from "@/stores/auth-store"
 import type { BookingDraft } from "@/stores/booking-store"
 import type { Client } from "@/types"
 import type { Database } from "@/types/database"
 
 type BookingRow = Database["public"]["Tables"]["bookings"]["Row"]
-type ManagerRow = Database["public"]["Tables"]["managers"]["Row"]
 
 export interface CreateBookingInput {
   /** Snapshot of the booking-store state after the last wizard step. */
@@ -49,33 +48,8 @@ export function useCreateBooking() {
   return useMutation<CreateBookingResult, Error, CreateBookingInput>({
     mutationFn: async ({ draft }) => {
       // ── Step 0: resolve auth identities ───────────────────────────────
-      const { tenant, user } = useAuthStore.getState()
-      if (!tenant?.id || !user?.id) throw new Error("no_session")
-
-      const tenantId = tenant.id
-      const userId = user.id
-
-      // Resolve manager id: cache first, then fresh SELECT on miss.
-      let managerId: string
-      const cachedManager = queryClient.getQueryData<ManagerRow | null>([
-        "managers",
-        "me",
-        userId,
-      ])
-      if (cachedManager) {
-        managerId = cachedManager.id
-      } else {
-        const { data: managerRow, error: managerErr } = await supabase
-          .from("managers")
-          .select("id")
-          .eq("user_id", userId)
-          .eq("is_active", true)
-          .limit(1)
-          .maybeSingle()
-        if (managerErr) throw managerErr
-        if (!managerRow) throw new Error("no_manager")
-        managerId = managerRow.id
-      }
+      const { tenantId, userId } = requireTenant()
+      const managerId = await resolveManagerId(queryClient, userId)
 
       // ── Step 1: resolve client id ──────────────────────────────────────
       let clientId = draft.clientId

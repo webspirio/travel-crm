@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { requireTenant, resolveManagerId } from "@/lib/auth-guard"
 import { paymentsKeys } from "@/hooks/queries/use-payments"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
-import { useAuthStore } from "@/stores/auth-store"
 import type { Database } from "@/types/database"
 
 type PaymentRow = Database["public"]["Tables"]["payments"]["Row"]
-type ManagerRow = Database["public"]["Tables"]["managers"]["Row"]
 type PaymentMethod = Database["public"]["Enums"]["payment_method"]
 
 export interface RecordPaymentInput {
@@ -34,6 +33,10 @@ export interface RecordPaymentInput {
  *
  * Auth is read inside mutationFn via useAuthStore.getState(); throws
  * "no_session" or "no_manager" on missing context.
+ *
+ * Named `useRecordPayment` rather than `useCreatePayment` — domain
+ * distinction: payments are *recorded against* an existing booking, not
+ * independently created.
  */
 export function useRecordPayment() {
   const queryClient = useQueryClient()
@@ -41,33 +44,8 @@ export function useRecordPayment() {
   return useMutation<PaymentRow, Error, RecordPaymentInput>({
     mutationFn: async ({ bookingId, amount, method, receivedAt, reference, notes }) => {
       // ── Step 0: resolve auth identities ────────────────────────────────
-      const { tenant, user } = useAuthStore.getState()
-      if (!tenant?.id || !user?.id) throw new Error("no_session")
-
-      const tenantId = tenant.id
-      const userId = user.id
-
-      // Resolve manager id: cache first, then fresh SELECT on miss.
-      let managerId: string
-      const cachedManager = queryClient.getQueryData<ManagerRow | null>([
-        "managers",
-        "me",
-        userId,
-      ])
-      if (cachedManager) {
-        managerId = cachedManager.id
-      } else {
-        const { data: managerRow, error: managerErr } = await supabase
-          .from("managers")
-          .select("id")
-          .eq("user_id", userId)
-          .eq("is_active", true)
-          .limit(1)
-          .maybeSingle()
-        if (managerErr) throw managerErr
-        if (!managerRow) throw new Error("no_manager")
-        managerId = managerRow.id
-      }
+      const { tenantId, userId } = requireTenant()
+      const managerId = await resolveManagerId(queryClient, userId)
 
       // ── Step 1: INSERT payment row ──────────────────────────────────────
       const insertPayload: Database["public"]["Tables"]["payments"]["Insert"] = {

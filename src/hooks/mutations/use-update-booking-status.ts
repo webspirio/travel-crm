@@ -19,10 +19,14 @@ interface UpdateResult {
 }
 
 /**
- * Flips the status of a single booking.
+ * Updates the status of a single booking by id.
  *
  * Auth guard: throws Error("no_session") when the store has no active
  * tenant — mirrors the pattern used in all other mutation hooks.
+ *
+ * Status transition validation is enforced by the DB-level state-machine
+ * trigger (`bookings_status_fsm`); invalid transitions are rejected at the
+ * Postgres layer, not here.
  *
  * On success, invalidates the following query keys so all downstream
  * views stay consistent:

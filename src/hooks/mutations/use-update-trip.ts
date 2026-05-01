@@ -24,7 +24,8 @@ export interface UpdateTripInput {
  *
  * Only fields present in `patch` (not undefined) are sent to the DB.
  *
- * On success: invalidates tripsKeys.detail(id) and tripsKeys.all.
+ * On success: invalidates tripsKeys.all (prefix-match covers all descendant
+ * keys, including detail(id)).
  */
 export function useUpdateTrip() {
   const queryClient = useQueryClient()
@@ -64,8 +65,10 @@ export function useUpdateTrip() {
       return data
     },
 
-    onSuccess: (_data, { id }) => {
-      void queryClient.invalidateQueries({ queryKey: tripsKeys.detail(id) })
+    onSuccess: () => {
+      // tripsKeys.all is ["trips"] — react-query prefix-match invalidation
+      // covers all descendant keys including detail(id), so no explicit
+      // detail invalidation is needed.
       void queryClient.invalidateQueries({ queryKey: tripsKeys.all })
     },
   })
