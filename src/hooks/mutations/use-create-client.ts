@@ -14,6 +14,7 @@ export interface CreateClientInput {
   phone: string
   nationality: "UA" | "DE"
   birthDate: Date | null
+  notes?: string | null
 }
 
 /**

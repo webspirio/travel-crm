@@ -46,6 +46,7 @@ export function useUpdateClient() {
           ? patch.birthDate.toISOString().split("T")[0]
           : null
       }
+      if (patch.notes !== undefined) dbPatch.notes = patch.notes
 
       const { data, error } = await supabase
         .from("clients")

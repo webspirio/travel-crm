@@ -16,13 +16,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { useUpdateClient } from "@/hooks/mutations/use-update-client"
 import { useBookingsByClient } from "@/hooks/queries/use-bookings"
 import { useClientById } from "@/hooks/queries/use-clients"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import { getClientStats } from "@/lib/stats"
-import { useClientNotesStore } from "@/stores/client-notes-store"
 import type { Locale } from "@/types"
 
 function initials(first: string, last: string) {
@@ -66,12 +66,13 @@ export default function ClientDetailPage() {
 
   const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-  const persistedNote = useClientNotesStore(
-    (s) => (client ? s.notes[client.id] ?? "" : ""),
-  )
-  const setNote = useClientNotesStore((s) => s.setNote)
+  const updateClient = useUpdateClient()
+  const persistedNote = client?.notes ?? ""
   const [draftNote, setDraftNote] = useState(persistedNote)
   const [lastPersisted, setLastPersisted] = useState(persistedNote)
+  // Sync draft when the server value changes (e.g. after a successful mutation
+  // invalidates the cache and the query refetches with the updated notes).
+  // This render-time state update avoids an extra render cycle.
   if (lastPersisted !== persistedNote) {
     setLastPersisted(persistedNote)
     setDraftNote(persistedNote)
@@ -101,8 +102,13 @@ export default function ClientDetailPage() {
   }
 
   const saveNote = () => {
-    setNote(client.id, draftNote)
-    toast.success(t("profile.notesSaved"))
+    updateClient.mutate(
+      { id: client.id, patch: { notes: draftNote } },
+      {
+        onSuccess: () => toast.success(t("profile.notesSaved")),
+        onError: (err) => toast.error(err.message),
+      },
+    )
   }
 
   return (
@@ -295,7 +301,7 @@ export default function ClientDetailPage() {
             <Button
               size="sm"
               onClick={saveNote}
-              disabled={draftNote === persistedNote}
+              disabled={draftNote === persistedNote || updateClient.isPending}
             >
               {t("profile.notesSave")}
             </Button>
