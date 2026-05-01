@@ -26,7 +26,17 @@
     "back": "Назад",
     "next": "Далі",
     "search": "Пошук",
-    "openProfile": "Відкрити профіль"
+    "openProfile": "Відкрити профіль",
+    "reset": "Скинути"
+  },
+  "pagination": {
+    "rowsSelected": "{{selected}} з {{total}} рядків обрано",
+    "rowsPerPage": "Рядків на сторінці",
+    "pageInfo": "Сторінка {{current}} з {{total}}",
+    "first": "Перша",
+    "previous": "Попередня",
+    "next": "Наступна",
+    "last": "Остання"
   },
   "palette": {
     "placeholder": "Пошук турів, клієнтів, готелів...",

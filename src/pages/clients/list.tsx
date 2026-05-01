@@ -250,7 +250,7 @@ export default function ClientsListPage() {
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {b.trip && formatDate(b.trip.departureDate, locale)} · Seats{" "}
+                          {b.trip && formatDate(b.trip.departureDate, locale)} · {t("details.seats")}{" "}
                           {b.passengers.map((p) => p.seatNumber).join(", ")}
                         </div>
                       </li>

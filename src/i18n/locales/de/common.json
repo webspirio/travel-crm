@@ -26,7 +26,17 @@
     "back": "Zurück",
     "next": "Weiter",
     "search": "Suchen",
-    "openProfile": "Profil öffnen"
+    "openProfile": "Profil öffnen",
+    "reset": "Zurücksetzen"
+  },
+  "pagination": {
+    "rowsSelected": "{{selected}} von {{total}} Zeile(n) ausgewählt",
+    "rowsPerPage": "Zeilen pro Seite",
+    "pageInfo": "Seite {{current}} von {{total}}",
+    "first": "Erste Seite",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "last": "Letzte Seite"
   },
   "palette": {
     "placeholder": "Reisen, Kunden, Hotels suchen...",

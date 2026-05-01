@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -128,6 +129,7 @@ export function PaymentFormDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("detail.payments.dialog.title")}</DialogTitle>
+          <DialogDescription className="sr-only">{t("detail.payments.dialog.title")}</DialogDescription>
         </DialogHeader>
 
         {/* Outstanding hint */}

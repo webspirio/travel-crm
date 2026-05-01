@@ -18,7 +18,9 @@
     "bookingHistory": "Історія бронювань",
     "noBookings": "Ще немає бронювань",
     "openFull": "Повний профіль",
-    "edit": "Редагувати"
+    "edit": "Редагувати",
+    "seats": "Місця",
+    "pax": "{{count}} пас."
   },
   "dialog": {
     "create": {

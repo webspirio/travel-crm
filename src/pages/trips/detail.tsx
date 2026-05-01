@@ -5,6 +5,8 @@ import { Link, useParams } from "react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 import { toast } from "sonner"
 
+import { Skeleton } from "@/components/ui/skeleton"
+
 import { SeatMap } from "@/components/bus/seat-map"
 import { DataTable } from "@/components/data-table/data-table"
 import { HotelCard } from "@/components/hotel/hotel-card"
@@ -54,12 +56,14 @@ export default function TripDetailPage() {
   )
   if (tripLoading) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-4">
         <Button variant="ghost" size="sm" render={<Link to="/trips" />}>
           <ArrowLeft className="size-4" />
           {t("title")}
         </Button>
-        <p className="text-muted-foreground">{tc("loading")}</p>
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-48" />
+        <Skeleton className="h-48 w-full" />
       </div>
     )
   }
@@ -70,7 +74,7 @@ export default function TripDetailPage() {
           <ArrowLeft className="size-4" />
           {t("title")}
         </Button>
-        <p className="text-muted-foreground">Trip not found.</p>
+        <p className="text-muted-foreground">{t("notFound")}</p>
       </div>
     )
   }
@@ -100,12 +104,12 @@ export default function TripDetailPage() {
   const passengerCols: ColumnDef<PassengerRow>[] = [
     {
       id: "seat",
-      header: "Seat",
+      header: t("passengers.columns.seat"),
       cell: ({ row }) => <span className="tabular-nums">#{row.original.seatNumber}</span>,
     },
     {
       id: "contract",
-      header: "Contract",
+      header: t("passengers.columns.contract"),
       cell: ({ row }) => (
         <Link
           to={`/bookings/${row.original.bookingId}`}
@@ -122,7 +126,7 @@ export default function TripDetailPage() {
     },
     {
       id: "room",
-      header: "Room",
+      header: t("passengers.columns.room"),
       cell: ({ row }) => tc(`room.${row.original.room}`),
     },
     {

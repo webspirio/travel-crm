@@ -127,5 +127,13 @@
       "abort": "Abbrechen"
     }
   },
-  "empty": "Keine Reisen gefunden"
+  "empty": "Keine Reisen gefunden",
+  "notFound": "Reise nicht gefunden",
+  "passengers": {
+    "columns": {
+      "seat": "Platz",
+      "contract": "Vertrag",
+      "room": "Zimmer"
+    }
+  }
 }

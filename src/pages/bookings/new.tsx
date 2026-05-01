@@ -93,7 +93,7 @@ export default function NewBookingPage() {
         </div>
         <Button variant="ghost" size="sm" onClick={reset}>
           <RotateCcw className="size-4" />
-          Reset
+          {tc("actions.reset")}
         </Button>
       </div>
 

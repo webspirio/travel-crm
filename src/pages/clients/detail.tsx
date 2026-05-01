@@ -273,8 +273,8 @@ export default function ClientDetailPage() {
                   <div className="mt-0.5 text-xs text-muted-foreground">
                     {b.trip && formatDate(b.trip.departureDate, locale)} · {b.hotel?.name ?? "—"}
                     {b.firstRoom && ` · ${tc(`room.${b.firstRoom}`)}`}
-                    {b.seatList && ` · Seats ${b.seatList}`}
-                    {b.passengers.length > 1 && ` · ${b.passengers.length} pax`}
+                    {b.seatList && ` · ${t("details.seats")} ${b.seatList}`}
+                    {b.passengers.length > 1 && ` · ${t("details.pax", { count: b.passengers.length })}`}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {formatDate(b.createdAt, locale)}

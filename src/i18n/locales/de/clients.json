@@ -18,7 +18,9 @@
     "bookingHistory": "Buchungshistorie",
     "noBookings": "Noch keine Buchungen",
     "openFull": "Volles Profil",
-    "edit": "Bearbeiten"
+    "edit": "Bearbeiten",
+    "seats": "Plätze",
+    "pax": "{{count}} Reisende"
   },
   "dialog": {
     "create": {

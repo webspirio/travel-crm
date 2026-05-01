@@ -193,7 +193,7 @@ export default function HotelDetailPage() {
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-semibold">
               {hotel.name}
-              <span className="flex" aria-label={`${hotel.stars} stars`}>
+              <span className="flex" aria-label={t("stars", { count: hotel.stars })}>
                 {Array.from({ length: hotel.stars }).map((_, i) => (
                   <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
                 ))}
