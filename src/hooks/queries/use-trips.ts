@@ -29,10 +29,16 @@ function toTrip(
     busType: fromDbBusType(row.bus_type),
     status: fromDbTripStatus(row.status),
     basePrice: Number(row.base_price_eur),
+    childPrice: Number(row.child_price_eur),
+    infantPrice: Number(row.infant_price_eur),
+    frontRowsCount: row.front_rows_count,
+    frontRowsSurcharge: Number(row.front_rows_surcharge_eur),
     managerId: row.owner_manager_id,
+    ownerManagerId: row.owner_manager_id,
     hotelIds,
     capacity: row.capacity,
     bookedCount,
+    notes: row.notes ?? null,
   }
 }
 

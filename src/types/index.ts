@@ -85,10 +85,16 @@ export interface Trip {
   busType: BusType
   status: TripStatus
   basePrice: number
+  childPrice: number
+  infantPrice: number
+  frontRowsCount: number
+  frontRowsSurcharge: number
   managerId: string
+  ownerManagerId: string
   hotelIds: string[]
   capacity: number
   bookedCount: number
+  notes: string | null
 }
 
 export type PassengerKind = Database["public"]["Enums"]["passenger_kind"]

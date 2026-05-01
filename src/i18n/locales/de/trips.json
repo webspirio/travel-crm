@@ -2,6 +2,7 @@
   "title": "Reisen",
   "subtitle": "Alle Busreisen und ihre Auslastung",
   "search": "Nach Name suchen",
+  "createCta": "Neue Reise",
   "columns": {
     "name": "Reise",
     "route": "Strecke",
@@ -23,6 +24,60 @@
     "bus": "Bus",
     "hotels": "Hotels",
     "clients": "Passagiere"
+  },
+  "details": {
+    "edit": "Reise bearbeiten"
+  },
+  "dialog": {
+    "create": {
+      "title": "Neue Reise",
+      "submit": "Reise erstellen"
+    },
+    "edit": {
+      "title": "Reise bearbeiten",
+      "submit": "Änderungen speichern"
+    },
+    "fields": {
+      "name": "Reisename",
+      "origin": "Abfahrtsort",
+      "destination": "Reiseziel",
+      "busType": "Bustyp",
+      "capacity": "Kapazität",
+      "owner": "Verantwortlicher Manager",
+      "departureAt": "Abfahrtsdatum und -uhrzeit",
+      "returnAt": "Rückkehrdatum und -uhrzeit",
+      "status": "Status",
+      "basePrice": "Grundpreis (€)",
+      "childPrice": "Kinderpreis (€)",
+      "infantPrice": "Kleinkindpreis (€)",
+      "frontRowsCount": "VIP-Reihen vorne",
+      "frontRowsSurcharge": "VIP-Aufpreis (€)",
+      "notes": "Notizen"
+    },
+    "busTypes": {
+      "55": "Bus mit 55 Sitzen",
+      "79": "Bus mit 79 Sitzen (Doppeldecker)"
+    },
+    "errors": {
+      "name": "Name ist erforderlich",
+      "origin": "Abfahrtsort ist erforderlich",
+      "destination": "Reiseziel ist erforderlich",
+      "ownerManagerId": "Bitte Manager auswählen",
+      "busType": "Bitte Bustyp auswählen",
+      "capacity": "Kapazität muss größer als 0 sein",
+      "departureAt": "Bitte Abfahrtsdatum angeben",
+      "returnAt": "Bitte Rückkehrdatum angeben",
+      "returnAfterDeparture": "Rückkehrdatum darf nicht vor dem Abfahrtsdatum liegen",
+      "basePriceEur": "Preis muss >= 0 sein",
+      "childPriceEur": "Preis muss >= 0 sein",
+      "infantPriceEur": "Preis muss >= 0 sein",
+      "frontRowsCount": "Wert muss >= 0 sein",
+      "frontRowsSurchargeEur": "Wert muss >= 0 sein"
+    },
+    "success": {
+      "created": "Reise erstellt",
+      "updated": "Reise aktualisiert"
+    }
   },
   "empty": "Keine Reisen gefunden"
 }
