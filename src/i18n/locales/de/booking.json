@@ -41,7 +41,8 @@
   "summary": {
     "title": "Daten prüfen",
     "confirmCta": "Buchung bestätigen",
-    "toast": "Buchung erstellt! 🎉"
+    "toast": "Buchung {{bookingNumber}} erstellt!",
+    "errorNoSession": "Sitzung ungültig. Bitte Seite neu laden und erneut versuchen."
   },
   "validation": {
     "selectClient": "Kunden auswählen oder neu anlegen",

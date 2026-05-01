@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Check, RotateCcw } from "lucide-react"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
 import { StepClient } from "@/components/booking-form/step-client"
@@ -12,13 +13,21 @@ import { StepTrip } from "@/components/booking-form/step-trip"
 import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
+import { useCurrentManager } from "@/hooks/use-current-manager"
+import { useAuthStore } from "@/stores/auth-store"
 import { useBookingStore } from "@/stores/booking-store"
 
 export default function NewBookingPage() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
+  const navigate = useNavigate()
   const state = useBookingStore()
   const { step, setStep, reset } = state
+
+  const tenantId = useAuthStore((s) => s.tenant?.id)
+  const { data: manager } = useCurrentManager()
+  const createBooking = useCreateBooking()
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -59,10 +68,28 @@ export default function NewBookingPage() {
   const onNext = () => {
     if (step < STEPS.length - 1) {
       setStep(step + 1)
-    } else {
-      toast.success(t("summary.toast"))
-      reset()
+      return
     }
+
+    // Last step — submit the booking.
+    if (!tenantId || !manager?.id) {
+      toast.error(t("summary.errorNoSession"))
+      return
+    }
+
+    createBooking.mutate(
+      { draft: state, tenantId, managerId: manager.id },
+      {
+        onSuccess: ({ booking }) => {
+          toast.success(t("summary.toast", { bookingNumber: booking.booking_number }))
+          reset()
+          void navigate(`/trips/${booking.trip_id}`)
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      },
+    )
   }
 
   return (
@@ -96,7 +123,7 @@ export default function NewBookingPage() {
           <ArrowLeft className="size-4" />
           {tc("actions.back")}
         </Button>
-        <Button onClick={onNext} disabled={!canContinue}>
+        <Button onClick={onNext} disabled={!canContinue || createBooking.isPending}>
           {step === STEPS.length - 1 ? (
             <>
               <Check className="size-4" />
