@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
-import { StepHotel } from "@/components/booking-form/step-hotel"
 import { StepPricing } from "@/components/booking-form/step-pricing"
+import { StepRooms } from "@/components/booking-form/step-rooms"
 import { StepSeats } from "@/components/booking-form/step-seats"
 import { StepSummary } from "@/components/booking-form/step-summary"
 import { StepTravelers } from "@/components/booking-form/step-travelers"
@@ -13,6 +13,7 @@ import { StepTrip } from "@/components/booking-form/step-trip"
 import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { useTravelersCanContinue } from "@/hooks/use-travelers-can-continue"
 import { useSeatsCanContinue } from "@/hooks/use-seats-can-continue"
+import { useRoomsCanContinue } from "@/hooks/use-rooms-can-continue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
@@ -37,6 +38,7 @@ export default function NewBookingPage() {
   // selector — Tasks 7-10 will migrate them.
   const travelersOk = useTravelersCanContinue()
   const seatsOk = useSeatsCanContinue()
+  const roomsOk = useRoomsCanContinue()
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -47,14 +49,13 @@ export default function NewBookingPage() {
       case 2:
         return seatsOk
       case 3:
-        // Allow advance when a hotel+room is chosen OR operator explicitly skips hotel.
-        return Boolean(state.hotelId && state.roomType) || state.noHotel
+        return roomsOk
       case 4:
         return Boolean(state.pricing)
       default:
         return true
     }
-  }, [step, state, travelersOk, seatsOk])
+  }, [step, state, travelersOk, seatsOk, roomsOk])
 
   const renderStep = () => {
     switch (step) {
@@ -65,7 +66,7 @@ export default function NewBookingPage() {
       case 2:
         return <StepSeats />
       case 3:
-        return <StepHotel />
+        return <StepRooms />
       case 4:
         return <StepPricing />
       case 5:

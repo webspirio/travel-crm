@@ -100,6 +100,32 @@
     "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
     "undoSkip": "Hotel auswählen"
   },
+  "rooms": {
+    "title": "Hotel &amp; Zimmer",
+    "hotelLabel": "Hotel",
+    "skipHotel": "Ohne Hotel — nur Bus",
+    "skipAll": "Hotel für alle überspringen",
+    "undoSkip": "Hotel auswählen",
+    "unassigned": "Nicht zugewiesene Reisende",
+    "declineHotel": "Hotel ablehnen",
+    "addRoom": "+ Zimmer hinzufügen",
+    "removeRoom": "Zimmer entfernen",
+    "roomLabel": "Zimmer {{n}}",
+    "roomType": {
+      "single": "Einzelzimmer",
+      "double": "Doppelzimmer",
+      "triple": "Dreibettzimmer",
+      "family": "Familienzimmer"
+    },
+    "familySoldOut": "Für diese Daten ausgebucht",
+    "lapInfantTag": "(auf dem Schoß, kostenlos)",
+    "pricePerNight": "{{amount}} €/Nacht",
+    "tripHasNoHotel": "Diese Reise hat kein Hotel.",
+    "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
+    "confirmRemoveRoom": "Zimmer mit zugewiesenen Reisenden entfernen?",
+    "priceNights": "{{nights}} Nacht × {{price}} €",
+    "totalPerPax": "{{amount}} € / Person"
+  },
   "pricing": {
     "basePrice": "Reisegrundpreis",
     "hotelCost": "Hotel",

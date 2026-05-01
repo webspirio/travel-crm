@@ -100,6 +100,32 @@
     "noHotelConfirmed": "Готель не обрано. Бронювання без готелю.",
     "undoSkip": "Обрати готель"
   },
+  "rooms": {
+    "title": "Готель і номери",
+    "hotelLabel": "Готель",
+    "skipHotel": "Без готелю — тільки автобус",
+    "skipAll": "Без готелю для всіх",
+    "undoSkip": "Обрати готель",
+    "unassigned": "Непризначені пасажири",
+    "declineHotel": "Відмовитись від готелю",
+    "addRoom": "+ Додати номер",
+    "removeRoom": "Видалити номер",
+    "roomLabel": "Номер {{n}}",
+    "roomType": {
+      "single": "Одномісний",
+      "double": "Двомісний",
+      "triple": "Тримісний",
+      "family": "Сімейний"
+    },
+    "familySoldOut": "Продано для цих дат",
+    "lapInfantTag": "(на руках, без оплати)",
+    "pricePerNight": "{{amount}} €/ніч",
+    "tripHasNoHotel": "Цей тур не має готелю.",
+    "noHotelConfirmed": "Готель не обрано. Бронювання без готелю.",
+    "confirmRemoveRoom": "Видалити номер з призначеними пасажирами?",
+    "priceNights": "{{nights}} ніч × {{price}} €",
+    "totalPerPax": "{{amount}} € / особу"
+  },
   "pricing": {
     "basePrice": "Базова ціна туру",
     "hotelCost": "Готель",
