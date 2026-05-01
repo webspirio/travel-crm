@@ -85,7 +85,14 @@ export default function TripDetailPage() {
     {
       id: "contract",
       header: "Contract",
-      cell: ({ row }) => <span className="tabular-nums">{row.original.contractNumber}</span>,
+      cell: ({ row }) => (
+        <Link
+          to={`/bookings/${row.original.bookingId}`}
+          className="tabular-nums hover:underline"
+        >
+          {row.original.contractNumber}
+        </Link>
+      ),
     },
     {
       id: "name",

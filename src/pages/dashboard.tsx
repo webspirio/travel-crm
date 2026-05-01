@@ -9,6 +9,8 @@ const CountUp =
   (CountUpImport as unknown as { default?: typeof CountUpImport }).default ??
   CountUpImport
 
+import { Link } from "react-router"
+
 import { RevenueChart } from "@/components/charts/revenue-chart"
 import {
   Card,
@@ -174,9 +176,11 @@ export default function DashboardPage() {
                   const client = clientById.get(b.clientId)
                   const trip = tripById.get(b.tripId)
                   return (
-                    <TableRow key={b.id}>
+                    <TableRow key={b.id} className="cursor-pointer">
                       <TableCell>
-                        {client ? `${client.firstName} ${client.lastName}` : b.clientId}
+                        <Link to={`/bookings/${b.id}`} className="hover:underline">
+                          {client ? `${client.firstName} ${client.lastName}` : b.clientId}
+                        </Link>
                       </TableCell>
                       <TableCell>{trip?.name ?? b.tripId}</TableCell>
                       <TableCell className="text-right tabular-nums">

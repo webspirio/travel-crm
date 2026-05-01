@@ -243,7 +243,9 @@ export default function ClientDetailPage() {
                 <li key={b.id} className="relative">
                   <span className="absolute -left-[26px] top-1 size-3 rounded-full border-2 border-background bg-primary" />
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">{b.trip?.name ?? b.tripId}</span>
+                    <Link to={`/bookings/${b.id}`} className="font-medium hover:underline">
+                      {b.trip?.name ?? b.tripId}
+                    </Link>
                     <Badge variant="outline">{tc(`bookingStatus.${b.status}`)}</Badge>
                     <span className="ml-auto tabular-nums font-medium">
                       {formatCurrency(b.totalPrice, locale)}

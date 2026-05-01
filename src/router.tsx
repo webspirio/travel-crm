@@ -12,6 +12,7 @@ const TripDetailPage = lazy(() => import("@/pages/trips/detail"))
 const ClientsListPage = lazy(() => import("@/pages/clients/list"))
 const ClientDetailPage = lazy(() => import("@/pages/clients/detail"))
 const NewBookingPage = lazy(() => import("@/pages/bookings/new"))
+const BookingDetailPage = lazy(() => import("@/pages/bookings/detail"))
 const HotelsListPage = lazy(() => import("@/pages/hotels/list"))
 const HotelDetailPage = lazy(() => import("@/pages/hotels/detail"))
 const CalendarPage = lazy(() => import("@/pages/calendar"))
@@ -113,6 +114,11 @@ export const router = createHashRouter([
             path: "bookings/new",
             element: lazyWrap(NewBookingPage),
             handle: { titleKey: "nav.newBooking" },
+          },
+          {
+            path: "bookings/:bookingId",
+            element: lazyWrap(BookingDetailPage),
+            handle: { titleKey: "nav.bookings" },
           },
         ],
       },

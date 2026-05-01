@@ -89,10 +89,13 @@ export interface Trip {
   bookedCount: number
 }
 
+export type PassengerKind = "adult" | "child" | "infant"
+
 export interface Passenger {
   id: string
   firstName: string
   lastName: string
+  kind: PassengerKind
   seatNumber: number
   hotelId: string
   roomType: RoomType

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
-import type { Booking, Passenger, RoomType } from "@/types"
+import type { Booking, Passenger, PassengerKind, RoomType } from "@/types"
 import type { Database } from "@/types/database"
 
 type BookingRow = Database["public"]["Tables"]["bookings"]["Row"]
@@ -17,6 +17,7 @@ function toPassenger(row: BookingPassengerRow): Passenger {
     id: row.id,
     firstName: row.first_name,
     lastName: row.last_name,
+    kind: (row.kind ?? "adult") as PassengerKind,
     seatNumber: row.seat_number ?? 0,
     hotelId: row.hotel_id ?? "",
     roomType: (row.room_type ?? "double") as RoomType,

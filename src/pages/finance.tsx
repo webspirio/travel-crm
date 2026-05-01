@@ -288,7 +288,7 @@ export default function FinancePage() {
                     const c = clientById.get(b.clientId)
                     const trip = tripById.get(b.tripId)
                     return (
-                      <TableRow key={b.id}>
+                      <TableRow key={b.id} className="cursor-pointer">
                         <TableCell>
                           {c ? (
                             <Link
@@ -320,9 +320,11 @@ export default function FinancePage() {
                           {formatCurrency(b.totalPrice - b.paidAmount, locale)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">
-                            {tc(`bookingStatus.${b.status}`)}
-                          </Badge>
+                          <Link to={`/bookings/${b.id}`} className="hover:underline">
+                            <Badge variant="outline">
+                              {tc(`bookingStatus.${b.status}`)}
+                            </Badge>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     )

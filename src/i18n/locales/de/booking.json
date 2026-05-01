@@ -48,5 +48,63 @@
     "pickTrip": "Reise auswählen",
     "pickSeat": "Freien Platz auswählen",
     "pickHotel": "Hotel auswählen"
+  },
+  "detail": {
+    "back": "Zurück zu Buchungen",
+    "notFound": "Buchung nicht gefunden",
+    "sections": {
+      "status": "Status",
+      "passengers": "Reisende",
+      "payments": "Zahlungen"
+    },
+    "fields": {
+      "booking": "Buchung",
+      "contract": "Vertrag",
+      "total": "Gesamt",
+      "paid": "Bezahlt",
+      "outstanding": "Ausstehend",
+      "client": "Kunde"
+    },
+    "passengers": {
+      "name": "Name",
+      "kind": "Typ",
+      "seat": "Platz",
+      "hotel": "Hotel",
+      "room": "Zimmer",
+      "price": "Preis",
+      "adult": "Erwachsener",
+      "child": "Kind",
+      "infant": "Kleinkind"
+    },
+    "payments": {
+      "date": "Datum",
+      "amount": "Betrag",
+      "method": "Zahlungsart",
+      "reference": "Referenz",
+      "recordedBy": "Erfasst von",
+      "empty": "Noch keine Zahlungen",
+      "cash": "Bargeld",
+      "bank_transfer": "Banküberweisung",
+      "card": "Karte"
+    },
+    "transitions": {
+      "confirm": "Bestätigen",
+      "markPartiallyPaid": "Teilweise bezahlt",
+      "markPaid": "Bezahlt",
+      "cancel": "Stornieren",
+      "markNoShow": "Nicht erschienen"
+    },
+    "cancelDialog": {
+      "title": "Buchung stornieren?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Die Buchung wird als «Storniert» markiert.",
+      "confirm": "Ja, stornieren",
+      "abort": "Nein, behalten"
+    },
+    "noShowDialog": {
+      "title": "Als «Nicht erschienen» markieren?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Der Reisende wird als nicht erschienen markiert.",
+      "confirm": "Ja, markieren",
+      "abort": "Nein, behalten"
+    }
   }
 }
