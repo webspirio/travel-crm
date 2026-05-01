@@ -1,10 +1,11 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowLeft, MapPin, Star } from "lucide-react"
+import { ArrowLeft, MapPin, Pencil, Star } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { DataTable } from "@/components/data-table/data-table"
+import { HotelFormDialog } from "@/components/hotels/hotel-form-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -57,6 +58,7 @@ export default function HotelDetailPage() {
   const { t, i18n } = useTranslation("hotels")
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
+  const [editOpen, setEditOpen] = useState(false)
 
   const { data: hotels = [], isLoading: hotelsLoading } = useHotels()
   const { data: trips = [] } = useTrips()
@@ -177,6 +179,13 @@ export default function HotelDetailPage() {
 
   return (
     <div className="space-y-6">
+      <HotelFormDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        mode="edit"
+        initialHotel={hotel}
+      />
+
       <div className="flex flex-col gap-2">
         <Button variant="ghost" size="sm" className="self-start" render={<Link to="/hotels" />}>
           <ArrowLeft className="size-4" />
@@ -198,6 +207,10 @@ export default function HotelDetailPage() {
               </span>
             </div>
           </div>
+          <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+            <Pencil className="size-4" />
+            {t("details.edit")}
+          </Button>
         </div>
       </div>
 

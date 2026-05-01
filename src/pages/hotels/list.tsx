@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
-import { Search } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 
 import { HotelCard } from "@/components/hotel/hotel-card"
+import { HotelFormDialog } from "@/components/hotels/hotel-form-dialog"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -25,6 +27,7 @@ export default function HotelsListPage() {
   const [stars, setStars] = useState<string>("all")
   const [country, setCountry] = useState<string>("all")
   const [sortKey, setSortKey] = useState<SortKey>("occupancyDesc")
+  const [createOpen, setCreateOpen] = useState(false)
 
   const { data: hotels = [] } = useHotels()
   const { data: trips = [] } = useTrips()
@@ -63,10 +66,22 @@ export default function HotelsListPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Plus className="size-4" />
+          {t("createCta")}
+        </Button>
       </div>
+
+      <HotelFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        mode="create"
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-full max-w-xs">

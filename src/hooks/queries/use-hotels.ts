@@ -30,7 +30,11 @@ function toHotel(row: HotelRow & { hotel_room_types: RoomTypeRow[] }): Hotel {
     name: row.name,
     city: row.city,
     country: countryCodeToName(row.country),
-    stars: (row.stars ?? 3) as 3 | 4 | 5,
+    countryCode: row.country,
+    stars: row.stars ?? 3,
+    address: row.address,
+    notes: row.notes,
+    isActive: row.is_active,
     rooms,
   }
 }

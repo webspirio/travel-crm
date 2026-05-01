@@ -41,8 +41,14 @@ export interface Hotel {
   id: string
   name: string
   city: string
+  /** Long display name (e.g. "Italy"), derived via countryCodeToName */
   country: string
-  stars: 3 | 4 | 5
+  /** ISO 3166-1 alpha-2 code (e.g. "IT"). Used for form pre-fill. */
+  countryCode: string
+  stars: number
+  address?: string | null
+  notes?: string | null
+  isActive: boolean
   rooms: Record<RoomType, { total: number; pricePerNight: number }>
 }
 
