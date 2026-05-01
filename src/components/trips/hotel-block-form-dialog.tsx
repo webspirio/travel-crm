@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { Loader2 } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -55,7 +56,7 @@ function makeSchema(t: (key: string) => string) {
     qtyTotal: z
       .number({ error: t("blocks.dialog.errors.qtyTotal") })
       .int({ message: t("blocks.dialog.errors.qtyTotal") })
-      .min(0, { message: t("blocks.dialog.errors.qtyTotal") }),
+      .min(1, { message: t("blocks.dialog.errors.qtyTotal") }),
     notes: z.string().optional(),
   })
 }
@@ -69,7 +70,7 @@ function toFormDefaults(block?: HotelBlock): FormValues {
     return {
       hotelId: "",
       roomType: "double",
-      qtyTotal: 0,
+      qtyTotal: 1,
       notes: "",
     }
   }
@@ -194,7 +195,7 @@ export function HotelBlockFormDialog({
                     disabled={mode === "edit" || hotelsLoading}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue />
+                      <SelectValue placeholder={t("blocks.dialog.fields.hotelPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {hotels.map((h) => (
@@ -251,7 +252,7 @@ export function HotelBlockFormDialog({
               <Input
                 id="hb-qtyTotal"
                 type="number"
-                min={0}
+                min={1}
                 step={1}
                 aria-invalid={!!form.formState.errors.qtyTotal}
                 {...form.register("qtyTotal", { valueAsNumber: true })}
@@ -302,6 +303,7 @@ export function HotelBlockFormDialog({
               {tc("actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="size-4 animate-spin" />}
               {submitLabel}
             </Button>
           </DialogFooter>

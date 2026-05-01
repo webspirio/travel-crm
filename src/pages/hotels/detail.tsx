@@ -29,24 +29,8 @@ import { useHotelById } from "@/hooks/queries/use-hotels"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
 import { getHotelStats } from "@/lib/stats"
+import { bookingStatusVariant } from "@/lib/booking-status"
 import type { Booking, Locale, RoomType } from "@/types"
-
-function bookingStatusVariant(
-  s: Booking["status"],
-): "default" | "secondary" | "outline" | "destructive" {
-  switch (s) {
-    case "paid":
-      return "default"
-    case "confirmed":
-    case "partially_paid":
-      return "secondary"
-    case "cancelled":
-    case "no_show":
-      return "destructive"
-    default:
-      return "outline"
-  }
-}
 
 import { useTripColumns } from "../trips/columns"
 

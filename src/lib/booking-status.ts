@@ -1,3 +1,6 @@
+import type { VariantProps } from "class-variance-authority"
+
+import { badgeVariants } from "@/components/ui/badge"
 import type { Database } from "@/types/database"
 
 export type BookingStatus = Database["public"]["Enums"]["booking_status"]
@@ -14,4 +17,24 @@ export const OCCUPYING_STATUSES = new Set<BookingStatus>([
 
 export function isOccupying(status: BookingStatus): boolean {
   return OCCUPYING_STATUSES.has(status)
+}
+
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
+
+/** Canonical badge variant for a booking status. Use in every view. */
+export function bookingStatusVariant(s: BookingStatus): BadgeVariant {
+  switch (s) {
+    case "draft":
+      return "outline"
+    case "confirmed":
+      return "secondary"
+    case "partially_paid":
+      return "secondary"
+    case "paid":
+      return "default"
+    case "cancelled":
+      return "destructive"
+    case "no_show":
+      return "destructive"
+  }
 }

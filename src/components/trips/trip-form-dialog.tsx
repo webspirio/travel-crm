@@ -28,6 +28,8 @@ import { useCreateTrip } from "@/hooks/mutations/use-create-trip"
 import { useUpdateTrip } from "@/hooks/mutations/use-update-trip"
 import { useManagers } from "@/hooks/queries/use-managers"
 import { useCurrentManager } from "@/hooks/use-current-manager"
+import { useNavigate } from "react-router"
+import { Loader2 } from "lucide-react"
 import { ALL_TRIP_STATUSES } from "@/lib/trip-status"
 import type { Trip, TripStatus } from "@/types"
 import type { Database } from "@/types/database"
@@ -170,6 +172,7 @@ export function TripFormDialog({
 }: TripFormDialogProps) {
   const { t } = useTranslation("trips")
   const { t: tc } = useTranslation()
+  const navigate = useNavigate()
 
   const createTrip = useCreateTrip()
   const updateTrip = useUpdateTrip()
@@ -236,9 +239,10 @@ export function TripFormDialog({
         },
         {
           onSuccess: (row) => {
-            toast.success(t("dialog.success.created"))
+            toast.success(t("dialog.success.createdNudge"))
             onOpenChange(false)
             onSuccess?.(row)
+            void navigate(`/trips/${row.id}`)
           },
           onError: (err) => {
             toast.error(err.message)
@@ -304,7 +308,7 @@ export function TripFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="sr-only">{title}</DialogDescription>
@@ -595,6 +599,7 @@ export function TripFormDialog({
               {tc("actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="size-4 animate-spin" />}
               {submitLabel}
             </Button>
           </DialogFooter>

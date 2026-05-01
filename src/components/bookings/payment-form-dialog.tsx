@@ -1,9 +1,10 @@
 import { useEffect } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { Controller, useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
+import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -91,6 +92,10 @@ export function PaymentFormDialog({
     defaultValues: toDefaultValues(),
   })
 
+  // Watch amount to detect refund (negative value).
+  const watchedAmount = useWatch({ control: form.control, name: "amount" })
+  const isRefund = typeof watchedAmount === "number" && watchedAmount < 0
+
   // Reset form each time the dialog opens.
   useEffect(() => {
     if (open) {
@@ -100,6 +105,10 @@ export function PaymentFormDialog({
   }, [open])
 
   async function onSubmit(values: FormValues) {
+    const successKey = isRefund
+      ? "detail.payments.successRefund"
+      : "detail.payments.success"
+
     recordPayment.mutate(
       {
         bookingId,
@@ -111,7 +120,7 @@ export function PaymentFormDialog({
       },
       {
         onSuccess: () => {
-          toast.success(t("detail.payments.success"))
+          toast.success(t(successKey))
           onOpenChange(false)
           onSuccess?.()
         },
@@ -124,12 +133,19 @@ export function PaymentFormDialog({
 
   const outstanding = bookingTotal - bookingPaidAmount
 
+  const dialogTitle = isRefund
+    ? t("detail.payments.dialog.titleRefund")
+    : t("detail.payments.dialog.title")
+  const submitLabel = isRefund
+    ? t("detail.payments.dialog.submitRefund")
+    : t("detail.payments.dialog.submit")
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t("detail.payments.dialog.title")}</DialogTitle>
-          <DialogDescription className="sr-only">{t("detail.payments.dialog.title")}</DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription className="sr-only">{dialogTitle}</DialogDescription>
         </DialogHeader>
 
         {/* Outstanding hint */}
@@ -226,7 +242,8 @@ export function PaymentFormDialog({
               {tc("actions.cancel")}
             </Button>
             <Button type="submit" disabled={recordPayment.isPending}>
-              {t("detail.payments.dialog.submit")}
+              {recordPayment.isPending && <Loader2 className="size-4 animate-spin" />}
+              {submitLabel}
             </Button>
           </DialogFooter>
         </form>

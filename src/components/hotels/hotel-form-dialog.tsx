@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
-import { Trash2 } from "lucide-react"
+import { Loader2, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -543,6 +543,7 @@ export function HotelFormDialog({
               {tc("actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="size-4 animate-spin" />}
               {submitLabel}
             </Button>
           </DialogFooter>

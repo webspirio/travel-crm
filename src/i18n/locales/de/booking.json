@@ -93,10 +93,13 @@
       "card": "Karte",
       "record": "Zahlung erfassen",
       "success": "Zahlung erfasst",
+      "successRefund": "Rückerstattung erfasst",
       "dialog": {
         "title": "Zahlung erfassen",
+        "titleRefund": "Rückerstattung",
         "outstanding": "Ausstehend: {{amount}}",
-        "submit": "Speichern"
+        "submit": "Speichern",
+        "submitRefund": "Rückerstattung erfassen"
       },
       "fields": {
         "amount": "Betrag (€)",

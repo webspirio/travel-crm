@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
 
 import { supabase } from "@/lib/supabase"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
@@ -62,10 +61,6 @@ export function useUpdateBookingStatus() {
       void queryClient.invalidateQueries({ queryKey: tripOccupancyKeys.byTrip(result.tripId) })
       // 5. Materialised trip_seats rows (seat-map status colours).
       void queryClient.invalidateQueries({ queryKey: tripSeatsKeys.byTrip(result.tripId) })
-    },
-
-    onError: (error) => {
-      toast.error(error.message)
     },
   })
 }

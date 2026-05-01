@@ -33,7 +33,7 @@ import { useTripById } from "@/hooks/queries/use-trips"
 import { useUpdateBookingStatus } from "@/hooks/mutations/use-update-booking-status"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { formatCurrency, formatDate, formatDateRange } from "@/lib/format"
-import type { BookingStatus } from "@/lib/booking-status"
+import { bookingStatusVariant, type BookingStatus } from "@/lib/booking-status"
 import type { Locale } from "@/types"
 
 // MIRROR of `private.bookings_assert_status_transition` in
@@ -50,24 +50,6 @@ const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
 
 // Statuses that require a confirmation dialog before applying.
 const DESTRUCTIVE_STATUSES = new Set<BookingStatus>(["cancelled", "no_show"])
-
-function statusVariant(
-  status: BookingStatus,
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "paid":
-      return "default"
-    case "partially_paid":
-      return "secondary"
-    case "confirmed":
-      return "outline"
-    case "cancelled":
-    case "no_show":
-      return "destructive"
-    default:
-      return "outline"
-  }
-}
 
 export default function BookingDetailPage() {
   const { bookingId } = useParams()
@@ -171,7 +153,7 @@ export default function BookingDetailPage() {
                 </span>
               )}
             </h1>
-            <Badge variant={statusVariant(booking.status)}>
+            <Badge variant={bookingStatusVariant(booking.status)}>
               {tc(`bookingStatus.${booking.status}`)}
             </Badge>
           </div>

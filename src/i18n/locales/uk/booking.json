@@ -93,10 +93,13 @@
       "card": "Картка",
       "record": "Записати платіж",
       "success": "Платіж записано",
+      "successRefund": "Повернення записано",
       "dialog": {
         "title": "Записати платіж",
+        "titleRefund": "Повернення коштів",
         "outstanding": "До оплати: {{amount}}",
-        "submit": "Зберегти"
+        "submit": "Зберегти",
+        "submitRefund": "Записати повернення"
       },
       "fields": {
         "amount": "Сума (€)",

@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Loader2 } from "lucide-react"
 import { formatDate } from "@/lib/format"
 
 import { Button } from "@/components/ui/button"
@@ -344,6 +344,7 @@ export function ClientFormDialog({
               {tc("actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
+              {isPending && <Loader2 className="size-4 animate-spin" />}
               {submitLabel}
             </Button>
           </DialogFooter>

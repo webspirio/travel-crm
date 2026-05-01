@@ -182,9 +182,9 @@ export default function TripDetailPage() {
       <Tabs defaultValue="bus">
         <TabsList>
           <TabsTrigger value="bus">{t("tabs.bus")}</TabsTrigger>
+          <TabsTrigger value="blocks">{t("tabs.blocks")}</TabsTrigger>
           <TabsTrigger value="hotels">{t("tabs.hotels")}</TabsTrigger>
           <TabsTrigger value="clients">{t("tabs.clients")}</TabsTrigger>
-          <TabsTrigger value="blocks">{t("tabs.blocks")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bus" className="mt-4">
@@ -199,18 +199,22 @@ export default function TripDetailPage() {
         </TabsContent>
 
         <TabsContent value="hotels" className="mt-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {tripHotels.map((h) => {
-              const bookedByType: Partial<Record<RoomType, number>> = {}
-              for (const b of tripBookings) {
-                for (const p of b.passengers) {
-                  if (p.hotelId !== h.id) continue
-                  bookedByType[p.roomType] = (bookedByType[p.roomType] ?? 0) + 1
+          {tripHotels.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("hotels.empty")}</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {tripHotels.map((h) => {
+                const bookedByType: Partial<Record<RoomType, number>> = {}
+                for (const b of tripBookings) {
+                  for (const p of b.passengers) {
+                    if (p.hotelId !== h.id) continue
+                    bookedByType[p.roomType] = (bookedByType[p.roomType] ?? 0) + 1
+                  }
                 }
-              }
-              return <HotelCard key={h.id} hotel={h} bookedByType={bookedByType} />
-            })}
-          </div>
+                return <HotelCard key={h.id} hotel={h} bookedByType={bookedByType} />
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="clients" className="mt-4">
