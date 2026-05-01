@@ -2,6 +2,7 @@
   "title": "Kunden",
   "subtitle": "Kundendatenbank und Buchungshistorie",
   "search": "Nach Name oder E-Mail suchen",
+  "createCta": "Neuer Kunde",
   "columns": {
     "name": "Kunde",
     "nationality": "Staatsangehörigkeit",
@@ -16,7 +17,37 @@
     "createdAt": "In Datenbank seit",
     "bookingHistory": "Buchungshistorie",
     "noBookings": "Noch keine Buchungen",
-    "openFull": "Volles Profil"
+    "openFull": "Volles Profil",
+    "edit": "Bearbeiten"
+  },
+  "dialog": {
+    "create": {
+      "title": "Neuer Kunde",
+      "submit": "Kunde erstellen"
+    },
+    "edit": {
+      "title": "Kunde bearbeiten",
+      "submit": "Änderungen speichern"
+    },
+    "fields": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "nationality": "Staatsangehörigkeit",
+      "birthDate": "Geburtsdatum",
+      "birthDatePlaceholder": "Datum auswählen"
+    },
+    "errors": {
+      "firstName": "Vorname ist erforderlich",
+      "lastName": "Nachname ist erforderlich",
+      "email": "Gültige E-Mail-Adresse eingeben",
+      "phone": "Telefonnummer ist erforderlich"
+    },
+    "success": {
+      "created": "Kunde wurde erstellt",
+      "updated": "Kundendaten wurden aktualisiert"
+    }
   },
   "profile": {
     "totalSpend": "Gesamtausgabe",

@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowLeft, Mail, MapPin, Phone, Star } from "lucide-react"
+import { ArrowLeft, Mail, MapPin, Pencil, Phone, Star } from "lucide-react"
 import { Link, useParams } from "react-router"
 import { toast } from "sonner"
 
+import { ClientFormDialog } from "@/components/clients/client-form-dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -63,6 +64,8 @@ export default function ClientDetailPage() {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
   }, [client, trips, hotels, bookings])
 
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+
   const persistedNote = useClientNotesStore(
     (s) => (client ? s.notes[client.id] ?? "" : ""),
   )
@@ -114,12 +117,22 @@ export default function ClientDetailPage() {
             <AvatarFallback>{initials(client.firstName, client.lastName)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h1 className="flex items-center gap-2 text-2xl font-semibold">
-              {client.firstName} {client.lastName}
-              <Badge variant="outline">
-                {client.nationality === "UA" ? "🇺🇦 UA" : "🇩🇪 DE"}
-              </Badge>
-            </h1>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h1 className="flex items-center gap-2 text-2xl font-semibold">
+                {client.firstName} {client.lastName}
+                <Badge variant="outline">
+                  {client.nationality === "UA" ? "🇺🇦 UA" : "🇩🇪 DE"}
+                </Badge>
+              </h1>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditDialogOpen(true)}
+              >
+                <Pencil className="size-3.5" />
+                {t("details.edit")}
+              </Button>
+            </div>
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Mail className="size-3.5" /> {client.email}
@@ -289,6 +302,13 @@ export default function ClientDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ClientFormDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        mode="edit"
+        initialClient={client}
+      />
     </div>
   )
 }
