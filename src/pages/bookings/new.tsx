@@ -14,8 +14,6 @@ import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
-import { useCurrentManager } from "@/hooks/use-current-manager"
-import { useAuthStore } from "@/stores/auth-store"
 import { useBookingStore } from "@/stores/booking-store"
 
 export default function NewBookingPage() {
@@ -25,8 +23,6 @@ export default function NewBookingPage() {
   const state = useBookingStore()
   const { step, setStep, reset } = state
 
-  const tenantId = useAuthStore((s) => s.tenant?.id)
-  const { data: manager } = useCurrentManager()
   const createBooking = useCreateBooking()
 
   const canContinue = useMemo(() => {
@@ -72,13 +68,8 @@ export default function NewBookingPage() {
     }
 
     // Last step — submit the booking.
-    if (!tenantId || !manager?.id) {
-      toast.error(t("summary.errorNoSession"))
-      return
-    }
-
     createBooking.mutate(
-      { draft: state, tenantId, managerId: manager.id },
+      { draft: state },
       {
         onSuccess: ({ booking }) => {
           toast.success(t("summary.toast", { bookingNumber: booking.booking_number }))

@@ -5,16 +5,17 @@ import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { clientsKeys } from "@/hooks/queries/use-clients"
 import { tripsKeys, tripOccupancyKeys } from "@/hooks/queries/use-trips"
 import { tripSeatsKeys } from "@/hooks/queries/use-trip-seats"
+import { useAuthStore } from "@/stores/auth-store"
 import type { BookingDraft } from "@/stores/booking-store"
+import type { Client } from "@/types"
 import type { Database } from "@/types/database"
 
 type BookingRow = Database["public"]["Tables"]["bookings"]["Row"]
+type ManagerRow = Database["public"]["Tables"]["managers"]["Row"]
 
 export interface CreateBookingInput {
   /** Snapshot of the booking-store state after the last wizard step. */
   draft: BookingDraft
-  tenantId: string
-  managerId: string
 }
 
 export interface CreateBookingResult {
@@ -34,14 +35,48 @@ export interface CreateBookingResult {
  * 3. INSERT into `booking_passengers` with the single adult passenger from
  *    the wizard.
  *
- * On success: invalidates bookings, trips, trip-seats, trip-occupancy, and
- * (when a new client was created) clients query caches.
+ * On success: invalidates bookings, trips (detail only), trip-seats,
+ * trip-occupancy, and (when a new client was created) clients query caches.
+ *
+ * Auth is read inside mutationFn via useAuthStore.getState() so call sites
+ * don't need to supply tenantId / managerId. Throws "no_session" or
+ * "no_manager" (dev-facing, not expected in normal flow) when the JWT or
+ * managers row is absent.
  */
 export function useCreateBooking() {
   const queryClient = useQueryClient()
 
   return useMutation<CreateBookingResult, Error, CreateBookingInput>({
-    mutationFn: async ({ draft, tenantId, managerId }) => {
+    mutationFn: async ({ draft }) => {
+      // ── Step 0: resolve auth identities ───────────────────────────────
+      const { tenant, user } = useAuthStore.getState()
+      if (!tenant?.id || !user?.id) throw new Error("no_session")
+
+      const tenantId = tenant.id
+      const userId = user.id
+
+      // Resolve manager id: cache first, then fresh SELECT on miss.
+      let managerId: string
+      const cachedManager = queryClient.getQueryData<ManagerRow | null>([
+        "managers",
+        "me",
+        userId,
+      ])
+      if (cachedManager) {
+        managerId = cachedManager.id
+      } else {
+        const { data: managerRow, error: managerErr } = await supabase
+          .from("managers")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("is_active", true)
+          .limit(1)
+          .maybeSingle()
+        if (managerErr) throw managerErr
+        if (!managerRow) throw new Error("no_manager")
+        managerId = managerRow.id
+      }
+
       // ── Step 1: resolve client id ──────────────────────────────────────
       let clientId = draft.clientId
 
@@ -95,7 +130,8 @@ export function useCreateBooking() {
 
       // ── Step 4: resolve passenger name ────────────────────────────────
       // New-client path: name is already in draft.newClient (captured before
-      // clientId was assigned above). Existing-client path: fetch from DB.
+      // clientId was assigned above). Existing-client path: cache-first
+      // lookup to avoid a redundant round-trip on the common path.
       let passengerFirstName: string
       let passengerLastName: string
 
@@ -104,15 +140,24 @@ export function useCreateBooking() {
         passengerFirstName = draft.newClient.firstName
         passengerLastName = draft.newClient.lastName
       } else {
-        // Existing client — look up names from the DB.
-        const { data: clientRow, error: lookupErr } = await supabase
-          .from("clients")
-          .select("first_name, last_name")
-          .eq("id", clientId)
-          .single()
-        if (lookupErr) throw lookupErr
-        passengerFirstName = clientRow.first_name
-        passengerLastName = clientRow.last_name
+        // Existing client — try the react-query cache first.
+        const cachedClients = queryClient.getQueryData<Client[]>(clientsKeys.lists())
+        const cachedClient = cachedClients?.find((c) => c.id === clientId)
+        if (cachedClient) {
+          passengerFirstName = cachedClient.firstName
+          passengerLastName = cachedClient.lastName
+        } else {
+          // Cache miss (e.g. direct navigation to /bookings/new) — fall back
+          // to a fresh SELECT.
+          const { data: clientRow, error: lookupErr } = await supabase
+            .from("clients")
+            .select("first_name, last_name")
+            .eq("id", clientId)
+            .single()
+          if (lookupErr) throw lookupErr
+          passengerFirstName = clientRow.first_name
+          passengerLastName = clientRow.last_name
+        }
       }
 
       // ── Step 5: INSERT passenger ───────────────────────────────────────
@@ -120,7 +165,7 @@ export function useCreateBooking() {
         tenant_id: tenantId,
         booking_id: bookingData.id,
         trip_id: draft.tripId,
-        kind: "adult" as const,
+        kind: "adult",
         first_name: passengerFirstName,
         last_name: passengerLastName,
         seat_number: draft.seatNumber,
@@ -138,7 +183,7 @@ export function useCreateBooking() {
       if (passengerErr) throw passengerErr
 
       return {
-        booking: bookingData as BookingRow,
+        booking: bookingData,
         clientCreated: !draft.clientId,
       }
     },
@@ -148,9 +193,12 @@ export function useCreateBooking() {
       // reflect the new booking immediately.
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.all })
 
-      // Trip availability and seat-map caches need refreshing.
-      void queryClient.invalidateQueries({ queryKey: tripsKeys.all })
+      // Only the trip's own detail page changes (seat count etc.); the
+      // trips list index doesn't carry derived booking counts.
       if (draft.tripId) {
+        void queryClient.invalidateQueries({
+          queryKey: tripsKeys.detail(draft.tripId),
+        })
         void queryClient.invalidateQueries({
           queryKey: tripSeatsKeys.byTrip(draft.tripId),
         })
