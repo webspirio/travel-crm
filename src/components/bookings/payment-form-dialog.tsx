@@ -26,9 +26,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRecordPayment } from "@/hooks/mutations/use-record-payment"
 import { formatCurrency } from "@/lib/format"
 import type { Locale } from "@/types"
-import type { Database } from "@/types/database"
-
-type PaymentMethod = Database["public"]["Enums"]["payment_method"]
 
 export interface PaymentFormDialogProps {
   open: boolean
@@ -46,7 +43,9 @@ function makeSchema(t: (key: string) => string) {
   return z.object({
     amount: z
       .number()
-      .refine((v) => v !== 0, { message: t("detail.payments.errors.amount") }),
+      .refine((v) => Number.isFinite(v) && v !== 0, {
+        message: t("detail.payments.errors.amount"),
+      }),
     method: z.enum(["cash", "bank_transfer", "card"] as const),
     receivedAt: z.string().min(1),
     reference: z.string().optional(),
@@ -104,7 +103,7 @@ export function PaymentFormDialog({
       {
         bookingId,
         amount: values.amount,
-        method: values.method as PaymentMethod,
+        method: values.method,
         receivedAt: new Date(values.receivedAt),
         reference: values.reference || undefined,
         notes: values.notes || undefined,

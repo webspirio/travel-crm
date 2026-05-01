@@ -48,12 +48,12 @@ export function useRecordPayment() {
       const userId = user.id
 
       // Resolve manager id: cache first, then fresh SELECT on miss.
+      let managerId: string
       const cachedManager = queryClient.getQueryData<ManagerRow | null>([
         "managers",
         "me",
         userId,
       ])
-      let managerId: string | null
       if (cachedManager) {
         managerId = cachedManager.id
       } else {
@@ -112,8 +112,7 @@ export function useRecordPayment() {
 
     onSuccess: (_paymentRow, { bookingId }) => {
       void queryClient.invalidateQueries({ queryKey: paymentsKeys.byBooking(bookingId) })
-      void queryClient.invalidateQueries({ queryKey: bookingsKeys.detail(bookingId) })
-      void queryClient.invalidateQueries({ queryKey: bookingsKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: bookingsKeys.all })
     },
   })
 }
