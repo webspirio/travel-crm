@@ -4,7 +4,7 @@ import { useClientById } from "@/hooks/queries/use-clients"
 import { useHotelById } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDateRange } from "@/lib/format"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 import type { Locale } from "@/types"
 
 export function StepSummary() {
@@ -12,7 +12,7 @@ export function StepSummary() {
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const { clientId, newClient, tripId, seatNumber, hotelId, roomType, noHotel, pricing } =
-    useBookingStore()
+    useLegacyBookingDraft()
 
   const { data: client } = useClientById(clientId ?? undefined)
   const { data: trip } = useTripById(tripId ?? undefined)

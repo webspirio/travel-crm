@@ -14,13 +14,13 @@ import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 
 export default function NewBookingPage() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
   const navigate = useNavigate()
-  const state = useBookingStore()
+  const state = useLegacyBookingDraft()
   const { step, setStep, reset } = state
 
   const createBooking = useCreateBooking()

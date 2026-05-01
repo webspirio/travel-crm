@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useClients } from "@/hooks/queries/use-clients"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 
 function initials(first: string, last: string) {
   return `${first[0] ?? ""}${last[0] ?? ""}`.toUpperCase()
@@ -21,7 +21,7 @@ function initials(first: string, last: string) {
 
 export function StepClient() {
   const { t } = useTranslation("booking")
-  const { clientId, newClient, update } = useBookingStore()
+  const { clientId, newClient, update } = useLegacyBookingDraft()
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(Boolean(newClient))
 

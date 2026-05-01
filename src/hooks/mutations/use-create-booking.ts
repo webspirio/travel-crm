@@ -6,7 +6,7 @@ import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { clientsKeys } from "@/hooks/queries/use-clients"
 import { tripsKeys, tripOccupancyKeys } from "@/hooks/queries/use-trips"
 import { tripSeatsKeys } from "@/hooks/queries/use-trip-seats"
-import type { BookingDraft } from "@/stores/booking-store"
+import type { LegacyBookingDraft } from "@/stores/booking-store"
 import type { Client } from "@/types"
 import type { Database } from "@/types/database"
 
@@ -14,7 +14,7 @@ type BookingRow = Database["public"]["Tables"]["bookings"]["Row"]
 
 export interface CreateBookingInput {
   /** Snapshot of the booking-store state after the last wizard step. */
-  draft: BookingDraft
+  draft: LegacyBookingDraft
 }
 
 export interface CreateBookingResult {

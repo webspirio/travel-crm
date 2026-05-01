@@ -2,11 +2,11 @@ import { useTranslation } from "react-i18next"
 
 import { SeatMap } from "@/components/bus/seat-map"
 import { useTripById } from "@/hooks/queries/use-trips"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 
 export function StepSeat() {
   const { t } = useTranslation("booking")
-  const { tripId, seatNumber, update } = useBookingStore()
+  const { tripId, seatNumber, update } = useLegacyBookingDraft()
   const { data: trip } = useTripById(tripId ?? undefined)
 
   if (!trip) {

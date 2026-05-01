@@ -7,14 +7,14 @@ import { Progress } from "@/components/ui/progress"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 import type { Locale } from "@/types"
 
 export function StepTrip() {
   const { t, i18n } = useTranslation("booking")
   const { t: tt } = useTranslation("trips")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
-  const { tripId, update } = useBookingStore()
+  const { tripId, update } = useLegacyBookingDraft()
   const { data: trips = [] } = useTrips()
 
   const available = useMemo(

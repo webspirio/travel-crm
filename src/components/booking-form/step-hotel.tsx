@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
 import { cn } from "@/lib/utils"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 import type { RoomType } from "@/types"
 
 const ROOM_TYPES: RoomType[] = ["single", "double", "triple", "family"]
@@ -14,7 +14,7 @@ const ROOM_TYPES: RoomType[] = ["single", "double", "triple", "family"]
 export function StepHotel() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
-  const { tripId, hotelId, roomType, noHotel, update } = useBookingStore()
+  const { tripId, hotelId, roomType, noHotel, update } = useLegacyBookingDraft()
   const { data: trip } = useTripById(tripId ?? undefined)
   const { data: hotels = [] } = useHotels()
 

@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next"
 import { useHotelById } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
-import { useBookingStore } from "@/stores/booking-store"
+import { useLegacyBookingDraft } from "@/stores/booking-store"
 import type { Locale } from "@/types"
 
 export function StepPricing() {
   const { t, i18n } = useTranslation("booking")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
-  const { tripId, hotelId, roomType, noHotel, update } = useBookingStore()
+  const { tripId, hotelId, roomType, noHotel, update } = useLegacyBookingDraft()
 
   const { data: trip } = useTripById(tripId ?? undefined)
   const { data: hotel } = useHotelById(hotelId ?? undefined)
