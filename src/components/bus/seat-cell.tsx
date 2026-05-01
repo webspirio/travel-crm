@@ -17,9 +17,15 @@ const SPECIAL_LABEL: Record<string, string> = {
 interface SeatCellProps {
   cell: Cell
   onSelect?: (seatNumber: number) => void
+  /**
+   * Short label (e.g. initials) to overlay inside the cell for a draft-assigned
+   * passenger in the multi-pax booking flow. Only shown when the cell is in
+   * "selected" status. Existing consumers leave this undefined.
+   */
+  draftLabel?: string
 }
 
-export function SeatCellView({ cell, onSelect }: SeatCellProps) {
+export function SeatCellView({ cell, onSelect, draftLabel }: SeatCellProps) {
   const { t } = useTranslation()
 
   if (!cell) return <div aria-hidden />
@@ -60,7 +66,11 @@ export function SeatCellView({ cell, onSelect }: SeatCellProps) {
               disabled && "cursor-not-allowed",
             )}
           >
-            {cell.number}
+            {draftLabel && cell.status === "selected" ? (
+              <span className="text-[10px] font-bold leading-none">{draftLabel}</span>
+            ) : (
+              cell.number
+            )}
           </button>
         }
       />

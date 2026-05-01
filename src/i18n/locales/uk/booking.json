@@ -75,6 +75,23 @@
   "seat": {
     "pickLabel": "Оберіть місце"
   },
+  "seats": {
+    "title": "Місця",
+    "waiting": "Пасажири без місця ({{count}})",
+    "seated": "Пасажири з місцем ({{count}})",
+    "activePassenger": "Активний: {{name}}",
+    "assigned": "Призначено",
+    "lapInfant": "(на руках)",
+    "autoAssign": "Авто-розміщення",
+    "seatTogether": "Разом",
+    "noBlockFound": "Немає блоку на {{n}} місць — оберіть вручну",
+    "swapConfirmTitle": "Поміняти місця?",
+    "swapConfirmBody": "Забрати місце {{seat}} у {{name}}?",
+    "swapConfirmYes": "Поміняти",
+    "swapConfirmNo": "Скасувати",
+    "soldToast": "Це місце вже продано",
+    "helpHint": "← / → для переключення • Enter для наступного вільного • Cmd+Shift+S для розміщення разом"
+  },
   "hotel": {
     "pickHotel": "Оберіть готель",
     "pickRoom": "Тип номера",

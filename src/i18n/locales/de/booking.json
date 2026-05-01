@@ -75,6 +75,23 @@
   "seat": {
     "pickLabel": "Platz auswählen"
   },
+  "seats": {
+    "title": "Sitzplätze",
+    "waiting": "Reisende ohne Platz ({{count}})",
+    "seated": "Reisende mit Platz ({{count}})",
+    "activePassenger": "Aktiv: {{name}}",
+    "assigned": "Zugewiesen",
+    "lapInfant": "(auf dem Schoß)",
+    "autoAssign": "Auto-Zuweisung",
+    "seatTogether": "Zusammen",
+    "noBlockFound": "Kein {{n}}-Platz-Block verfügbar — bitte manuell wählen",
+    "swapConfirmTitle": "Plätze tauschen?",
+    "swapConfirmBody": "Platz {{seat}} von {{name}} übernehmen?",
+    "swapConfirmYes": "Tauschen",
+    "swapConfirmNo": "Abbrechen",
+    "soldToast": "Dieser Platz ist bereits verkauft",
+    "helpHint": "← / → zum Wechseln • Enter für nächsten freien • Cmd+Shift+S für gemeinsame Plätze"
+  },
   "hotel": {
     "pickHotel": "Hotel auswählen",
     "pickRoom": "Zimmertyp",

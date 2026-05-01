@@ -15,7 +15,17 @@ interface SeatMapProps {
   busType: BusType
   tripId: string
   onSelect?: (seatNumber: number) => void
-  selected?: number[]
+  /**
+   * Seat numbers to highlight as "selected".
+   * Accepts a single number, an array, or null/undefined for backwards compat.
+   */
+  selected?: number | number[] | null
+  /**
+   * Optional map of seatNumber → short label (e.g. initials) rendered inside
+   * the seat cell for draft-assigned passengers in the multi-pax booking flow.
+   * Defaults to an empty map — existing consumers are unaffected.
+   */
+  assignedTo?: Map<number, string>
 }
 
 type TripBooking = NonNullable<ReturnType<typeof useBookingsByTrip>["data"]>[number]
@@ -74,9 +84,13 @@ function applyBookings(
   return { deck: next, totals }
 }
 
-export function SeatMap({ busType, tripId, onSelect, selected }: SeatMapProps) {
+export function SeatMap({ busType, tripId, onSelect, selected, assignedTo }: SeatMapProps) {
   const { t } = useTranslation()
-  const selectedSet = useMemo(() => new Set(selected ?? []), [selected])
+  const selectedSet = useMemo(() => {
+    if (selected == null) return new Set<number>()
+    if (Array.isArray(selected)) return new Set(selected)
+    return new Set([selected])
+  }, [selected])
   const layout = useMemo(() => layoutFor(busType), [busType])
   const { data: tripBookings = [] } = useBookingsByTrip(tripId)
   const { data: occupied = [] } = useOccupiedSeats(tripId)
@@ -103,7 +117,13 @@ export function SeatMap({ busType, tripId, onSelect, selected }: SeatMapProps) {
       {deck.flatMap((row, rIdx) =>
         row.map((cell, cIdx) => (
           <div key={`${rIdx}-${cIdx}`} role="gridcell">
-            <SeatCellView cell={cell} onSelect={onSelect} />
+            <SeatCellView
+              cell={cell}
+              onSelect={onSelect}
+              draftLabel={
+                cell?.type === "seat" ? (assignedTo?.get(cell.number) ?? undefined) : undefined
+              }
+            />
           </div>
         )),
       )}

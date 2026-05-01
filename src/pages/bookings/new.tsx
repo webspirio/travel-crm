@@ -6,12 +6,13 @@ import { toast } from "sonner"
 
 import { StepHotel } from "@/components/booking-form/step-hotel"
 import { StepPricing } from "@/components/booking-form/step-pricing"
-import { StepSeat } from "@/components/booking-form/step-seat"
+import { StepSeats } from "@/components/booking-form/step-seats"
 import { StepSummary } from "@/components/booking-form/step-summary"
 import { StepTravelers } from "@/components/booking-form/step-travelers"
 import { StepTrip } from "@/components/booking-form/step-trip"
 import { STEPS, Stepper } from "@/components/booking-form/stepper"
 import { useTravelersCanContinue } from "@/hooks/use-travelers-can-continue"
+import { useSeatsCanContinue } from "@/hooks/use-seats-can-continue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
@@ -35,6 +36,7 @@ export default function NewBookingPage() {
   // on a later step. Other steps still read from the legacy compatibility
   // selector — Tasks 7-10 will migrate them.
   const travelersOk = useTravelersCanContinue()
+  const seatsOk = useSeatsCanContinue()
 
   const canContinue = useMemo(() => {
     switch (step) {
@@ -43,7 +45,7 @@ export default function NewBookingPage() {
       case 1:
         return Boolean(state.tripId)
       case 2:
-        return Boolean(state.seatNumber)
+        return seatsOk
       case 3:
         // Allow advance when a hotel+room is chosen OR operator explicitly skips hotel.
         return Boolean(state.hotelId && state.roomType) || state.noHotel
@@ -52,7 +54,7 @@ export default function NewBookingPage() {
       default:
         return true
     }
-  }, [step, state, travelersOk])
+  }, [step, state, travelersOk, seatsOk])
 
   const renderStep = () => {
     switch (step) {
@@ -61,7 +63,7 @@ export default function NewBookingPage() {
       case 1:
         return <StepTrip />
       case 2:
-        return <StepSeat />
+        return <StepSeats />
       case 3:
         return <StepHotel />
       case 4:
