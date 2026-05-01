@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import { z } from "zod"
 import { CalendarIcon } from "lucide-react"
+import { formatDate } from "@/lib/format"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/select"
 import { useCreateClient } from "@/hooks/mutations/use-create-client"
 import { useUpdateClient } from "@/hooks/mutations/use-update-client"
-import type { Client } from "@/types"
+import type { Client, Locale } from "@/types"
 import type { Database } from "@/types/database"
 import { cn } from "@/lib/utils"
 
@@ -85,15 +86,6 @@ function toFormDefaults(client?: Client): FormValues {
   }
 }
 
-function formatDisplayDate(date: Date | undefined): string {
-  if (!date) return ""
-  return date.toLocaleDateString("uk-UA", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  })
-}
-
 // --- Component ---
 
 export function ClientFormDialog({
@@ -103,8 +95,9 @@ export function ClientFormDialog({
   initialClient,
   onSuccess,
 }: ClientFormDialogProps) {
-  const { t } = useTranslation("clients")
+  const { t, i18n } = useTranslation("clients")
   const { t: tc } = useTranslation()
+  const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
   const createClient = useCreateClient()
   const updateClient = useUpdateClient()
@@ -174,6 +167,11 @@ export function ClientFormDialog({
           : null
       if (newBdStr !== origBdStr) {
         patch.birthDate = values.birthDate ?? null
+      }
+
+      if (Object.keys(patch).length === 0) {
+        onOpenChange(false)
+        return
       }
 
       updateClient.mutate(
@@ -314,7 +312,7 @@ export function ClientFormDialog({
                     >
                       <CalendarIcon className="mr-2 size-4" />
                       {field.value
-                        ? formatDisplayDate(field.value)
+                        ? formatDate(field.value, locale)
                         : t("dialog.fields.birthDatePlaceholder")}
                     </PopoverTrigger>
                     <PopoverContent align="start" className="w-auto p-0">
@@ -323,9 +321,9 @@ export function ClientFormDialog({
                         selected={field.value}
                         onSelect={(date) => field.onChange(date ?? undefined)}
                         captionLayout="dropdown"
-                        fromYear={1930}
-                        toYear={new Date().getFullYear() - 1}
-                        initialFocus
+                        startMonth={new Date(1930, 0)}
+                        endMonth={new Date(new Date().getFullYear() - 1, 11)}
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>
