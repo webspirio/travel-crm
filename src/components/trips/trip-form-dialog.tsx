@@ -75,30 +75,30 @@ function makeSchema(t: (key: string) => string) {
       ownerManagerId: z.string().min(1, { message: t("dialog.errors.ownerManagerId") }),
       busType: z.enum(["55", "79"], { message: t("dialog.errors.busType") }),
       capacity: z
-        .number({ invalid_type_error: t("dialog.errors.capacity") })
+        .number({ error: t("dialog.errors.capacity") })
         .int()
         .min(1, { message: t("dialog.errors.capacity") }),
       departureAt: z.string().min(1, { message: t("dialog.errors.departureAt") }),
       returnAt: z.string().min(1, { message: t("dialog.errors.returnAt") }),
-      status: z.string().optional(),
+      status: z.enum(ALL_TRIP_STATUSES as [TripStatus, ...TripStatus[]]).optional(),
       basePriceEur: z
-        .number({ invalid_type_error: t("dialog.errors.basePriceEur") })
+        .number({ error: t("dialog.errors.basePriceEur") })
         .finite()
         .min(0, { message: t("dialog.errors.basePriceEur") }),
       childPriceEur: z
-        .number({ invalid_type_error: t("dialog.errors.childPriceEur") })
+        .number({ error: t("dialog.errors.childPriceEur") })
         .finite()
         .min(0, { message: t("dialog.errors.childPriceEur") }),
       infantPriceEur: z
-        .number({ invalid_type_error: t("dialog.errors.infantPriceEur") })
+        .number({ error: t("dialog.errors.infantPriceEur") })
         .finite()
         .min(0, { message: t("dialog.errors.infantPriceEur") }),
       frontRowsCount: z
-        .number({ invalid_type_error: t("dialog.errors.frontRowsCount") })
+        .number({ error: t("dialog.errors.frontRowsCount") })
         .int()
         .min(0, { message: t("dialog.errors.frontRowsCount") }),
       frontRowsSurchargeEur: z
-        .number({ invalid_type_error: t("dialog.errors.frontRowsSurchargeEur") })
+        .number({ error: t("dialog.errors.frontRowsSurchargeEur") })
         .finite()
         .min(0, { message: t("dialog.errors.frontRowsSurchargeEur") }),
       notes: z.string().optional(),
@@ -172,7 +172,8 @@ export function TripFormDialog({
 
   const createTrip = useCreateTrip()
   const updateTrip = useUpdateTrip()
-  const { data: managers = [] } = useManagers()
+  const managersQuery = useManagers()
+  const managers = managersQuery.data ?? []
   const { data: currentManagerRow } = useCurrentManager()
 
   const isPending = createTrip.isPending || updateTrip.isPending
@@ -198,14 +199,14 @@ export function TripFormDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTrip?.id])
 
-  // When bus type changes, auto-suggest capacity (only in create mode).
+  // When bus type changes, auto-suggest capacity unless the user has manually edited it.
   const watchedBusType = useWatch({ control: form.control, name: "busType" })
+  const capacityDirty = form.formState.dirtyFields.capacity
   useEffect(() => {
-    if (!initialTrip) {
-      form.setValue("capacity", BUS_SEAT_DEFAULTS[watchedBusType as "55" | "79"] ?? 55)
+    if (!capacityDirty) {
+      form.setValue("capacity", BUS_SEAT_DEFAULTS[watchedBusType])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchedBusType])
+  }, [watchedBusType, capacityDirty, form])
 
   async function onSubmit(values: FormValues) {
     const departureAt = fromDatetimeLocal(values.departureAt)
@@ -218,7 +219,7 @@ export function TripFormDialog({
           origin: values.origin,
           destination: values.destination,
           ownerManagerId: values.ownerManagerId,
-          busType: values.busType as "55" | "79",
+          busType: values.busType,
           capacity: values.capacity,
           departureAt,
           returnAt,
@@ -251,8 +252,8 @@ export function TripFormDialog({
       if (values.destination !== initialTrip.destination) patch.destination = values.destination
       if (values.ownerManagerId !== initialTrip.ownerManagerId)
         patch.ownerManagerId = values.ownerManagerId
-      if ((values.busType as "55" | "79") !== initialTrip.busType)
-        patch.busType = values.busType as "55" | "79"
+      if (values.busType !== initialTrip.busType)
+        patch.busType = values.busType
       if (values.capacity !== initialTrip.capacity) patch.capacity = values.capacity
       if (departureAt.toISOString() !== initialTrip.departureDate.toISOString())
         patch.departureAt = departureAt
@@ -270,7 +271,7 @@ export function TripFormDialog({
       const notesVal = values.notes || null
       if (notesVal !== initialTrip.notes) patch.notes = notesVal
       if (values.status && values.status !== initialTrip.status)
-        patch.status = values.status as TripStatus
+        patch.status = values.status
 
       // Empty-patch guard: no changes — just close.
       if (Object.keys(patch).length === 0) {
@@ -398,8 +399,8 @@ export function TripFormDialog({
                 name="ownerManagerId"
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={(v) => field.onChange(v)}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
+                    <SelectTrigger className="w-full" disabled={managersQuery.isLoading}>
+                      <SelectValue placeholder={t("dialog.fields.ownerPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {managers.map((m) => (

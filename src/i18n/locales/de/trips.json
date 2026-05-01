@@ -44,6 +44,7 @@
       "busType": "Bustyp",
       "capacity": "Kapazität",
       "owner": "Verantwortlicher Manager",
+      "ownerPlaceholder": "Manager auswählen",
       "departureAt": "Abfahrtsdatum und -uhrzeit",
       "returnAt": "Rückkehrdatum und -uhrzeit",
       "status": "Status",
