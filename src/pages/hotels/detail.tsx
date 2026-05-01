@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useBookings } from "@/hooks/queries/use-bookings"
-import { useHotels } from "@/hooks/queries/use-hotels"
+import { useHotelById } from "@/hooks/queries/use-hotels"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
 import { getHotelStats } from "@/lib/stats"
@@ -60,14 +60,12 @@ export default function HotelDetailPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const [editOpen, setEditOpen] = useState(false)
 
-  const { data: hotels = [], isLoading: hotelsLoading } = useHotels()
+  const { data: hotel, isLoading: hotelsLoading } = useHotelById(hotelId)
   const { data: trips = [] } = useTrips()
   const { data: bookings = [] } = useBookings()
-
-  const hotel = useMemo(() => hotels.find((h) => h.id === hotelId), [hotels, hotelId])
   const stats = useMemo(
-    () => (hotel ? getHotelStats(hotel.id, trips, bookings, hotels) : null),
-    [hotel, trips, bookings, hotels],
+    () => (hotel ? getHotelStats(hotel.id, trips, bookings, [hotel]) : null),
+    [hotel, trips, bookings],
   )
   const hotelTrips = useMemo(
     () => (hotel ? trips.filter((tr) => tr.hotelIds.includes(hotel.id)) : []),

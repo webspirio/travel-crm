@@ -10,13 +10,27 @@ import type { Locale } from "@/types"
 export function StepPricing() {
   const { t, i18n } = useTranslation("booking")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
-  const { tripId, hotelId, roomType, update } = useBookingStore()
+  const { tripId, hotelId, roomType, noHotel, update } = useBookingStore()
 
   const { data: trip } = useTripById(tripId ?? undefined)
   const { data: hotel } = useHotelById(hotelId ?? undefined)
 
   const pricing = useMemo(() => {
-    if (!trip || !hotel || !roomType) return null
+    if (!trip) return null
+
+    if (noHotel || (!hotelId && !roomType)) {
+      // Bus-only booking: no hotel cost, total is just the base price.
+      const total = trip.basePrice
+      return {
+        basePrice: trip.basePrice,
+        hotelCost: 0,
+        total,
+        commission: Math.round(total * 0.1),
+      }
+    }
+
+    if (!hotel || !roomType) return null
+
     const nights = Math.max(
       1,
       Math.round(
@@ -31,7 +45,7 @@ export function StepPricing() {
       total,
       commission: Math.round(total * 0.1),
     }
-  }, [trip, hotel, roomType])
+  }, [trip, hotel, roomType, hotelId, noHotel])
 
   useEffect(() => {
     update({ pricing })
@@ -44,7 +58,9 @@ export function StepPricing() {
   return (
     <div className="mx-auto max-w-md space-y-2 rounded-md border p-4">
       <Row label={t("pricing.basePrice")} value={formatCurrency(pricing.basePrice, locale)} />
-      <Row label={t("pricing.hotelCost")} value={formatCurrency(pricing.hotelCost, locale)} />
+      {pricing.hotelCost > 0 && (
+        <Row label={t("pricing.hotelCost")} value={formatCurrency(pricing.hotelCost, locale)} />
+      )}
       <hr />
       <Row
         label={t("pricing.total")}

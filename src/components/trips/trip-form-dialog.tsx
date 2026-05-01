@@ -200,13 +200,16 @@ export function TripFormDialog({
   }, [initialTrip?.id])
 
   // When bus type changes, auto-suggest capacity unless the user has manually edited it.
+  // Only fires in create mode — in edit mode the operator has authoritative
+  // control over capacity and we must never silently overwrite it.
   const watchedBusType = useWatch({ control: form.control, name: "busType" })
   const capacityDirty = form.formState.dirtyFields.capacity
   useEffect(() => {
-    if (!capacityDirty) {
+    if (mode === "create" && !capacityDirty) {
       form.setValue("capacity", BUS_SEAT_DEFAULTS[watchedBusType])
     }
-  }, [watchedBusType, capacityDirty, form])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedBusType, capacityDirty, mode])
 
   async function onSubmit(values: FormValues) {
     const departureAt = fromDatetimeLocal(values.departureAt)

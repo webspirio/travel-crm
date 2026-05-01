@@ -30,7 +30,11 @@
   },
   "hotel": {
     "pickHotel": "Hotel auswählen",
-    "pickRoom": "Zimmertyp"
+    "pickRoom": "Zimmertyp",
+    "skipHotel": "Ohne Hotel",
+    "noHotel": "Ohne Hotel",
+    "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
+    "undoSkip": "Hotel auswählen"
   },
   "pricing": {
     "basePrice": "Reisegrundpreis",

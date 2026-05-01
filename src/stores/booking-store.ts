@@ -15,8 +15,15 @@ export interface BookingDraft {
   }
   tripId: string | null
   seatNumber: number | null
+  /** null when no hotel blocks exist or operator explicitly skips hotel. */
   hotelId: string | null
   roomType: RoomType | null
+  /**
+   * True when the operator has explicitly confirmed "no hotel" for this
+   * booking (bus-only trip or unconfigured hotel blocks). Distinguishes the
+   * "skip confirmed" state from "not yet chosen" so canContinue unblocks.
+   */
+  noHotel: boolean
   pricing: {
     basePrice: number
     hotelCost: number
@@ -32,6 +39,7 @@ const EMPTY: BookingDraft = {
   seatNumber: null,
   hotelId: null,
   roomType: null,
+  noHotel: false,
   pricing: null,
 }
 

@@ -1,6 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js"
 import { create } from "zustand"
 
+import { queryClient } from "@/lib/query-client"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
@@ -151,8 +152,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     return { error: null }
   },
 
+  /**
+   * Signs the user out and immediately wipes the react-query in-memory
+   * cache. Without the clear(), a subsequent component render on a shared
+   * workstation could briefly expose the previous user's tenant data before
+   * the router redirects to /login. queryClient is a module-level singleton
+   * from @/lib/query-client, so it is safe to call here outside of a hook.
+   */
   signOut: async () => {
     await supabase.auth.signOut()
+    // Prevent cross-user cache leakage on shared devices.
+    queryClient.clear()
     // onAuthStateChange handles state reset; explicit set() here is a
     // belt-and-suspenders fallback in case the subscription hasn't been
     // attached yet (e.g. signOut called before init completes).

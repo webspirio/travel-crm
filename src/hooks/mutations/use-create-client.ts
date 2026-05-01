@@ -49,6 +49,7 @@ export function useCreateClient() {
           phone: input.phone,
           nationality: input.nationality,
           ...(birthDateStr !== null ? { birth_date: birthDateStr } : {}),
+          ...(input.notes != null ? { notes: input.notes } : {}),
         })
         .select()
         .single()

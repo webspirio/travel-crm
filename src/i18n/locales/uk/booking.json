@@ -30,7 +30,11 @@
   },
   "hotel": {
     "pickHotel": "Оберіть готель",
-    "pickRoom": "Тип номера"
+    "pickRoom": "Тип номера",
+    "skipHotel": "Без готелю",
+    "noHotel": "Без готелю",
+    "noHotelConfirmed": "Готель не обрано. Бронювання без готелю.",
+    "undoSkip": "Обрати готель"
   },
   "pricing": {
     "basePrice": "Базова ціна туру",

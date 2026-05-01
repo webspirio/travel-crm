@@ -11,7 +11,7 @@ export function StepSummary() {
   const { t, i18n } = useTranslation("booking")
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
-  const { clientId, newClient, tripId, seatNumber, hotelId, roomType, pricing } =
+  const { clientId, newClient, tripId, seatNumber, hotelId, roomType, noHotel, pricing } =
     useBookingStore()
 
   const { data: client } = useClientById(clientId ?? undefined)
@@ -44,8 +44,11 @@ export function StepSummary() {
         <dd>{seatNumber ? `#${seatNumber}` : "—"}</dd>
         <dt className="text-muted-foreground">{t("steps.hotel")}</dt>
         <dd>
-          {hotel?.name ?? "—"}
-          {roomType ? ` · ${tc(`room.${roomType}`)}` : ""}
+          {noHotel
+            ? t("hotel.noHotel")
+            : hotel
+              ? `${hotel.name}${roomType ? ` · ${tc(`room.${roomType}`)}` : ""}`
+              : "—"}
         </dd>
         <dt className="text-muted-foreground">{t("pricing.total")}</dt>
         <dd className="font-semibold">

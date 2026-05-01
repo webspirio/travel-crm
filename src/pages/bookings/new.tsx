@@ -34,7 +34,8 @@ export default function NewBookingPage() {
       case 2:
         return Boolean(state.seatNumber)
       case 3:
-        return Boolean(state.hotelId && state.roomType)
+        // Allow advance when a hotel+room is chosen OR operator explicitly skips hotel.
+        return Boolean(state.hotelId && state.roomType) || state.noHotel
       case 4:
         return Boolean(state.pricing)
       default:
