@@ -86,7 +86,29 @@
       "empty": "Noch keine Zahlungen",
       "cash": "Bargeld",
       "bank_transfer": "Banküberweisung",
-      "card": "Karte"
+      "card": "Karte",
+      "record": "Zahlung erfassen",
+      "success": "Zahlung erfasst",
+      "dialog": {
+        "title": "Zahlung erfassen",
+        "outstanding": "Ausstehend: {{amount}}",
+        "submit": "Speichern"
+      },
+      "fields": {
+        "amount": "Betrag (€)",
+        "method": "Zahlungsart",
+        "receivedAt": "Eingangsdatum",
+        "reference": "Referenz",
+        "notes": "Notizen"
+      },
+      "methods": {
+        "cash": "Bargeld",
+        "bank_transfer": "Banküberweisung",
+        "card": "Karte"
+      },
+      "errors": {
+        "amount": "Bitte einen Betrag ungleich null eingeben"
+      }
     },
     "transitions": {
       "confirm": "Bestätigen",

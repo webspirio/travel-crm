@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import { PaymentFormDialog } from "@/components/bookings/payment-form-dialog"
 import { useTranslation } from "react-i18next"
 import { ArrowLeft, Mail, Phone } from "lucide-react"
 import { Link, useParams } from "react-router"
@@ -84,6 +85,9 @@ export default function BookingDetailPage() {
 
   // Pending confirmation: which target status we're about to apply.
   const [pendingStatus, setPendingStatus] = useState<BookingStatus | null>(null)
+
+  // Payment dialog state.
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
 
   const hotelById = useMemo(
     () => new Map(hotels.map((h) => [h.id, h])),
@@ -301,8 +305,11 @@ export default function BookingDetailPage() {
 
       {/* Payments table */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t("detail.sections.payments")}</CardTitle>
+          <Button size="sm" onClick={() => setPaymentDialogOpen(true)}>
+            {t("detail.payments.record")}
+          </Button>
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
@@ -348,6 +355,15 @@ export default function BookingDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Payment form dialog */}
+      <PaymentFormDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        bookingId={booking.id}
+        bookingTotal={booking.totalPrice}
+        bookingPaidAmount={booking.paidAmount}
+      />
 
       {/* Confirmation dialog for destructive transitions */}
       <Dialog open={pendingStatus !== null} onOpenChange={(open) => { if (!open) setPendingStatus(null) }} disablePointerDismissal>

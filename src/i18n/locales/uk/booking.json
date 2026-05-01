@@ -86,7 +86,29 @@
       "empty": "Платежів ще немає",
       "cash": "Готівка",
       "bank_transfer": "Банківський переказ",
-      "card": "Картка"
+      "card": "Картка",
+      "record": "Записати платіж",
+      "success": "Платіж записано",
+      "dialog": {
+        "title": "Записати платіж",
+        "outstanding": "До оплати: {{amount}}",
+        "submit": "Зберегти"
+      },
+      "fields": {
+        "amount": "Сума (€)",
+        "method": "Спосіб",
+        "receivedAt": "Дата отримання",
+        "reference": "Реквізити",
+        "notes": "Нотатки"
+      },
+      "methods": {
+        "cash": "Готівка",
+        "bank_transfer": "Банківський переказ",
+        "card": "Картка"
+      },
+      "errors": {
+        "amount": "Введіть ненульову суму"
+      }
     },
     "transitions": {
       "confirm": "Підтвердити",
