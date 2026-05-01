@@ -99,5 +99,20 @@
     "double": "Doppelzimmer",
     "triple": "Dreibettzimmer",
     "family": "Familienzimmer"
+  },
+  "errors": {
+    "duplicateEmail": "Es existiert bereits ein Kunde mit dieser E-Mail-Adresse. Bitte verwende den bestehenden Datensatz oder eine andere Adresse.",
+    "seatTaken": "Dieser Sitzplatz ist bereits vergeben. Bitte wähle einen anderen Platz.",
+    "seatDupInDraft": "Zwei Reisende in dieser Buchung haben denselben Sitzplatz. Bitte behebe den Konflikt.",
+    "lapInfantNeedsSeat": "Für Kinder oder Erwachsene muss ein Sitzplatz gewählt werden.",
+    "bookingNumberRace": "Buchungsnummer konnte nicht erzeugt werden. Bitte erneut versuchen.",
+    "crossTenant": "Datensatz gehört zu einem anderen Mandanten. Aktion nicht erlaubt.",
+    "illegalStatus": "Dieser Statuswechsel ist nicht zulässig.",
+    "permissionDenied": "Unzureichende Berechtigungen für diese Aktion.",
+    "sessionExpired": "Sitzung abgelaufen. Bitte melde dich erneut an.",
+    "notAManager": "Konto hat keine Manager-Rolle in diesem Mandanten.",
+    "emptyPassengers": "Eine Buchung muss mindestens einen Reisenden enthalten.",
+    "unknown": "Unerwarteter Fehler. Bitte erneut versuchen.",
+    "invalidPhone": "Ungültige Telefonnummer."
   }
 }
