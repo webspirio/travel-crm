@@ -86,7 +86,7 @@
       "countryFormat": "Bitte 2-stelligen ISO-Code eingeben (z. B. IT, DE)",
       "stars": "Bitte Sterne von 1 bis 5 angeben",
       "pricePerNight": "Preis muss >= 0 sein",
-      "totalCapacity": "Anzahl muss >= 0 sein",
+      "totalCapacity": "Anzahl muss >= 1 sein",
       "duplicateRoomType": "Zimmertyp bereits hinzugefügt"
     },
     "success": {

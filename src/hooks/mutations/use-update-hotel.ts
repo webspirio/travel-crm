@@ -30,6 +30,14 @@ export interface UpdateHotelInput {
  *     hotel_id+room_type), then delete any existing rows whose room_type is
  *     no longer in the desired set
  *
+ * Failure modes (Etap 1 — no compensation):
+ * - If the hotel UPDATE succeeds but the rooms fetch / upsert / delete
+ *   fails, the mutation throws and the hotel may be in a partially
+ *   updated state. The next refetch shows the actual DB state; manual
+ *   retry from the dialog is the recovery path.
+ * - The composite trigger `hotel_room_types_assert_same_tenant`
+ *   guarantees tenant isolation even if a stale ID slipped through.
+ *
  * On success: invalidates hotelsKeys.detail(id) and hotelsKeys.all.
  */
 export function useUpdateHotel() {

@@ -87,7 +87,7 @@
       "countryFormat": "Введіть 2-літерний код ISO (напр. IT, DE)",
       "stars": "Вкажіть кількість зірок від 1 до 5",
       "pricePerNight": "Ціна має бути >= 0",
-      "totalCapacity": "Кількість має бути >= 0",
+      "totalCapacity": "Кількість має бути >= 1",
       "duplicateRoomType": "Тип номеру вже доданий"
     },
     "success": {

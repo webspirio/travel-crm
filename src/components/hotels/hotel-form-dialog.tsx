@@ -63,7 +63,7 @@ function makeSchema(t: (key: string) => string) {
             totalCapacity: z
               .number({ error: t("dialog.errors.totalCapacity") })
               .int()
-              .min(0, { message: t("dialog.errors.totalCapacity") }),
+              .min(1, { message: t("dialog.errors.totalCapacity") }),
             pricePerNight: z
               .number({ error: t("dialog.errors.pricePerNight") })
               .min(0, { message: t("dialog.errors.pricePerNight") }),
@@ -458,7 +458,7 @@ export function HotelFormDialog({
                     <div>
                       <Input
                         type="number"
-                        min={0}
+                        min={1}
                         step={1}
                         className="text-right"
                         aria-invalid={!!form.formState.errors.rooms?.[index]?.totalCapacity}
@@ -523,7 +523,7 @@ export function HotelFormDialog({
               onClick={() => {
                 const nextType = availableRoomTypes[0]
                 if (nextType) {
-                  append({ roomType: nextType, totalCapacity: 0, pricePerNight: 0 })
+                  append({ roomType: nextType, totalCapacity: 1, pricePerNight: 0 })
                 }
               }}
             >
