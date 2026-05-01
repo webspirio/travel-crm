@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
-import { StepClient } from "@/components/booking-form/step-client"
 import { StepHotel } from "@/components/booking-form/step-hotel"
 import { StepPricing } from "@/components/booking-form/step-pricing"
 import { StepSeat } from "@/components/booking-form/step-seat"
 import { StepSummary } from "@/components/booking-form/step-summary"
+import { StepTravelers } from "@/components/booking-form/step-travelers"
 import { StepTrip } from "@/components/booking-form/step-trip"
 import { STEPS, Stepper } from "@/components/booking-form/stepper"
+import { useTravelersCanContinue } from "@/hooks/use-travelers-can-continue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
@@ -28,10 +29,17 @@ export default function NewBookingPage() {
 
   const createBooking = useCreateBooking()
 
+  // Travelers step (index 0) gates via the new multi-passenger draft. The
+  // hook subscribes to the new store + runs the duplicate-detection query
+  // unconditionally, so we always get a fresh boolean even when the user is
+  // on a later step. Other steps still read from the legacy compatibility
+  // selector — Tasks 7-10 will migrate them.
+  const travelersOk = useTravelersCanContinue()
+
   const canContinue = useMemo(() => {
     switch (step) {
       case 0:
-        return Boolean(state.clientId) || Boolean(state.newClient?.firstName && state.newClient?.lastName && state.newClient?.email)
+        return travelersOk
       case 1:
         return Boolean(state.tripId)
       case 2:
@@ -44,12 +52,12 @@ export default function NewBookingPage() {
       default:
         return true
     }
-  }, [step, state])
+  }, [step, state, travelersOk])
 
   const renderStep = () => {
     switch (step) {
       case 0:
-        return <StepClient />
+        return <StepTravelers />
       case 1:
         return <StepTrip />
       case 2:
