@@ -23,7 +23,8 @@
   "tabs": {
     "bus": "Bus",
     "hotels": "Hotels",
-    "clients": "Passagiere"
+    "clients": "Passagiere",
+    "blocks": "Kontingente"
   },
   "details": {
     "edit": "Reise bearbeiten"
@@ -78,6 +79,52 @@
     "success": {
       "created": "Reise erstellt",
       "updated": "Reise aktualisiert"
+    }
+  },
+  "blocks": {
+    "title": "Hotelkontingente",
+    "empty": "Noch keine Kontingente. Fügen Sie ein Kontingent hinzu, um Zimmer für diese Reise zu reservieren.",
+    "addCta": "Kontingent hinzufügen",
+    "columns": {
+      "hotel": "Hotel",
+      "roomType": "Zimmertyp",
+      "used": "Belegt / Gesamt",
+      "notes": "Notizen",
+      "actions": "Aktionen"
+    },
+    "dialog": {
+      "create": {
+        "title": "Neues Kontingent",
+        "submit": "Kontingent erstellen"
+      },
+      "edit": {
+        "title": "Kontingent bearbeiten",
+        "submit": "Änderungen speichern"
+      },
+      "fields": {
+        "hotel": "Hotel",
+        "roomType": "Zimmertyp",
+        "qtyTotal": "Zimmeranzahl",
+        "qtyTotalHint": "Aktuell belegt: {{count}} (nicht unterschreiten)",
+        "notes": "Notizen"
+      },
+      "usedHint": "Belegt: {{used}} / {{total}}",
+      "errors": {
+        "hotel": "Bitte Hotel auswählen",
+        "roomType": "Bitte Zimmertyp auswählen",
+        "qtyTotal": "Anzahl muss eine ganze Zahl >= 0 sein"
+      },
+      "success": {
+        "created": "Kontingent erstellt",
+        "updated": "Kontingent aktualisiert",
+        "deleted": "Kontingent gelöscht"
+      }
+    },
+    "deleteDialog": {
+      "title": "Kontingent löschen?",
+      "body": "Diese Aktion löscht das Kontingent unwiderruflich. Bestehende Buchungen bleiben erhalten, werden aber nicht mehr über dieses Kontingent verfolgt.",
+      "confirm": "Löschen",
+      "abort": "Abbrechen"
     }
   },
   "empty": "Keine Reisen gefunden"

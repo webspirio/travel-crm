@@ -1,20 +1,33 @@
-import { ArrowLeft, Bus, Calendar, MapPin, Pencil } from "lucide-react"
+import { ArrowLeft, Bus, Calendar, MapPin, Pencil, PlusIcon, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useParams } from "react-router"
 import type { ColumnDef } from "@tanstack/react-table"
+import { toast } from "sonner"
 
 import { SeatMap } from "@/components/bus/seat-map"
 import { DataTable } from "@/components/data-table/data-table"
 import { HotelCard } from "@/components/hotel/hotel-card"
+import { HotelBlockFormDialog } from "@/components/trips/hotel-block-form-dialog"
 import { TripFormDialog } from "@/components/trips/trip-form-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useBookingsByTrip } from "@/hooks/queries/use-bookings"
+import { useHotelBlocks } from "@/hooks/queries/use-hotel-blocks"
+import type { HotelBlock } from "@/hooks/queries/use-hotel-blocks"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
+import { useDeleteHotelBlock } from "@/hooks/mutations/use-delete-hotel-block"
 import { formatCurrency, formatDateRange } from "@/lib/format"
 import type { Locale, RoomType } from "@/types"
 
@@ -25,10 +38,15 @@ export default function TripDetailPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
   const [editOpen, setEditOpen] = useState(false)
+  const [blockCreateOpen, setBlockCreateOpen] = useState(false)
+  const [blockEditTarget, setBlockEditTarget] = useState<HotelBlock | null>(null)
+  const [blockDeleteTarget, setBlockDeleteTarget] = useState<HotelBlock | null>(null)
 
   const { data: trip, isLoading: tripLoading } = useTripById(tripId)
   const { data: tripBookings = [] } = useBookingsByTrip(tripId)
   const { data: hotels = [] } = useHotels()
+  const { data: hotelBlocks = [] } = useHotelBlocks(tripId)
+  const deleteBlock = useDeleteHotelBlock()
 
   const tripHotels = useMemo(
     () => (trip ? hotels.filter((h) => trip.hotelIds.includes(h.id)) : []),
@@ -162,6 +180,7 @@ export default function TripDetailPage() {
           <TabsTrigger value="bus">{t("tabs.bus")}</TabsTrigger>
           <TabsTrigger value="hotels">{t("tabs.hotels")}</TabsTrigger>
           <TabsTrigger value="clients">{t("tabs.clients")}</TabsTrigger>
+          <TabsTrigger value="blocks">{t("tabs.blocks")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bus" className="mt-4">
@@ -197,7 +216,143 @@ export default function TripDetailPage() {
             emptyMessage={t("empty")}
           />
         </TabsContent>
+
+        <TabsContent value="blocks" className="mt-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>{t("blocks.title")}</CardTitle>
+                <Button size="sm" onClick={() => setBlockCreateOpen(true)}>
+                  <PlusIcon className="size-4" />
+                  {t("blocks.addCta")}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {hotelBlocks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("blocks.empty")}</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-muted-foreground">
+                        <th className="pb-2 pr-4 font-medium">{t("blocks.columns.hotel")}</th>
+                        <th className="pb-2 pr-4 font-medium">{t("blocks.columns.roomType")}</th>
+                        <th className="pb-2 pr-4 font-medium">{t("blocks.columns.used")}</th>
+                        <th className="pb-2 pr-4 font-medium">{t("blocks.columns.notes")}</th>
+                        <th className="pb-2 font-medium">{t("blocks.columns.actions")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hotelBlocks.map((block) => {
+                        const hotel = hotels.find((h) => h.id === block.hotel_id)
+                        return (
+                          <tr key={block.id} className="border-b last:border-0">
+                            <td className="py-2 pr-4">
+                              {hotel ? (
+                                <span>
+                                  {hotel.name}
+                                  <span className="ml-1 text-muted-foreground">{hotel.city}</span>
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">{block.hotel_id}</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-4">{tc(`room.${block.room_type}`)}</td>
+                            <td className="py-2 pr-4 tabular-nums">
+                              {block.qty_used} / {block.qty_total}
+                            </td>
+                            <td className="max-w-[200px] truncate py-2 pr-4 text-muted-foreground">
+                              {block.notes ?? "—"}
+                            </td>
+                            <td className="py-2">
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="icon-sm"
+                                  variant="ghost"
+                                  aria-label={tc("actions.edit")}
+                                  onClick={() => setBlockEditTarget(block)}
+                                >
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                                <Button
+                                  size="icon-sm"
+                                  variant="ghost"
+                                  aria-label={tc("actions.delete")}
+                                  onClick={() => setBlockDeleteTarget(block)}
+                                >
+                                  <Trash2 className="size-3.5 text-destructive" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+
+      {/* Hotel block — create dialog */}
+      <HotelBlockFormDialog
+        open={blockCreateOpen}
+        onOpenChange={setBlockCreateOpen}
+        mode="create"
+        tripId={trip.id}
+      />
+
+      {/* Hotel block — edit dialog */}
+      <HotelBlockFormDialog
+        open={blockEditTarget !== null}
+        onOpenChange={(open) => { if (!open) setBlockEditTarget(null) }}
+        mode="edit"
+        tripId={trip.id}
+        initialBlock={blockEditTarget ?? undefined}
+      />
+
+      {/* Hotel block — delete confirmation */}
+      <Dialog
+        open={blockDeleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setBlockDeleteTarget(null) }}
+        disablePointerDismissal
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>{t("blocks.deleteDialog.title")}</DialogTitle>
+            <DialogDescription>{t("blocks.deleteDialog.body")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBlockDeleteTarget(null)}>
+              {t("blocks.deleteDialog.abort")}
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteBlock.isPending}
+              onClick={() => {
+                if (!blockDeleteTarget) return
+                deleteBlock.mutate(
+                  { id: blockDeleteTarget.id, tripId: trip.id },
+                  {
+                    onSuccess: () => {
+                      toast.success(t("blocks.dialog.success.deleted"))
+                      setBlockDeleteTarget(null)
+                    },
+                    onError: (err) => {
+                      toast.error(err.message)
+                    },
+                  },
+                )
+              }}
+            >
+              {t("blocks.deleteDialog.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
