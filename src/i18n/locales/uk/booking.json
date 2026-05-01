@@ -50,7 +50,8 @@
     "pickHotel": "Оберіть готель"
   },
   "detail": {
-    "back": "До бронювань",
+    "back": "До панелі",
+    "statusChanged": "Статус змінено: {{status}}",
     "notFound": "Бронювання не знайдено",
     "sections": {
       "status": "Статус",

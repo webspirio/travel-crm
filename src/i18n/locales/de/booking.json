@@ -50,7 +50,8 @@
     "pickHotel": "Hotel auswählen"
   },
   "detail": {
-    "back": "Zurück zu Buchungen",
+    "back": "Zum Dashboard",
+    "statusChanged": "Status geändert: {{status}}",
     "notFound": "Buchung nicht gefunden",
     "sections": {
       "status": "Status",

@@ -28,7 +28,8 @@ function toPassenger(row: BookingPassengerRow): Passenger {
 function toBooking(row: BookingRow & { booking_passengers: BookingPassengerRow[] }): Booking {
   return {
     id: row.id,
-    contractNumber: row.contract_number ?? row.booking_number,
+    bookingNumber: row.booking_number,
+    contractNumber: row.contract_number ?? null,
     clientId: row.client_id,
     tripId: row.trip_id,
     passengers: (row.booking_passengers ?? []).map(toPassenger),

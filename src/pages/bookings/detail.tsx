@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { ArrowLeft, Mail, Phone } from "lucide-react"
 import { Link, useParams } from "react-router"
@@ -35,7 +35,9 @@ import { formatCurrency, formatDate, formatDateRange } from "@/lib/format"
 import type { BookingStatus } from "@/lib/booking-status"
 import type { Locale } from "@/types"
 
-// State-machine: which target statuses are reachable from each current status.
+// MIRROR of `private.bookings_assert_status_transition` in
+// supabase/migrations/20260508900000_domain_rls.sql. The DB enforces
+// transitions; this map only governs which buttons render. Keep in sync.
 const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
   draft: ["confirmed", "cancelled"],
   confirmed: ["partially_paid", "paid", "cancelled"],
@@ -83,8 +85,14 @@ export default function BookingDetailPage() {
   // Pending confirmation: which target status we're about to apply.
   const [pendingStatus, setPendingStatus] = useState<BookingStatus | null>(null)
 
-  const hotelById = new Map(hotels.map((h) => [h.id, h]))
-  const managerById = new Map(managers.map((m) => [m.id, m]))
+  const hotelById = useMemo(
+    () => new Map(hotels.map((h) => [h.id, h])),
+    [hotels],
+  )
+  const managerById = useMemo(
+    () => new Map(managers.map((m) => [m.id, m])),
+    [managers],
+  )
 
   function handleTransition(target: BookingStatus) {
     if (DESTRUCTIVE_STATUSES.has(target)) {
@@ -100,7 +108,7 @@ export default function BookingDetailPage() {
       { id: bookingId, status: target },
       {
         onSuccess: () => {
-          toast.success(tc(`bookingStatus.${target}`))
+          toast.success(t("detail.statusChanged", { status: tc(`bookingStatus.${target}`) }))
         },
       },
     )
@@ -152,7 +160,12 @@ export default function BookingDetailPage() {
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold tabular-nums">
-              #{booking.contractNumber}
+              {t("detail.fields.booking")} #{booking.bookingNumber}
+              {booking.contractNumber !== null && (
+                <span className="ml-2 text-lg font-normal text-muted-foreground">
+                  · {t("detail.fields.contract")}: #{booking.contractNumber}
+                </span>
+              )}
             </h1>
             <Badge variant={statusVariant(booking.status)}>
               {tc(`bookingStatus.${booking.status}`)}
@@ -337,7 +350,7 @@ export default function BookingDetailPage() {
       </Card>
 
       {/* Confirmation dialog for destructive transitions */}
-      <Dialog open={pendingStatus !== null} onOpenChange={(open) => { if (!open) setPendingStatus(null) }}>
+      <Dialog open={pendingStatus !== null} onOpenChange={(open) => { if (!open) setPendingStatus(null) }} disablePointerDismissal>
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>{t(`detail.${dialogKey}.title`)}</DialogTitle>

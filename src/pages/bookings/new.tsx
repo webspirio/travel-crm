@@ -74,7 +74,7 @@ export default function NewBookingPage() {
         onSuccess: ({ booking }) => {
           toast.success(t("summary.toast", { bookingNumber: booking.booking_number }))
           reset()
-          void navigate(`/trips/${booking.trip_id}`)
+          void navigate(`/bookings/${booking.id}`)
         },
         onError: (err) => {
           toast.error(err.message)

@@ -56,7 +56,7 @@ export default function TripDetailPage() {
 
   type PassengerRow = {
     key: string
-    contractNumber: string
+    displayNumber: string
     seatNumber: number
     name: string
     room: string
@@ -66,7 +66,7 @@ export default function TripDetailPage() {
   const passengerRows: PassengerRow[] = tripBookings.flatMap((b) =>
     b.passengers.map((p) => ({
       key: p.id,
-      contractNumber: b.contractNumber,
+      displayNumber: b.contractNumber ?? b.bookingNumber,
       seatNumber: p.seatNumber,
       name: `${p.firstName} ${p.lastName}`,
       room: p.roomType,
@@ -90,7 +90,7 @@ export default function TripDetailPage() {
           to={`/bookings/${row.original.bookingId}`}
           className="tabular-nums hover:underline"
         >
-          {row.original.contractNumber}
+          {row.original.displayNumber}
         </Link>
       ),
     },

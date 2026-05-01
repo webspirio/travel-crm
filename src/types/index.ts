@@ -1,3 +1,5 @@
+import type { Database } from "@/types/database"
+
 export type BusType = "55" | "79"
 
 export type SeatStatus = "free" | "selected" | "reserved" | "sold" | "blocked"
@@ -89,7 +91,7 @@ export interface Trip {
   bookedCount: number
 }
 
-export type PassengerKind = "adult" | "child" | "infant"
+export type PassengerKind = Database["public"]["Enums"]["passenger_kind"]
 
 export interface Passenger {
   id: string
@@ -105,7 +107,8 @@ export interface Passenger {
 
 export interface Booking {
   id: string
-  contractNumber: string
+  bookingNumber: string
+  contractNumber: string | null
   clientId: string
   tripId: string
   passengers: Passenger[]

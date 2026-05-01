@@ -74,7 +74,7 @@ export default function HotelDetailPage() {
   type HotelPassengerRow = {
     key: string
     bookingId: string
-    contractNumber: string
+    displayNumber: string
     passengerName: string
     tripId: string
     tripName: string
@@ -98,7 +98,7 @@ export default function HotelDetailPage() {
         rows.push({
           key: p.id,
           bookingId: b.id,
-          contractNumber: b.contractNumber,
+          displayNumber: b.contractNumber ?? b.bookingNumber,
           passengerName: `${p.firstName} ${p.lastName}`,
           tripId: b.tripId,
           tripName: tripById.get(b.tripId)?.name ?? b.tripId,

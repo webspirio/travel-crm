@@ -288,7 +288,7 @@ export default function FinancePage() {
                     const c = clientById.get(b.clientId)
                     const trip = tripById.get(b.tripId)
                     return (
-                      <TableRow key={b.id} className="cursor-pointer">
+                      <TableRow key={b.id}>
                         <TableCell>
                           {c ? (
                             <Link

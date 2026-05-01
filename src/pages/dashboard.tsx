@@ -176,7 +176,7 @@ export default function DashboardPage() {
                   const client = clientById.get(b.clientId)
                   const trip = tripById.get(b.tripId)
                   return (
-                    <TableRow key={b.id} className="cursor-pointer">
+                    <TableRow key={b.id}>
                       <TableCell>
                         <Link to={`/bookings/${b.id}`} className="hover:underline">
                           {client ? `${client.firstName} ${client.lastName}` : b.clientId}
