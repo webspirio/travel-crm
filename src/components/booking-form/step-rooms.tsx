@@ -383,9 +383,11 @@ export function StepRooms({ editMode = false }: { editMode?: boolean } = {}) {
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{t("rooms.tripHasNoHotel")}</p>
-        <Button variant="outline" size="sm" onClick={handleSkipAll}>
-          {t("rooms.skipHotel")}
-        </Button>
+        {!editMode && (
+          <Button variant="outline" size="sm" onClick={handleSkipAll}>
+            {t("rooms.skipHotel")}
+          </Button>
+        )}
       </div>
     )
   }
@@ -507,11 +509,15 @@ export function StepRooms({ editMode = false }: { editMode?: boolean } = {}) {
         </>
       )}
 
-      {/* Skip hotel for everyone */}
-      <Separator />
-      <Button variant="ghost" size="sm" onClick={handleSkipAll}>
-        {t("rooms.skipAll")}
-      </Button>
+      {/* Skip hotel for everyone — hidden in edit mode (would wipe assignments) */}
+      {!editMode && (
+        <>
+          <Separator />
+          <Button variant="ghost" size="sm" onClick={handleSkipAll}>
+            {t("rooms.skipAll")}
+          </Button>
+        </>
+      )}
     </div>
   )
 }
