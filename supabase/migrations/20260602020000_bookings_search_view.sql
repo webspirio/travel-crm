@@ -19,9 +19,10 @@
 -- update_*_with_reason RPCs and the create_booking_with_passengers RPC.
 --
 -- Computed-column expression matching:
---   `client_full_name` and `passenger_full_names` are written byte-for-byte
---   to match the trigram-index expressions on `clients.clients_name_trgm_idx`
---   and `booking_passengers.booking_passengers_name_trgm_idx` — i.e.
+--   `client_full_name` and `passenger_full_names` are written to match the
+--   trigram-index expressions on `clients.clients_name_trgm_idx` and
+--   `booking_passengers.booking_passengers_name_trgm_idx` as the same
+--   canonical expression after Postgres normalization — i.e.
 --   `(first_name || ' '::text) || last_name`. This lets the planner reuse
 --   the GIN trigram index for `ilike '%foo%'` substring search when the
 --   user filters the list page. The `passenger_full_names` aggregate is
@@ -41,7 +42,7 @@ create extension if not exists pg_trgm;
 
 create index booking_passengers_name_trgm_idx
   on public.booking_passengers
-  using gin (((first_name || ' '::text) || last_name) gin_trgm_ops);
+  using gin (((first_name || ' '::text) || last_name) extensions.gin_trgm_ops);
 
 -- ============================================================
 -- 2. bookings_search_view — list-page driver.
@@ -87,7 +88,8 @@ select
   -- Seller display name.
   m.display_name                  as sold_by_manager_name,
   -- Computed: full client name. Expression matches clients_name_trgm_idx
-  -- byte-for-byte so `ilike '%foo%'` on this column can use the GIN index.
+  -- (same canonical form after Postgres normalization) so `ilike '%foo%'`
+  -- on this column can use the GIN index.
   -- NULL when the LEFT JOIN misses; consumers handle that case in the UI.
   (c.first_name || ' '::text) || c.last_name              as client_full_name,
   -- Computed: comma-separated passenger names, deterministic order by id.
