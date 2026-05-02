@@ -20,7 +20,7 @@ import { layoutFor } from "@/lib/bus-layouts"
 import { isOccupying } from "@/lib/booking-status"
 import { cn } from "@/lib/utils"
 import type { PassengerDraft } from "@/stores/booking-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 
 // ─── Colour palette for passenger pills ───────────────────────────────────────
 
@@ -92,9 +92,9 @@ function SwapConfirmDialog({ open, seatNumber, ownerName, onConfirm, onCancel }:
 
 export function StepSeats() {
   const { t } = useTranslation("booking")
-  const passengers = useBookingStore((s) => s.passengers)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
-  const tripId = useBookingStore((s) => s.tripId)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
+  const tripId = useBookingDraft((s) => s.tripId)
   const { data: trip } = useTripById(tripId ?? undefined)
 
   // ── Seatable vs lap-infant split ──────────────────────────────────────────

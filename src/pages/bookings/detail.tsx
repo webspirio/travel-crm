@@ -33,23 +33,13 @@ import { useTripById } from "@/hooks/queries/use-trips"
 import { useUpdateBookingStatus } from "@/hooks/mutations/use-update-booking-status"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { formatCurrency, formatDate, formatDateRange } from "@/lib/format"
-import { bookingStatusVariant, type BookingStatus } from "@/lib/booking-status"
+import {
+  bookingStatusVariant,
+  DESTRUCTIVE_STATUSES,
+  TRANSITIONS,
+  type BookingStatus,
+} from "@/lib/booking-status"
 import type { Locale } from "@/types"
-
-// MIRROR of `private.bookings_assert_status_transition` in
-// supabase/migrations/20260508900000_domain_rls.sql. The DB enforces
-// transitions; this map only governs which buttons render. Keep in sync.
-const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
-  draft: ["confirmed", "cancelled"],
-  confirmed: ["partially_paid", "paid", "cancelled"],
-  partially_paid: ["paid", "cancelled"],
-  paid: ["no_show", "cancelled"],
-  cancelled: [],
-  no_show: [],
-}
-
-// Statuses that require a confirmation dialog before applying.
-const DESTRUCTIVE_STATUSES = new Set<BookingStatus>(["cancelled", "no_show"])
 
 export default function BookingDetailPage() {
   const { bookingId } = useParams()

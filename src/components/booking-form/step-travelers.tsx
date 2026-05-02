@@ -12,7 +12,7 @@ import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
 import { useDebouncedValue } from "@/lib/use-debounced-value"
 import { useAuthStore } from "@/stores/auth-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft, useBookingDraftStore } from "@/lib/booking-draft-context"
 import type { Locale, PassengerKind } from "@/types"
 
 /**
@@ -36,12 +36,13 @@ export function StepTravelers() {
 
   const tenantId = useAuthStore((s) => s.tenant?.id ?? null)
 
-  const passengers = useBookingStore((s) => s.passengers)
-  const tripId = useBookingStore((s) => s.tripId)
-  const addPassenger = useBookingStore((s) => s.addPassenger)
-  const removePassenger = useBookingStore((s) => s.removePassenger)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
-  const setPrimary = useBookingStore((s) => s.setPrimary)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const addPassenger = useBookingDraft((s) => s.addPassenger)
+  const removePassenger = useBookingDraft((s) => s.removePassenger)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
+  const setPrimary = useBookingDraft((s) => s.setPrimary)
+  const draftStore = useBookingDraftStore()
 
   const { data: trip = null } = useTripById(tripId ?? undefined)
 
@@ -88,7 +89,7 @@ export function StepTravelers() {
     // store will append it; we rely on the focus-on-mount effect inside
     // TravelerCard to handle keyboard focus.
     requestAnimationFrame(() => {
-      const latest = useBookingStore.getState().passengers
+      const latest = draftStore.getState().passengers
       const newest = latest[latest.length - 1]
       if (newest) {
         setExpandedIds((prev) => new Set(prev).add(newest.localId))
@@ -104,7 +105,7 @@ export function StepTravelers() {
     addPassenger("child")
     addPassenger("child")
     requestAnimationFrame(() => {
-      const latest = useBookingStore.getState().passengers
+      const latest = draftStore.getState().passengers
       const added = latest.slice(-3)
       added.forEach((p) => {
         if (ln) updatePassenger(p.localId, { lastName: ln })

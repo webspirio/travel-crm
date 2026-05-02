@@ -38,3 +38,41 @@ export function bookingStatusVariant(s: BookingStatus): BadgeVariant {
       return "destructive"
   }
 }
+
+// MIRROR of `private.bookings_assert_status_transition` in
+// supabase/migrations/20260508900000_domain_rls.sql. The DB enforces
+// transitions; this map only governs which buttons render. Keep in sync.
+export const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
+  draft: ["confirmed", "cancelled"],
+  confirmed: ["partially_paid", "paid", "cancelled"],
+  partially_paid: ["paid", "cancelled"],
+  paid: ["no_show", "cancelled"],
+  cancelled: [],
+  no_show: [],
+}
+
+// Statuses that require a confirmation dialog before applying.
+export const DESTRUCTIVE_STATUSES = new Set<BookingStatus>(["cancelled", "no_show"])
+
+/**
+ * Sections whose edits require a typed reason once the booking is committed
+ * (status >= confirmed). Notes / contact stay frictionless. Sensitive
+ * sections that touch money or inventory require a reason.
+ */
+export type EditableSection =
+  | "notes"
+  | "contact"
+  | "passengers"
+  | "hotelsRooms"
+  | "pricing"
+
+const SENSITIVE_SECTIONS = new Set<EditableSection>([
+  "passengers",
+  "hotelsRooms",
+  "pricing",
+])
+
+export function requiresReason(status: BookingStatus, section: EditableSection): boolean {
+  if (!SENSITIVE_SECTIONS.has(section)) return false
+  return status === "confirmed" || status === "partially_paid" || status === "paid"
+}

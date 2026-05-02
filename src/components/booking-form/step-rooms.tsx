@@ -26,7 +26,7 @@ import { useHotelBlocks } from "@/hooks/queries/use-hotel-blocks"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
 import type { PassengerDraft, RoomDraft } from "@/stores/booking-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 import type { RoomType } from "@/types"
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -226,15 +226,15 @@ export function StepRooms() {
   const { t } = useTranslation("booking")
 
   // Store slices
-  const tripId = useBookingStore((s) => s.tripId)
-  const passengers = useBookingStore((s) => s.passengers)
-  const rooms = useBookingStore((s) => s.rooms)
-  const noHotel = useBookingStore((s) => s.noHotel)
-  const addRoom = useBookingStore((s) => s.addRoom)
-  const removeRoom = useBookingStore((s) => s.removeRoom)
-  const assignToRoom = useBookingStore((s) => s.assignToRoom)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
-  const update = useBookingStore((s) => s.update)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const rooms = useBookingDraft((s) => s.rooms)
+  const noHotel = useBookingDraft((s) => s.noHotel)
+  const addRoom = useBookingDraft((s) => s.addRoom)
+  const removeRoom = useBookingDraft((s) => s.removeRoom)
+  const assignToRoom = useBookingDraft((s) => s.assignToRoom)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
+  const update = useBookingDraft((s) => s.update)
 
   // Data fetches
   const { data: trip } = useTripById(tripId ?? undefined)

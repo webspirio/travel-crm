@@ -49,7 +49,7 @@ export interface BookingDraft {
 
 // ─── Store actions ─────────────────────────────────────────────────────────────
 
-interface BookingStore extends BookingDraft {
+export interface BookingStore extends BookingDraft {
   // Step navigation
   setStep: (step: number) => void
 
