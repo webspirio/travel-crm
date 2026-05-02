@@ -1,0 +1,42 @@
+{
+  "title": "Buchungen",
+  "subtitle": "Alle Buchungen deines Mandanten",
+  "createCta": "Neue Buchung",
+  "search": "Suche nach Nummer, Kunde, Passagier…",
+  "empty": "Keine Buchungen gefunden",
+  "errorTitle": "Buchungen konnten nicht geladen werden",
+  "filters": {
+    "status": "Status",
+    "trip": "Reise",
+    "manager": "Manager",
+    "departure": "Abreise",
+    "from": "Von",
+    "to": "Bis",
+    "outstanding": "Offen",
+    "reset": "Filter zurücksetzen",
+    "anyTrip": "Beliebige Reise",
+    "anyManager": "Beliebiger Manager",
+    "apply": "Anwenden",
+    "clear": "Leeren"
+  },
+  "columns": {
+    "bookingNumber": "Nummer",
+    "status": "Status",
+    "client": "Kunde",
+    "trip": "Reise",
+    "passengers": "Passagiere",
+    "total": "Summe",
+    "paid": "Bezahlt",
+    "balance": "Saldo",
+    "soldBy": "Manager",
+    "createdAt": "Erstellt am"
+  },
+  "status": {
+    "draft": "Entwurf",
+    "confirmed": "Bestätigt",
+    "partially_paid": "Teilbezahlt",
+    "paid": "Bezahlt",
+    "cancelled": "Storniert",
+    "no_show": "Nicht erschienen"
+  }
+}

@@ -14,6 +14,8 @@ import clientsUk from "./locales/uk/clients.json"
 import clientsDe from "./locales/de/clients.json"
 import bookingUk from "./locales/uk/booking.json"
 import bookingDe from "./locales/de/booking.json"
+import bookingsUk from "./locales/uk/bookings.json"
+import bookingsDe from "./locales/de/bookings.json"
 import hotelsUk from "./locales/uk/hotels.json"
 import hotelsDe from "./locales/de/hotels.json"
 import calendarUk from "./locales/uk/calendar.json"
@@ -38,6 +40,7 @@ i18n
         trips: tripsUk,
         clients: clientsUk,
         booking: bookingUk,
+        bookings: bookingsUk,
         hotels: hotelsUk,
         calendar: calendarUk,
         finance: financeUk,
@@ -50,6 +53,7 @@ i18n
         trips: tripsDe,
         clients: clientsDe,
         booking: bookingDe,
+        bookings: bookingsDe,
         hotels: hotelsDe,
         calendar: calendarDe,
         finance: financeDe,
@@ -66,6 +70,7 @@ i18n
       "trips",
       "clients",
       "booking",
+      "bookings",
       "hotels",
       "calendar",
       "finance",
