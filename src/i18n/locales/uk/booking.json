@@ -306,7 +306,13 @@
       "contactFirstName": "Ім'я",
       "contactLastName": "Прізвище",
       "contactEmail": "Email",
-      "contactPhone": "Телефон"
+      "contactPhone": "Телефон",
+      "errors": {
+        "firstName": "Ім'я обов'язкове",
+        "lastName": "Прізвище обов'язкове",
+        "email": "Введіть коректний email",
+        "phone": "Телефон обов'язковий"
+      }
     },
     "toast": {
       "notesUpdated": "Нотатки оновлено",

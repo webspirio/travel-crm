@@ -306,7 +306,13 @@
       "contactFirstName": "Vorname",
       "contactLastName": "Nachname",
       "contactEmail": "E-Mail",
-      "contactPhone": "Telefon"
+      "contactPhone": "Telefon",
+      "errors": {
+        "firstName": "Vorname ist erforderlich",
+        "lastName": "Nachname ist erforderlich",
+        "email": "Gültige E-Mail-Adresse eingeben",
+        "phone": "Telefonnummer ist erforderlich"
+      }
     },
     "toast": {
       "notesUpdated": "Notizen aktualisiert",

@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { z } from "zod"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -32,9 +34,13 @@ interface Props {
  * and never require a reason.
  *
  * The inner form is keyed on `open + client.id` so React unmounts/remounts it
- * each time the sheet re-opens — that lets `useState(initial)` re-seed from
- * props without a setState-in-effect (which the React compiler ESLint rule
- * flags as a cascading-render risk).
+ * each time the sheet re-opens — that lets `useForm({ defaultValues })` re-seed
+ * from props without a setState-in-effect (which the React compiler ESLint
+ * rule flags as a cascading-render risk).
+ *
+ * Validation rules mirror `ClientFormDialog` (firstName/lastName non-empty,
+ * email format, phone non-empty) so a row edited from either surface enforces
+ * the same shape.
  */
 export function ContactEditSheet({ open, onOpenChange, client }: Props) {
   return (
@@ -50,6 +56,19 @@ export function ContactEditSheet({ open, onOpenChange, client }: Props) {
   )
 }
 
+// --- Zod schema (mirrors ClientFormDialog) ---
+
+function makeSchema(t: (key: string) => string) {
+  return z.object({
+    firstName: z.string().min(1, { message: t("detail.edit.errors.firstName") }),
+    lastName: z.string().min(1, { message: t("detail.edit.errors.lastName") }),
+    email: z.string().email({ message: t("detail.edit.errors.email") }),
+    phone: z.string().min(1, { message: t("detail.edit.errors.phone") }),
+  })
+}
+
+type FormValues = z.infer<ReturnType<typeof makeSchema>>
+
 function ContactEditForm({
   client,
   onClose,
@@ -60,19 +79,26 @@ function ContactEditForm({
   const { t } = useTranslation("booking")
   const updateClient = useUpdateClient()
 
-  const [firstName, setFirstName] = useState(client.firstName)
-  const [lastName, setLastName] = useState(client.lastName)
-  const [email, setEmail] = useState(client.email)
-  const [phone, setPhone] = useState(client.phone)
+  const form = useForm<FormValues>({
+    resolver: zodResolver(makeSchema(t)),
+    defaultValues: {
+      firstName: client.firstName,
+      lastName: client.lastName,
+      email: client.email,
+      phone: client.phone,
+    },
+  })
 
-  function handleSave() {
+  const isPending = updateClient.isPending || form.formState.isSubmitting
+
+  function onSubmit(values: FormValues) {
     // Build a diff — only send fields that actually changed. Mirrors the
     // pattern used by ClientFormDialog edit mode.
     const patch: Parameters<typeof updateClient.mutate>[0]["patch"] = {}
-    if (firstName !== client.firstName) patch.firstName = firstName
-    if (lastName !== client.lastName) patch.lastName = lastName
-    if (email !== client.email) patch.email = email
-    if (phone !== client.phone) patch.phone = phone
+    if (values.firstName !== client.firstName) patch.firstName = values.firstName
+    if (values.lastName !== client.lastName) patch.lastName = values.lastName
+    if (values.email !== client.email) patch.email = values.email
+    if (values.phone !== client.phone) patch.phone = values.phone
 
     if (Object.keys(patch).length === 0) {
       onClose()
@@ -94,7 +120,11 @@ function ContactEditForm({
   }
 
   return (
-    <>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      noValidate
+      className="contents"
+    >
       <SheetHeader>
         <SheetTitle>{t("detail.edit.contactTitle")}</SheetTitle>
         <SheetDescription>{t("detail.edit.contactDescription")}</SheetDescription>
@@ -105,39 +135,59 @@ function ContactEditForm({
           <Label htmlFor="ce-first-name">{t("detail.edit.contactFirstName")}</Label>
           <Input
             id="ce-first-name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            disabled={updateClient.isPending}
+            aria-invalid={!!form.formState.errors.firstName}
+            disabled={isPending}
+            {...form.register("firstName")}
           />
+          {form.formState.errors.firstName && (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.firstName.message}
+            </p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="ce-last-name">{t("detail.edit.contactLastName")}</Label>
           <Input
             id="ce-last-name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={updateClient.isPending}
+            aria-invalid={!!form.formState.errors.lastName}
+            disabled={isPending}
+            {...form.register("lastName")}
           />
+          {form.formState.errors.lastName && (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.lastName.message}
+            </p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="ce-email">{t("detail.edit.contactEmail")}</Label>
           <Input
             id="ce-email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={updateClient.isPending}
+            aria-invalid={!!form.formState.errors.email}
+            disabled={isPending}
+            {...form.register("email")}
           />
+          {form.formState.errors.email && (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.email.message}
+            </p>
+          )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="ce-phone">{t("detail.edit.contactPhone")}</Label>
           <Input
             id="ce-phone"
             type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            disabled={updateClient.isPending}
+            aria-invalid={!!form.formState.errors.phone}
+            disabled={isPending}
+            {...form.register("phone")}
           />
+          {form.formState.errors.phone && (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.phone.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -146,15 +196,15 @@ function ContactEditForm({
           type="button"
           variant="outline"
           onClick={onClose}
-          disabled={updateClient.isPending}
+          disabled={isPending}
         >
           {t("detail.edit.cancel")}
         </Button>
-        <Button type="button" onClick={handleSave} disabled={updateClient.isPending}>
-          {updateClient.isPending && <Loader2 className="size-4 animate-spin" />}
-          {updateClient.isPending ? t("detail.edit.saving") : t("detail.edit.save")}
+        <Button type="submit" disabled={isPending}>
+          {isPending && <Loader2 className="size-4 animate-spin" />}
+          {isPending ? t("detail.edit.saving") : t("detail.edit.save")}
         </Button>
       </SheetFooter>
-    </>
+    </form>
   )
 }

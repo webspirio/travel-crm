@@ -64,7 +64,7 @@ function NotesEditForm({
     updateBooking.mutate(
       {
         id: booking.id,
-        patch: { notes: trimmed === "" ? null : value },
+        patch: { notes: trimmed === "" ? null : trimmed },
       },
       {
         onSuccess: () => {
