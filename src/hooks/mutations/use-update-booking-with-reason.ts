@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { bookingHistoryKeys } from "@/hooks/queries/use-booking-history"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { useAuthStore } from "@/stores/auth-store"
 import type { Database, Json } from "@/types/database"
@@ -38,8 +39,7 @@ export interface UpdateBookingWithReasonInput {
  *   1. bookingsKeys.detail(id)         — booking detail page
  *   2. bookingsKeys.lists()            — global lists (dashboard, finance)
  *   3. bookingsKeys.byTrip(tripId)     — trip passenger table
- *   (TODO T11 — also invalidate bookingHistoryKeys.detail(id) once that
- *    factory exists. Not added yet.)
+ *   4. bookingHistoryKeys.detail(id)   — History tab (T11)
  */
 export function useUpdateBookingWithReason() {
   const queryClient = useQueryClient()
@@ -66,6 +66,7 @@ export function useUpdateBookingWithReason() {
     onSuccess: (row, { id }) => {
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.detail(id) })
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: bookingHistoryKeys.detail(id) })
       if (row.trip_id) {
         void queryClient.invalidateQueries({ queryKey: bookingsKeys.byTrip(row.trip_id) })
       }

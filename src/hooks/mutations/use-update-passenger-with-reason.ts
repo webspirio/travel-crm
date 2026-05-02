@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { bookingHistoryKeys } from "@/hooks/queries/use-booking-history"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { tripOccupancyKeys } from "@/hooks/queries/use-trips"
 import { tripSeatsKeys } from "@/hooks/queries/use-trip-seats"
@@ -43,7 +44,7 @@ export interface UpdatePassengerWithReasonInput {
  *   4. tripOccupancyKeys.byTrip(tripId)
  *      (#3 + #4 only when the patch touched seat_number — seat reassignment
  *      changes occupancy.)
- *   (TODO T11 — also invalidate bookingHistoryKeys.detail(bookingId).)
+ *   5. bookingHistoryKeys.detail(bookingId) — History tab (T11)
  */
 export function useUpdatePassengerWithReason() {
   const queryClient = useQueryClient()
@@ -68,6 +69,7 @@ export function useUpdatePassengerWithReason() {
     onSuccess: (row, { bookingId, patch }) => {
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.detail(bookingId) })
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.lists() })
+      void queryClient.invalidateQueries({ queryKey: bookingHistoryKeys.detail(bookingId) })
 
       // Seat reassignment → bust the trip-scoped seat caches so the seat map
       // and occupancy overlay re-fetch.

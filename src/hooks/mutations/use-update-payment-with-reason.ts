@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { bookingHistoryKeys } from "@/hooks/queries/use-booking-history"
 import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { paymentsKeys } from "@/hooks/queries/use-payments"
 import { useAuthStore } from "@/stores/auth-store"
@@ -29,7 +30,7 @@ export interface UpdatePaymentWithReasonInput {
  * On success invalidates:
  *   1. paymentsKeys.byBooking(bookingId) — payments table on detail page
  *   2. bookingsKeys.detail(bookingId)    — header totals (paid_amount safety)
- *   (TODO T11 — also invalidate bookingHistoryKeys.detail(bookingId).)
+ *   3. bookingHistoryKeys.detail(bookingId) — History tab (T11)
  */
 export function useUpdatePaymentWithReason() {
   const queryClient = useQueryClient()
@@ -54,6 +55,7 @@ export function useUpdatePaymentWithReason() {
     onSuccess: (_row, { bookingId }) => {
       void queryClient.invalidateQueries({ queryKey: paymentsKeys.byBooking(bookingId) })
       void queryClient.invalidateQueries({ queryKey: bookingsKeys.detail(bookingId) })
+      void queryClient.invalidateQueries({ queryKey: bookingHistoryKeys.detail(bookingId) })
     },
   })
 }
