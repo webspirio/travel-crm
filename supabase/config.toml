@@ -53,7 +53,12 @@ enable_anonymous_sign_ins = false
 enable_manual_linking = false
 
 [auth.email]
-enable_signup = false
+# Enables the email/password provider itself. Despite the name, the
+# Supabase CLI maps this to GOTRUE_EXTERNAL_EMAIL_ENABLED — false here
+# disables ALL email-based auth (sign-in, not just sign-up). The
+# invite-only model is enforced by [auth] enable_signup = false above
+# (which becomes GOTRUE_DISABLE_SIGNUP=true).
+enable_signup = true
 double_confirm_changes = true
 # Disabled in dev — use Inbucket at http://localhost:54324 to read magic links.
 # Production overrides this to true.
