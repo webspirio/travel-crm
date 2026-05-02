@@ -30,13 +30,5 @@
     "balance": "Saldo",
     "soldBy": "Manager",
     "createdAt": "Erstellt am"
-  },
-  "status": {
-    "draft": "Entwurf",
-    "confirmed": "Bestätigt",
-    "partially_paid": "Teilbezahlt",
-    "paid": "Bezahlt",
-    "cancelled": "Storniert",
-    "no_show": "Nicht erschienen"
   }
 }

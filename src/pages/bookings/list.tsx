@@ -76,6 +76,22 @@ interface ParsedUrlState {
 const DEFAULT_SORT_ID = "created_at"
 const DEFAULT_SORT_DESC = true
 
+// Query-param keys this page owns. `patchUrl` and `resetAll` only touch
+// these — anything else in the URL (e.g. an unrelated future flag) is
+// preserved across mutations.
+const OWNED_KEYS = [
+  "q",
+  "status",
+  "trip",
+  "manager",
+  "from",
+  "to",
+  "outstanding",
+  "sort",
+  "page",
+  "size",
+] as const
+
 function parseSearchParams(sp: URLSearchParams): ParsedUrlState {
   const status = sp.getAll("status").filter((s): s is BookingStatus =>
     (ALL_STATUSES as string[]).includes(s),
@@ -198,6 +214,16 @@ export default function BookingsListPage() {
     }
   }, [])
 
+  // One-way URL → input sync. Covers browser back/forward and the
+  // "Reset filters" button. We skip the sync while a debounce timer is
+  // pending so we never clobber an in-flight user edit. The setter is
+  // idempotent, so always running it on URL change is safe (no loop).
+  useEffect(() => {
+    if (debounceRef.current === null) {
+      setSearchInput(url.q)
+    }
+  }, [url.q])
+
   const params = useMemo(() => toListParams(url), [url])
   const query = useBookingsList(params)
   const { data: trips = [] } = useTrips()
@@ -206,8 +232,20 @@ export default function BookingsListPage() {
   // --- URL mutators ------------------------------------------------------
 
   function patchUrl(patch: Partial<ParsedUrlState>, opts?: { replace?: boolean }) {
-    const next = serializeUrlState({ ...url, ...patch })
-    setSearchParams(next, { replace: opts?.replace ?? false })
+    // serializeUrlState is the single source of truth for *our* keys.
+    // Anything else in the URL (unknown / unrelated params) is preserved
+    // by stripping only the owned keys from `prev` then re-applying the
+    // serialized form on top.
+    const owned = serializeUrlState({ ...url, ...patch })
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        for (const k of OWNED_KEYS) next.delete(k)
+        for (const [k, v] of owned.entries()) next.append(k, v)
+        return next
+      },
+      { replace: opts?.replace ?? false },
+    )
   }
 
   function setStatusFilter(values: BookingStatus[]) {
@@ -226,8 +264,30 @@ export default function BookingsListPage() {
     patchUrl({ outstanding: !url.outstanding, pageIndex: 0 })
   }
   function resetAll() {
-    setSearchParams(new URLSearchParams())
+    // Clear only the keys this page owns; leave everything else intact.
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      for (const k of OWNED_KEYS) next.delete(k)
+      return next
+    })
   }
+
+  // Snap the user back to page 1 when the URL points beyond the last
+  // page of an otherwise-non-empty result set (e.g. ?page=99 with 2
+  // pages of data). `replace: true` keeps this out of browser history.
+  // We deliberately do NOT fire when `totalRows === 0` — that's the
+  // genuine "no results" state and the empty table belongs there.
+  useEffect(() => {
+    if (!query.data) return
+    if (query.data.totalRows === 0) return
+    if (url.pageIndex >= query.data.pageCount) {
+      patchUrl({ pageIndex: 0 }, { replace: true })
+    }
+    // patchUrl is a stable function declaration recreated on each render
+    // but only reads from closure — the effect's actual triggers are the
+    // query result and the URL page index.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query.data, url.pageIndex])
 
   // --- TanStack controlled state -----------------------------------------
   //
@@ -308,7 +368,7 @@ export default function BookingsListPage() {
         cell: ({ row }) => {
           const s = row.original.status
           if (!s) return <span className="text-xs text-muted-foreground">—</span>
-          return <Badge variant={bookingStatusVariant(s)}>{t(`status.${s}`)}</Badge>
+          return <Badge variant={bookingStatusVariant(s)}>{tc(`bookingStatus.${s}`)}</Badge>
         },
       },
       {
@@ -433,14 +493,14 @@ export default function BookingsListPage() {
           ),
       },
     ],
-    [t, locale],
+    [t, tc, locale],
   )
 
   // --- Filter chip option lists ------------------------------------------
 
   const statusOptions = useMemo(
-    () => ALL_STATUSES.map((s) => ({ label: t(`status.${s}`), value: s })),
-    [t],
+    () => ALL_STATUSES.map((s) => ({ label: tc(`bookingStatus.${s}`), value: s })),
+    [tc],
   )
 
   const selectedTrip = trips.find((tr) => tr.id === url.trip) ?? null

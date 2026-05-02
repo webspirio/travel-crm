@@ -30,13 +30,5 @@
     "balance": "Залишок",
     "soldBy": "Менеджер",
     "createdAt": "Створено"
-  },
-  "status": {
-    "draft": "Чернетка",
-    "confirmed": "Підтверджено",
-    "partially_paid": "Частково оплачено",
-    "paid": "Сплачено",
-    "cancelled": "Скасовано",
-    "no_show": "Неявка"
   }
 }
