@@ -180,10 +180,13 @@
       "history": "Verlauf"
     },
     "history": {
+      "loading": "Verlauf wird geladen",
       "loadMore": "Mehr laden",
       "loadingMore": "Lädt...",
       "endOfHistory": "Ende des Verlaufs",
       "empty": "Keine Verlaufseinträge",
+      "reasonLabel": "Grund",
+      "reasonAriaLabel": "Grund: {{reason}}",
       "actionInsert": "Erstellt",
       "actionUpdate": "Aktualisiert",
       "actionDelete": "Gelöscht",

@@ -4,6 +4,8 @@
     "tagline": "Busreisen — Italien, Spanien und weitere Ziele"
   },
   "loading": "Wird geladen…",
+  "yes": "Ja",
+  "no": "Nein",
   "nav": {
     "dashboard": "Dashboard",
     "trips": "Reisen",

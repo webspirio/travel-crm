@@ -180,10 +180,13 @@
       "history": "Історія"
     },
     "history": {
+      "loading": "Завантаження історії",
       "loadMore": "Завантажити ще",
       "loadingMore": "Завантаження...",
       "endOfHistory": "Кінець історії",
       "empty": "Записів історії немає",
+      "reasonLabel": "Причина",
+      "reasonAriaLabel": "Причина: {{reason}}",
       "actionInsert": "Створено",
       "actionUpdate": "Оновлено",
       "actionDelete": "Видалено",

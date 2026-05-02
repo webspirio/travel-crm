@@ -148,7 +148,7 @@ export function FieldDiff({ table, column, before, after, t, tc, locale }: Props
     <div className="flex flex-wrap items-baseline gap-x-2 text-sm">
       <span className="text-muted-foreground">{t(labelKey)}:</span>
       <span className="line-through opacity-60">{beforeNode}</span>
-      <span className="text-muted-foreground">→</span>
+      <span aria-hidden="true" className="text-muted-foreground">→</span>
       <span className="font-medium">{afterNode}</span>
     </div>
   )

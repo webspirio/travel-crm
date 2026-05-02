@@ -51,7 +51,8 @@ export function HistoryTab({ bookingId, passengerNamesById }: HistoryTabProps) {
 
   if (query.isLoading) {
     return (
-      <div className="space-y-3">
+      <div role="status" aria-busy="true" aria-live="polite" className="space-y-3">
+        <span className="sr-only">{t("detail.history.loading")}</span>
         {[0, 1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-20 w-full" />
         ))}
@@ -176,7 +177,15 @@ function HistoryRow({ row, passengerNamesById, t, tc, locale }: HistoryRowProps)
 
       {row.reason && (
         <div className="mt-2">
-          <Badge variant="secondary">{row.reason}</Badge>
+          <Badge
+            variant="secondary"
+            aria-label={t("detail.history.reasonAriaLabel", { reason: row.reason })}
+          >
+            <span className="text-muted-foreground mr-1">
+              {t("detail.history.reasonLabel")}:
+            </span>
+            {row.reason}
+          </Badge>
         </div>
       )}
 
