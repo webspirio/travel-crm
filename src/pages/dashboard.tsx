@@ -9,6 +9,8 @@ const CountUp =
   (CountUpImport as unknown as { default?: typeof CountUpImport }).default ??
   CountUpImport
 
+import { Link } from "react-router"
+
 import { RevenueChart } from "@/components/charts/revenue-chart"
 import {
   Card,
@@ -27,8 +29,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { clients, stats, trips } from "@/data"
+import { useMemo } from "react"
+
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { computeDashboardStats } from "@/lib/stats"
 import type { Locale } from "@/types"
 
 interface KpiCardProps {
@@ -70,8 +79,19 @@ export default function DashboardPage() {
   const { t, i18n } = useTranslation("dashboard")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const clientById = new Map(clients.map((c) => [c.id, c]))
-  const tripById = new Map(trips.map((t) => [t.id, t]))
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
+  const { data: hotels = [] } = useHotels()
+  const { data: managers = [] } = useManagers()
+  const { data: clients = [] } = useClients()
+
+  const stats = useMemo(
+    () => computeDashboardStats(trips, bookings, hotels, managers),
+    [trips, bookings, hotels, managers],
+  )
+
+  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients])
+  const tripById = useMemo(() => new Map(trips.map((t) => [t.id, t])), [trips])
 
   return (
     <div className="space-y-6">
@@ -109,7 +129,7 @@ export default function DashboardPage() {
             <CardDescription>{t("charts.revenueSubtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <RevenueChart />
+            <RevenueChart data={stats.revenueByMonth} managers={managers} />
           </CardContent>
         </Card>
 
@@ -158,7 +178,9 @@ export default function DashboardPage() {
                   return (
                     <TableRow key={b.id}>
                       <TableCell>
-                        {client ? `${client.firstName} ${client.lastName}` : b.clientId}
+                        <Link to={`/bookings/${b.id}`} className="hover:underline">
+                          {client ? `${client.firstName} ${client.lastName}` : b.clientId}
+                        </Link>
                       </TableCell>
                       <TableCell>{trip?.name ?? b.tripId}</TableCell>
                       <TableCell className="text-right tabular-nums">

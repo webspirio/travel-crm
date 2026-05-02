@@ -45,5 +45,53 @@
   },
   "stars_one": "{{count}} Stern",
   "stars_other": "{{count}} Sterne",
-  "notFound": "Hotel nicht gefunden"
+  "notFound": "Hotel nicht gefunden",
+  "createCta": "Neues Hotel",
+  "details": {
+    "edit": "Hotel bearbeiten"
+  },
+  "dialog": {
+    "create": {
+      "title": "Neues Hotel",
+      "submit": "Hotel erstellen"
+    },
+    "edit": {
+      "title": "Hotel bearbeiten",
+      "submit": "Änderungen speichern"
+    },
+    "fields": {
+      "name": "Hotelname",
+      "city": "Stadt",
+      "country": "Land",
+      "countryHint": "ISO-Code mit 2 Buchstaben, z. B. IT, DE",
+      "stars": "Sterne",
+      "address": "Adresse",
+      "notes": "Notizen",
+      "isActive": "Aktiv"
+    },
+    "rooms": {
+      "title": "Zimmertypen",
+      "add": "Zimmertyp hinzufügen",
+      "remove": "Entfernen",
+      "fields": {
+        "roomType": "Typ",
+        "totalCapacity": "Zimmeranzahl",
+        "pricePerNight": "Preis/Nacht (€)"
+      }
+    },
+    "errors": {
+      "name": "Name ist erforderlich",
+      "city": "Stadt ist erforderlich",
+      "country": "Land ist erforderlich",
+      "countryFormat": "Bitte 2-stelligen ISO-Code eingeben (z. B. IT, DE)",
+      "stars": "Bitte Sterne von 1 bis 5 angeben",
+      "pricePerNight": "Preis muss >= 0 sein",
+      "totalCapacity": "Anzahl muss >= 1 sein",
+      "duplicateRoomType": "Zimmertyp bereits hinzugefügt"
+    },
+    "success": {
+      "created": "Hotel erstellt",
+      "updated": "Hotel aktualisiert"
+    }
+  }
 }

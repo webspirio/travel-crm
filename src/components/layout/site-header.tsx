@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { usePaletteStore } from "@/stores/palette-store"
+import { UserMenu } from "./user-menu"
 
 interface RouteHandle {
   titleKey?: string
@@ -53,18 +54,21 @@ export function SiteHeader() {
           })}
         </BreadcrumbList>
       </Breadcrumb>
-      <Button
-        variant="outline"
-        size="sm"
-        className="ml-auto h-8 gap-2 text-muted-foreground"
-        onClick={() => setPaletteOpen(true)}
-      >
-        <Search className="size-3.5" />
-        <span className="hidden sm:inline">{t("palette.trigger")}</span>
-        <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium sm:inline">
-          ⌘K
-        </kbd>
-      </Button>
+      <div className="ml-auto flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-2 text-muted-foreground"
+          onClick={() => setPaletteOpen(true)}
+        >
+          <Search className="size-3.5" />
+          <span className="hidden sm:inline">{t("palette.trigger")}</span>
+          <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 text-[10px] font-medium sm:inline">
+            ⌘K
+          </kbd>
+        </Button>
+        <UserMenu />
+      </div>
     </header>
   )
 }

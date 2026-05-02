@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
@@ -8,7 +9,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { managers, stats } from "@/data"
+import type { DashboardStats, Manager } from "@/types"
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -18,27 +19,42 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ]
 
-const chartConfig: ChartConfig = Object.fromEntries(
-  managers.map((m, i) => [
-    m.id,
-    {
-      label: m.name,
-      color: CHART_COLORS[i % CHART_COLORS.length],
-    },
-  ]),
-) satisfies ChartConfig
+type RevenueByMonth = DashboardStats["revenueByMonth"]
 
-export function RevenueChart() {
-  const data = stats.revenueByMonth.map((row) => ({
-    ...row,
-    month: new Date(row.month + "-01").toLocaleDateString("en-US", {
-      month: "short",
-    }),
-  }))
+interface RevenueChartProps {
+  data: RevenueByMonth
+  managers: Pick<Manager, "id" | "name">[]
+}
+
+export function RevenueChart({ data, managers }: RevenueChartProps) {
+  const chartConfig: ChartConfig = useMemo(
+    () =>
+      Object.fromEntries(
+        managers.map((m, i) => [
+          m.id,
+          {
+            label: m.name,
+            color: CHART_COLORS[i % CHART_COLORS.length],
+          },
+        ]),
+      ),
+    [managers],
+  )
+
+  const chartData = useMemo(
+    () =>
+      data.map((row) => ({
+        ...row,
+        month: new Date(row.month + "-01").toLocaleDateString("en-US", {
+          month: "short",
+        }),
+      })),
+    [data],
+  )
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[280px] w-full">
-      <BarChart data={data} barCategoryGap="20%">
+      <BarChart data={chartData} barCategoryGap="20%">
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis dataKey="month" tickLine={false} axisLine={false} />
         <YAxis

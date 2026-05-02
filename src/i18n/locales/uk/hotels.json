@@ -46,5 +46,53 @@
   "stars_one": "{{count}} зірка",
   "stars_few": "{{count}} зірки",
   "stars_many": "{{count}} зірок",
-  "notFound": "Готель не знайдено"
+  "notFound": "Готель не знайдено",
+  "createCta": "Новий готель",
+  "details": {
+    "edit": "Редагувати готель"
+  },
+  "dialog": {
+    "create": {
+      "title": "Новий готель",
+      "submit": "Створити готель"
+    },
+    "edit": {
+      "title": "Редагувати готель",
+      "submit": "Зберегти зміни"
+    },
+    "fields": {
+      "name": "Назва готелю",
+      "city": "Місто",
+      "country": "Країна",
+      "countryHint": "ISO код з 2 літер, напр. IT, DE",
+      "stars": "Зірки",
+      "address": "Адреса",
+      "notes": "Нотатки",
+      "isActive": "Активний"
+    },
+    "rooms": {
+      "title": "Типи номерів",
+      "add": "Додати тип номеру",
+      "remove": "Видалити",
+      "fields": {
+        "roomType": "Тип",
+        "totalCapacity": "Кількість номерів",
+        "pricePerNight": "Ціна/ніч (€)"
+      }
+    },
+    "errors": {
+      "name": "Назва обов'язкова",
+      "city": "Місто обов'язкове",
+      "country": "Країна обов'язкова",
+      "countryFormat": "Введіть 2-літерний код ISO (напр. IT, DE)",
+      "stars": "Вкажіть кількість зірок від 1 до 5",
+      "pricePerNight": "Ціна має бути >= 0",
+      "totalCapacity": "Кількість має бути >= 1",
+      "duplicateRoomType": "Тип номеру вже доданий"
+    },
+    "success": {
+      "created": "Готель створено",
+      "updated": "Готель оновлено"
+    }
+  }
 }

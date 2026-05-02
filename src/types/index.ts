@@ -1,3 +1,5 @@
+import type { Database } from "@/types/database"
+
 export type BusType = "55" | "79"
 
 export type SeatStatus = "free" | "selected" | "reserved" | "sold" | "blocked"
@@ -39,8 +41,14 @@ export interface Hotel {
   id: string
   name: string
   city: string
+  /** Long display name (e.g. "Italy"), derived via countryCodeToName */
   country: string
-  stars: 3 | 4 | 5
+  /** ISO 3166-1 alpha-2 code (e.g. "IT"). Used for form pre-fill. */
+  countryCode: string
+  stars: number
+  address?: string | null
+  notes?: string | null
+  isActive: boolean
   rooms: Record<RoomType, { total: number; pricePerNight: number }>
 }
 
@@ -83,17 +91,27 @@ export interface Trip {
   busType: BusType
   status: TripStatus
   basePrice: number
+  childPrice: number
+  infantPrice: number
+  frontRowsCount: number
+  frontRowsSurcharge: number
   managerId: string
+  ownerManagerId: string
   hotelIds: string[]
   capacity: number
   bookedCount: number
+  notes: string | null
 }
+
+export type PassengerKind = Database["public"]["Enums"]["passenger_kind"]
 
 export interface Passenger {
   id: string
   firstName: string
   lastName: string
-  seatNumber: number
+  kind: PassengerKind
+  /** null for lap-infants and passengers without an assigned seat */
+  seatNumber: number | null
   hotelId: string
   roomType: RoomType
   price: number
@@ -102,7 +120,8 @@ export interface Passenger {
 
 export interface Booking {
   id: string
-  contractNumber: string
+  bookingNumber: string
+  contractNumber: string | null
   clientId: string
   tripId: string
   passengers: Passenger[]
@@ -110,7 +129,7 @@ export interface Booking {
   paidAmount: number
   dueDate: Date
   commission: number
-  status: "draft" | "confirmed" | "paid" | "cancelled"
+  status: "draft" | "confirmed" | "partially_paid" | "paid" | "cancelled" | "no_show"
   managerId: string
   createdAt: Date
 }

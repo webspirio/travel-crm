@@ -1,10 +1,11 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowLeft, MapPin, Star } from "lucide-react"
+import { ArrowLeft, MapPin, Pencil, Star } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
 import type { ColumnDef } from "@tanstack/react-table"
 
 import { DataTable } from "@/components/data-table/data-table"
+import { HotelFormDialog } from "@/components/hotels/hotel-form-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,25 +24,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { bookings, hotels, trips } from "@/data"
-import { getHotelStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useHotelById } from "@/hooks/queries/use-hotels"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
+import { getHotelStats } from "@/lib/stats"
+import { bookingStatusVariant } from "@/lib/booking-status"
 import type { Booking, Locale, RoomType } from "@/types"
-
-function bookingStatusVariant(
-  s: Booking["status"],
-): "default" | "secondary" | "outline" | "destructive" {
-  switch (s) {
-    case "paid":
-      return "default"
-    case "confirmed":
-      return "secondary"
-    case "cancelled":
-      return "destructive"
-    default:
-      return "outline"
-  }
-}
 
 import { useTripColumns } from "../trips/columns"
 
@@ -53,20 +42,23 @@ export default function HotelDetailPage() {
   const { t, i18n } = useTranslation("hotels")
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
+  const [editOpen, setEditOpen] = useState(false)
 
-  const hotel = useMemo(() => hotels.find((h) => h.id === hotelId), [hotelId])
+  const { data: hotel, isLoading: hotelsLoading } = useHotelById(hotelId)
+  const { data: trips = [] } = useTrips()
+  const { data: bookings = [] } = useBookings()
   const stats = useMemo(
-    () => (hotel ? getHotelStats(hotel.id, trips, bookings, hotels) : null),
-    [hotel],
+    () => (hotel ? getHotelStats(hotel.id, trips, bookings, [hotel]) : null),
+    [hotel, trips, bookings],
   )
   const hotelTrips = useMemo(
     () => (hotel ? trips.filter((tr) => tr.hotelIds.includes(hotel.id)) : []),
-    [hotel],
+    [hotel, trips],
   )
   type HotelPassengerRow = {
     key: string
     bookingId: string
-    contractNumber: string
+    displayNumber: string
     passengerName: string
     tripId: string
     tripName: string
@@ -76,10 +68,10 @@ export default function HotelDetailPage() {
   }
   const hotelBookings = useMemo(
     () => (hotel ? bookings.filter((b) => b.passengers.some((p) => p.hotelId === hotel.id)) : []),
-    [hotel],
+    [hotel, bookings],
   )
   const tripColumns = useTripColumns()
-  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [])
+  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
 
   const hotelPassengerRows: HotelPassengerRow[] = useMemo(() => {
     if (!hotel) return []
@@ -90,7 +82,7 @@ export default function HotelDetailPage() {
         rows.push({
           key: p.id,
           bookingId: b.id,
-          contractNumber: b.contractNumber,
+          displayNumber: b.contractNumber ?? b.bookingNumber,
           passengerName: `${p.firstName} ${p.lastName}`,
           tripId: b.tripId,
           tripName: tripById.get(b.tripId)?.name ?? b.tripId,
@@ -144,6 +136,17 @@ export default function HotelDetailPage() {
     [t, tc, locale],
   )
 
+  if (hotelsLoading) {
+    return (
+      <div className="space-y-2">
+        <Button variant="ghost" size="sm" render={<Link to="/hotels" />}>
+          <ArrowLeft className="size-4" />
+          {t("title")}
+        </Button>
+        <p className="text-muted-foreground">{tc("loading")}</p>
+      </div>
+    )
+  }
   if (!hotel || !stats) {
     return (
       <div className="space-y-2">
@@ -158,6 +161,13 @@ export default function HotelDetailPage() {
 
   return (
     <div className="space-y-6">
+      <HotelFormDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        mode="edit"
+        initialHotel={hotel}
+      />
+
       <div className="flex flex-col gap-2">
         <Button variant="ghost" size="sm" className="self-start" render={<Link to="/hotels" />}>
           <ArrowLeft className="size-4" />
@@ -167,7 +177,7 @@ export default function HotelDetailPage() {
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-semibold">
               {hotel.name}
-              <span className="flex" aria-label={`${hotel.stars} stars`}>
+              <span className="flex" aria-label={t("stars", { count: hotel.stars })}>
                 {Array.from({ length: hotel.stars }).map((_, i) => (
                   <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
                 ))}
@@ -179,6 +189,10 @@ export default function HotelDetailPage() {
               </span>
             </div>
           </div>
+          <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+            <Pencil className="size-4" />
+            {t("details.edit")}
+          </Button>
         </div>
       </div>
 

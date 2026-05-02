@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, PlusIcon } from "lucide-react"
 import type { ColumnDef } from "@tanstack/react-table"
 
+import { ClientFormDialog } from "@/components/clients/client-form-dialog"
 import { DataTable } from "@/components/data-table/data-table"
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -17,7 +18,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { bookings, clients, trips } from "@/data"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import type { Client, Locale } from "@/types"
 
@@ -35,6 +38,13 @@ export default function ClientsListPage() {
   const { t, i18n } = useTranslation("clients")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const [openId, setOpenId] = useState<string | null>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
+  const [dialogClient, setDialogClient] = useState<Client | undefined>(undefined)
+
+  const { data: clients = [] } = useClients()
+  const { data: bookings = [] } = useBookings()
+  const { data: trips = [] } = useTrips()
 
   const enriched: EnrichedClient[] = useMemo(() => {
     const tripById = new Map(trips.map((tr) => [tr.id, tr]))
@@ -51,7 +61,7 @@ export default function ClientsListPage() {
         lastTripDate: last?.departureDate ?? null,
       }
     })
-  }, [])
+  }, [clients, bookings, trips])
 
   const columns: ColumnDef<EnrichedClient>[] = useMemo(
     () => [
@@ -132,13 +142,31 @@ export default function ClientsListPage() {
       .filter((b) => b.clientId === openClient.id)
       .map((b) => ({ ...b, trip: tripById.get(b.tripId) ?? null }))
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-  }, [openClient])
+  }, [openClient, bookings, trips])
+
+  function openCreate() {
+    setDialogMode("create")
+    setDialogClient(undefined)
+    setDialogOpen(true)
+  }
+
+  function openEdit(client: Client) {
+    setDialogMode("edit")
+    setDialogClient(client)
+    setDialogOpen(true)
+  }
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <Button size="sm" onClick={openCreate}>
+          <PlusIcon className="size-4" />
+          {t("createCta")}
+        </Button>
       </div>
 
       <DataTable
@@ -148,6 +176,13 @@ export default function ClientsListPage() {
         searchPlaceholder={t("search")}
         emptyMessage={t("empty")}
         onRowClick={(c) => setOpenId(c.id)}
+      />
+
+      <ClientFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
+        initialClient={dialogClient}
       />
 
       <Sheet open={openId !== null} onOpenChange={(o) => !o && setOpenId(null)}>
@@ -181,7 +216,14 @@ export default function ClientsListPage() {
                 <dd>{formatDate(openClient.createdAt, locale)}</dd>
               </dl>
               <Separator />
-              <div className="px-4">
+              <div className="flex flex-col gap-2 px-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openEdit(openClient)}
+                >
+                  {t("details.edit")}
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -208,8 +250,11 @@ export default function ClientsListPage() {
                           </span>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {b.trip && formatDate(b.trip.departureDate, locale)} · Seats{" "}
-                          {b.passengers.map((p) => p.seatNumber).join(", ")}
+                          {b.trip && formatDate(b.trip.departureDate, locale)} · {t("details.seats")}{" "}
+                          {b.passengers
+                            .map((p) => p.seatNumber)
+                            .filter((n): n is number => n !== null)
+                            .join(", ") || "—"}
                         </div>
                       </li>
                     ))}

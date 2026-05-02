@@ -2,8 +2,10 @@ import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { layoutFor } from "@/data/seats"
-import { bookings as allBookings } from "@/data"
+import { useBookingsByTrip } from "@/hooks/queries/use-bookings"
+import { useOccupiedSeats } from "@/hooks/queries/use-trips"
+import { isOccupying } from "@/lib/booking-status"
+import { layoutFor } from "@/lib/bus-layouts"
 import type { BusType, Cell, SeatStatus } from "@/types"
 
 import { SeatCellView } from "./seat-cell"
@@ -13,19 +15,41 @@ interface SeatMapProps {
   busType: BusType
   tripId: string
   onSelect?: (seatNumber: number) => void
-  selected?: number[]
+  /**
+   * Seat numbers to highlight as "selected".
+   * Accepts a single number, an array, or null/undefined for backwards compat.
+   */
+  selected?: number | number[] | null
+  /**
+   * Optional map of seatNumber → short label (e.g. initials) rendered inside
+   * the seat cell for draft-assigned passengers in the multi-pax booking flow.
+   * Defaults to an empty map — existing consumers are unaffected.
+   */
+  assignedTo?: Map<number, string>
 }
+
+type TripBooking = NonNullable<ReturnType<typeof useBookingsByTrip>["data"]>[number]
+type OccupancyHint = { paid: boolean }
 
 function applyBookings(
   deck: Cell[][],
-  tripId: string,
+  tripBookings: TripBooking[],
+  occupancyHints: Map<number, OccupancyHint>,
   selected: Set<number>,
 ): { deck: Cell[][]; totals: Record<SeatStatus, number> } {
-  const tripBookings = allBookings.filter((b) => b.tripId === tripId)
-  const seatIndex = new Map<number, { booking: (typeof tripBookings)[number]; passenger: (typeof tripBookings)[number]["passengers"][number] }>()
+  // Visible bookings (RLS-scoped). Cancelled / no_show / draft passengers
+  // don't hold a seat; skip them so seats free up correctly.
+  const seatIndex = new Map<
+    number,
+    { booking: TripBooking; passenger: TripBooking["passengers"][number] }
+  >()
   for (const b of tripBookings) {
+    if (!isOccupying(b.status)) continue
     for (const p of b.passengers) {
-      seatIndex.set(p.seatNumber, { booking: b, passenger: p })
+      // Lap-infants (seatNumber === null) don't occupy a seat slot — skip.
+      if (p.seatNumber !== null) {
+        seatIndex.set(p.seatNumber, { booking: b, passenger: p })
+      }
     }
   }
   const totals: Record<SeatStatus, number> = {
@@ -45,6 +69,12 @@ function applyBookings(
       if (hit) {
         status = hit.booking.status === "paid" ? "sold" : "reserved"
         passengerName = `${hit.passenger.firstName} ${hit.passenger.lastName}`
+      } else {
+        // Occupied via the RPC but not in the caller's visible bookings:
+        // render the seat as taken without a name. Prevents the manager
+        // from selling a seat that is already booked by someone else.
+        const hint = occupancyHints.get(cell.number)
+        if (hint) status = hint.paid ? "sold" : "reserved"
       }
       if (selected.has(cell.number) && status === "free") status = "selected"
       totals[status]++
@@ -54,14 +84,27 @@ function applyBookings(
   return { deck: next, totals }
 }
 
-export function SeatMap({ busType, tripId, onSelect, selected }: SeatMapProps) {
+export function SeatMap({ busType, tripId, onSelect, selected, assignedTo }: SeatMapProps) {
   const { t } = useTranslation()
-  const selectedSet = useMemo(() => new Set(selected ?? []), [selected])
+  const selectedSet = useMemo(() => {
+    if (selected == null) return new Set<number>()
+    if (Array.isArray(selected)) return new Set(selected)
+    return new Set([selected])
+  }, [selected])
   const layout = useMemo(() => layoutFor(busType), [busType])
+  const { data: tripBookings = [] } = useBookingsByTrip(tripId)
+  const { data: occupied = [] } = useOccupiedSeats(tripId)
+
+  const occupancyHints = useMemo(() => {
+    const m = new Map<number, OccupancyHint>()
+    for (const o of occupied) m.set(o.seatNumber, { paid: o.paid })
+    return m
+  }, [occupied])
 
   const processed = useMemo(
-    () => layout.decks.map((d) => applyBookings(d, tripId, selectedSet)),
-    [layout, tripId, selectedSet],
+    () =>
+      layout.decks.map((d) => applyBookings(d, tripBookings, occupancyHints, selectedSet)),
+    [layout, tripBookings, occupancyHints, selectedSet],
   )
 
   const renderDeck = (deck: Cell[][]) => (
@@ -74,7 +117,13 @@ export function SeatMap({ busType, tripId, onSelect, selected }: SeatMapProps) {
       {deck.flatMap((row, rIdx) =>
         row.map((cell, cIdx) => (
           <div key={`${rIdx}-${cIdx}`} role="gridcell">
-            <SeatCellView cell={cell} onSelect={onSelect} />
+            <SeatCellView
+              cell={cell}
+              onSelect={onSelect}
+              draftLabel={
+                cell?.type === "seat" ? (assignedTo?.get(cell.number) ?? undefined) : undefined
+              }
+            />
           </div>
         )),
       )}

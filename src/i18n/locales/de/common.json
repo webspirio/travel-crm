@@ -3,6 +3,7 @@
     "name": "AnyTour CRM",
     "tagline": "Busreisen — Italien, Spanien und weitere Ziele"
   },
+  "loading": "Wird geladen…",
   "nav": {
     "dashboard": "Dashboard",
     "trips": "Reisen",
@@ -12,6 +13,7 @@
     "managers": "Manager",
     "finance": "Finanzen",
     "newBooking": "Neue Buchung",
+    "bookings": "Buchungen",
     "proposal": "Angebot"
   },
   "actions": {
@@ -24,7 +26,17 @@
     "back": "Zurück",
     "next": "Weiter",
     "search": "Suchen",
-    "openProfile": "Profil öffnen"
+    "openProfile": "Profil öffnen",
+    "reset": "Zurücksetzen"
+  },
+  "pagination": {
+    "rowsSelected": "{{selected}} von {{total}} Zeile(n) ausgewählt",
+    "rowsPerPage": "Zeilen pro Seite",
+    "pageInfo": "Seite {{current}} von {{total}}",
+    "first": "Erste Seite",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "last": "Letzte Seite"
   },
   "palette": {
     "placeholder": "Reisen, Kunden, Hotels suchen...",
@@ -64,8 +76,10 @@
   "bookingStatus": {
     "draft": "Entwurf",
     "confirmed": "Bestätigt",
+    "partially_paid": "Teilweise bezahlt",
     "paid": "Bezahlt",
-    "cancelled": "Storniert"
+    "cancelled": "Storniert",
+    "no_show": "Nicht erschienen"
   },
   "seat": {
     "free": "Frei",
@@ -85,5 +99,20 @@
     "double": "Doppelzimmer",
     "triple": "Dreibettzimmer",
     "family": "Familienzimmer"
+  },
+  "errors": {
+    "duplicateEmail": "Es existiert bereits ein Kunde mit dieser E-Mail-Adresse. Bitte verwende den bestehenden Datensatz oder eine andere Adresse.",
+    "seatTaken": "Dieser Sitzplatz ist bereits vergeben. Bitte wähle einen anderen Platz.",
+    "seatDupInDraft": "Zwei Reisende in dieser Buchung haben denselben Sitzplatz. Bitte behebe den Konflikt.",
+    "lapInfantNeedsSeat": "Für Kinder oder Erwachsene muss ein Sitzplatz gewählt werden.",
+    "bookingNumberRace": "Buchungsnummer konnte nicht erzeugt werden. Bitte erneut versuchen.",
+    "crossTenant": "Datensatz gehört zu einem anderen Mandanten. Aktion nicht erlaubt.",
+    "illegalStatus": "Dieser Statuswechsel ist nicht zulässig.",
+    "permissionDenied": "Unzureichende Berechtigungen für diese Aktion.",
+    "sessionExpired": "Sitzung abgelaufen. Bitte melde dich erneut an.",
+    "notAManager": "Konto hat keine Manager-Rolle in diesem Mandanten.",
+    "emptyPassengers": "Eine Buchung muss mindestens einen Reisenden enthalten.",
+    "unknown": "Unerwarteter Fehler. Bitte erneut versuchen.",
+    "invalidPhone": "Ungültige Telefonnummer."
   }
 }

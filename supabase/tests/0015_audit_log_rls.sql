@@ -23,7 +23,11 @@ insert into _ids values ('mgr',   tests.make_member((select v from _ids where k=
 insert into _ids values ('acc',   tests.make_member((select v from _ids where k='tid'), 'audit-acc@test.local',   'accountant'));
 
 -- Seed an audit row directly as postgres (simulating the trigger writing
--- through `security definer` once it's attached in Phase 2).
+-- through `security definer` once it's attached in Phase 2). Phase 2 also
+-- attaches audit_trigger to tenant_users — make_member calls above each
+-- generated their own audit_log row. We filter on entity_table = 'tenants'
+-- so the assertions only see the manually-seeded row, keeping the test's
+-- intent (RLS shape) independent of fixture noise.
 insert into public.audit_log (tenant_id, actor_user_id, entity_table, entity_id, action, after)
 select
   (select v from _ids where k='tid'),
@@ -33,19 +37,19 @@ select
   'insert',
   jsonb_build_object('name', 'Audit Tenant');
 
--- 1: owner sees the row.
+-- 1: owner sees the seeded tenants row.
 select tests.impersonate_user('audit-owner@test.local');
 select results_eq(
-  'select count(*)::int from public.audit_log',
+  $$select count(*)::int from public.audit_log where entity_table = 'tenants'$$,
   $$values (1)$$,
   'owner can SELECT audit_log rows for their tenant'
 );
 
--- 2: accountant sees the row.
+-- 2: accountant sees the seeded tenants row.
 reset role; reset request.jwt.claims;
 select tests.impersonate_user('audit-acc@test.local');
 select results_eq(
-  'select count(*)::int from public.audit_log',
+  $$select count(*)::int from public.audit_log where entity_table = 'tenants'$$,
   $$values (1)$$,
   'accountant can SELECT audit_log rows for their tenant'
 );

@@ -2,6 +2,7 @@
   "title": "Reisen",
   "subtitle": "Alle Busreisen und ihre Auslastung",
   "search": "Nach Name suchen",
+  "createCta": "Neue Reise",
   "columns": {
     "name": "Reise",
     "route": "Strecke",
@@ -22,7 +23,122 @@
   "tabs": {
     "bus": "Bus",
     "hotels": "Hotels",
-    "clients": "Passagiere"
+    "clients": "Passagiere",
+    "blocks": "Kontingente"
   },
-  "empty": "Keine Reisen gefunden"
+  "details": {
+    "edit": "Reise bearbeiten"
+  },
+  "dialog": {
+    "create": {
+      "title": "Neue Reise",
+      "submit": "Reise erstellen"
+    },
+    "edit": {
+      "title": "Reise bearbeiten",
+      "submit": "Änderungen speichern"
+    },
+    "fields": {
+      "name": "Reisename",
+      "origin": "Abfahrtsort",
+      "destination": "Reiseziel",
+      "busType": "Bustyp",
+      "capacity": "Kapazität",
+      "owner": "Verantwortlicher Manager",
+      "ownerPlaceholder": "Manager auswählen",
+      "departureAt": "Abfahrtsdatum und -uhrzeit",
+      "returnAt": "Rückkehrdatum und -uhrzeit",
+      "status": "Status",
+      "basePrice": "Grundpreis (€)",
+      "childPrice": "Kinderpreis (€)",
+      "infantPrice": "Kleinkindpreis (€)",
+      "frontRowsCount": "VIP-Reihen vorne",
+      "frontRowsSurcharge": "VIP-Aufpreis (€)",
+      "notes": "Notizen"
+    },
+    "busTypes": {
+      "55": "Bus mit 55 Sitzen",
+      "79": "Bus mit 79 Sitzen (Doppeldecker)"
+    },
+    "errors": {
+      "name": "Name ist erforderlich",
+      "origin": "Abfahrtsort ist erforderlich",
+      "destination": "Reiseziel ist erforderlich",
+      "ownerManagerId": "Bitte Manager auswählen",
+      "busType": "Bitte Bustyp auswählen",
+      "capacity": "Kapazität muss größer als 0 sein",
+      "departureAt": "Bitte Abfahrtsdatum angeben",
+      "returnAt": "Bitte Rückkehrdatum angeben",
+      "returnAfterDeparture": "Rückkehrdatum darf nicht vor dem Abfahrtsdatum liegen",
+      "basePriceEur": "Preis muss >= 0 sein",
+      "childPriceEur": "Preis muss >= 0 sein",
+      "infantPriceEur": "Preis muss >= 0 sein",
+      "frontRowsCount": "Wert muss >= 0 sein",
+      "frontRowsSurchargeEur": "Wert muss >= 0 sein"
+    },
+    "success": {
+      "created": "Reise erstellt",
+      "createdNudge": "Reise erstellt — Kontingente hinzufügen, um die Reise buchbar zu machen",
+      "updated": "Reise aktualisiert"
+    }
+  },
+  "blocks": {
+    "title": "Hotelkontingente",
+    "empty": "Noch keine Kontingente. Fügen Sie ein Kontingent hinzu, um Zimmer für diese Reise zu reservieren.",
+    "addCta": "Kontingent hinzufügen",
+    "columns": {
+      "hotel": "Hotel",
+      "roomType": "Zimmertyp",
+      "used": "Belegt / Gesamt",
+      "notes": "Notizen",
+      "actions": "Aktionen"
+    },
+    "dialog": {
+      "create": {
+        "title": "Neues Kontingent",
+        "submit": "Kontingent erstellen"
+      },
+      "edit": {
+        "title": "Kontingent bearbeiten",
+        "submit": "Änderungen speichern"
+      },
+      "fields": {
+        "hotel": "Hotel",
+        "hotelPlaceholder": "Hotel auswählen",
+        "roomType": "Zimmertyp",
+        "qtyTotal": "Zimmeranzahl",
+        "qtyTotalHint": "Aktuell belegt: {{count}} (nicht unterschreiten)",
+        "notes": "Notizen"
+      },
+      "usedHint": "Belegt: {{used}} / {{total}}",
+      "errors": {
+        "hotel": "Bitte Hotel auswählen",
+        "roomType": "Bitte Zimmertyp auswählen",
+        "qtyTotal": "Anzahl muss eine ganze Zahl >= 1 sein"
+      },
+      "success": {
+        "created": "Kontingent erstellt",
+        "updated": "Kontingent aktualisiert",
+        "deleted": "Kontingent gelöscht"
+      }
+    },
+    "deleteDialog": {
+      "title": "Kontingent löschen?",
+      "body": "Diese Aktion löscht das Kontingent unwiderruflich. Bestehende Buchungen bleiben erhalten, werden aber nicht mehr über dieses Kontingent verfolgt.",
+      "confirm": "Löschen",
+      "abort": "Abbrechen"
+    }
+  },
+  "hotels": {
+    "empty": "Keine Hotels mit dieser Reise verknüpft. Fügen Sie ein Kontingent im Tab „Blöcke“ hinzu."
+  },
+  "empty": "Keine Reisen gefunden",
+  "notFound": "Reise nicht gefunden",
+  "passengers": {
+    "columns": {
+      "seat": "Platz",
+      "contract": "Vertrag",
+      "room": "Zimmer"
+    }
+  }
 }

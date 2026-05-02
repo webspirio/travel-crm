@@ -8,7 +8,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Progress } from "@/components/ui/progress"
-import { managers } from "@/data"
+import { useManagers } from "@/hooks/queries/use-managers"
 import { formatDateRange } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { TRIP_STATUS_CLASS } from "@/lib/trip-status"
@@ -23,6 +23,7 @@ interface TripEventProps {
 export function TripEvent({ trip, kind, locale }: TripEventProps) {
   const { t } = useTranslation("calendar")
   const { t: tc } = useTranslation()
+  const { data: managers = [] } = useManagers()
   const manager = managers.find((m) => m.id === trip.managerId)
   const percent = Math.round((trip.bookedCount / trip.capacity) * 100)
 

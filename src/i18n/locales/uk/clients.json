@@ -2,6 +2,7 @@
   "title": "Клієнти",
   "subtitle": "База клієнтів та історія бронювань",
   "search": "Пошук за іменем або email",
+  "createCta": "Новий клієнт",
   "columns": {
     "name": "Клієнт",
     "nationality": "Громадянство",
@@ -16,7 +17,39 @@
     "createdAt": "У базі з",
     "bookingHistory": "Історія бронювань",
     "noBookings": "Ще немає бронювань",
-    "openFull": "Повний профіль"
+    "openFull": "Повний профіль",
+    "edit": "Редагувати",
+    "seats": "Місця",
+    "pax": "{{count}} пас."
+  },
+  "dialog": {
+    "create": {
+      "title": "Новий клієнт",
+      "submit": "Створити клієнта"
+    },
+    "edit": {
+      "title": "Редагувати клієнта",
+      "submit": "Зберегти зміни"
+    },
+    "fields": {
+      "firstName": "Ім'я",
+      "lastName": "Прізвище",
+      "email": "Email",
+      "phone": "Телефон",
+      "nationality": "Громадянство",
+      "birthDate": "Дата народження",
+      "birthDatePlaceholder": "Оберіть дату"
+    },
+    "errors": {
+      "firstName": "Ім'я обов'язкове",
+      "lastName": "Прізвище обов'язкове",
+      "email": "Введіть коректний email",
+      "phone": "Телефон обов'язковий"
+    },
+    "success": {
+      "created": "Клієнта створено",
+      "updated": "Дані клієнта оновлено"
+    }
   },
   "profile": {
     "totalSpend": "Всього витрачено",

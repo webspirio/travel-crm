@@ -1,10 +1,11 @@
 import { z } from "zod"
+import { isValidPhoneNumber } from "libphonenumber-js"
 
 export const newClientSchema = z.object({
   firstName: z.string().min(1, "Required"),
   lastName: z.string().min(1, "Required"),
   email: z.string().email("Invalid email"),
-  phone: z.string().min(6, "Too short"),
+  phone: z.string().refine(isValidPhoneNumber, "errors.invalidPhone"),
   nationality: z.enum(["UA", "DE"]),
 })
 

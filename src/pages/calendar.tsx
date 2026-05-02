@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
 import {
@@ -35,19 +35,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { managers, trips } from "@/data"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { ALL_TRIP_STATUSES, tripStatusVariant } from "@/lib/trip-status"
 import type { Locale, Trip } from "@/types"
 
-const TODAY = new Date("2026-04-23")
-
-function defaultMonthAnchor(ts: Trip[]): Date {
+function defaultMonthAnchor(ts: Trip[], today: Date): Date {
   const next = ts
-    .filter((tr) => tr.departureDate >= TODAY)
+    .filter((tr) => tr.departureDate >= today)
     .sort((a, b) => a.departureDate.getTime() - b.departureDate.getTime())[0]
-  return startOfMonth(next?.departureDate ?? TODAY)
+  return startOfMonth(next?.departureDate ?? today)
 }
 
 export default function CalendarPage() {
@@ -56,10 +55,28 @@ export default function CalendarPage() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const dateFnsLocale = locale === "uk" ? uk : de
 
-  const [anchor, setAnchor] = useState(() => defaultMonthAnchor(trips))
+  const { data: trips = [] } = useTrips()
+  const { data: managers = [] } = useManagers()
+
+  // Stable identity across renders. Recomputed only on remount, so the
+  // calendar's "today" reference doesn't drift across an active session.
+  const today = useMemo(() => new Date(), [])
+
+  const [anchor, setAnchor] = useState<Date>(() => startOfMonth(today))
   const [destination, setDestination] = useState<string>("all")
   const [status, setStatus] = useState<string>("all")
   const [managerId, setManagerId] = useState<string>("all")
+
+  // Re-anchor once trips arrive so the calendar opens on the next
+  // upcoming-trip's month rather than the current month. Only fires
+  // once, on first arrival of trips data.
+  const anchoredRef = useRef(false)
+  useEffect(() => {
+    if (!anchoredRef.current && trips.length > 0) {
+      setAnchor(defaultMonthAnchor(trips, today))
+      anchoredRef.current = true
+    }
+  }, [trips, today])
 
   const filtered = useMemo(
     () =>
@@ -69,18 +86,18 @@ export default function CalendarPage() {
           (status === "all" || tr.status === status) &&
           (managerId === "all" || tr.managerId === managerId),
       ),
-    [destination, status, managerId],
+    [trips, destination, status, managerId],
   )
 
   const destinations = useMemo(
     () => [...new Set(trips.map((tr) => tr.destination))].sort(),
-    [],
+    [trips],
   )
 
   const nextDeparture = useMemo(
     () =>
       [...filtered]
-        .filter((tr) => tr.departureDate >= TODAY)
+        .filter((tr) => tr.departureDate >= today)
         .sort((a, b) => a.departureDate.getTime() - b.departureDate.getTime())[0],
     [filtered],
   )
@@ -152,7 +169,7 @@ export default function CalendarPage() {
               <CardDescription>
                 {formatDate(nextDeparture.departureDate, locale)} ·{" "}
                 {t("nextDepartureIn", {
-                  days: Math.max(0, differenceInCalendarDays(nextDeparture.departureDate, TODAY)),
+                  days: Math.max(0, differenceInCalendarDays(nextDeparture.departureDate, today)),
                 })}
               </CardDescription>
             </CardHeader>
@@ -170,7 +187,7 @@ export default function CalendarPage() {
           >
             <ChevronLeft />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setAnchor(defaultMonthAnchor(trips))}>
+          <Button variant="outline" size="sm" onClick={() => setAnchor(startOfMonth(today))}>
             {t("today")}
           </Button>
           <Button
@@ -243,7 +260,7 @@ export default function CalendarPage() {
               const inMonth = isSameMonth(day, anchor)
               const dayKey = format(day, "yyyy-MM-dd")
               const dayEvents = eventsByDate.get(dayKey) ?? []
-              const today = isToday(day) || isSameDay(day, TODAY)
+              const isCurrentDay = isToday(day) || isSameDay(day, today)
               return (
                 <div
                   key={dayKey}
@@ -255,7 +272,7 @@ export default function CalendarPage() {
                   <div
                     className={cn(
                       "flex h-6 w-6 items-center justify-center self-start rounded-full text-xs tabular-nums",
-                      today && "bg-primary text-primary-foreground font-semibold",
+                      isCurrentDay && "bg-primary text-primary-foreground font-semibold",
                     )}
                   >
                     {format(day, "d")}

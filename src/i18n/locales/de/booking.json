@@ -1,13 +1,12 @@
 {
   "title": "Neue Buchung",
-  "subtitle": "Buchung in 6 Schritten anlegen",
+  "subtitle": "Buchung in 5 Schritten anlegen",
   "steps": {
-    "client": "Kunde",
     "trip": "Reise",
-    "seat": "Platz",
-    "hotel": "Hotel",
-    "pricing": "Preis",
-    "summary": "Bestätigung"
+    "travelers": "Reisende",
+    "seats": "Sitzplätze",
+    "rooms": "Hotel",
+    "review": "Bestätigung"
   },
   "client": {
     "searchLabel": "Kunde suchen",
@@ -20,17 +19,117 @@
     "nationality": "Staatsangehörigkeit",
     "selected": "Ausgewählt"
   },
+  "travelers": {
+    "title": "Reisende ({{count}})",
+    "primaryContact": "Hauptkontakt",
+    "additional": "Weitere Reisende",
+    "additionalCount": "Weitere Reisende ({{count}})",
+    "add": "+ Reisenden hinzufügen",
+    "familyOfFour": "Familie zu viert",
+    "kindAdult": "Erwachsener",
+    "kindChild": "Kind",
+    "kindInfant": "Kleinkind",
+    "lapInfant": "auf dem Schoß, ohne Sitzplatz",
+    "savePromote": "Als Kunde speichern",
+    "savePromoteHelp": "Fügt diese Person der Kundenliste hinzu",
+    "linkExisting": "Mit bestehendem verknüpfen",
+    "createInstead": "Stattdessen neu anlegen",
+    "maybeExists": "Dieser Kunde existiert möglicherweise bereits:",
+    "makePrimary": "Als Hauptkontakt setzen",
+    "remove": "Entfernen",
+    "primaryBadge": "Hauptkontakt",
+    "priceLabel": "Preis (€)",
+    "priceDefault": "Standard {{amount}} €",
+    "dobLabel": "Geburtsdatum",
+    "tripChangeConfirm": "Bei Reisewechsel werden {{count}} Sitzplatz-/Zimmerzuweisungen zurückgesetzt. Fortfahren?",
+    "draftReset": "Der Entwurf wurde aufgrund einer inkompatiblen gespeicherten Version zurückgesetzt.",
+    "liveTotal": "Aktuelle Summe",
+    "subtotal": "Zwischensumme",
+    "commission": "Provision (10%)",
+    "total": "Gesamt",
+    "hotelNotSet": "Hotel: nicht festgelegt",
+    "lineAdult": "Erwachsene {{count}} × {{amount}}",
+    "lineChild": "Kinder {{count}} × {{amount}}",
+    "lineInfant": "Kleinkinder {{count}} × {{amount}}",
+    "namePlaceholder": "Ohne Namen"
+  },
+  "match": {
+    "emailFound": "Bestehender Kunde gefunden",
+    "softDeletedFound": "Kunden wiederherstellen?",
+    "phoneMatch": "Telefonnummer stimmt mit bestehendem Kunden überein",
+    "phoneMatchHint": "Familientelefon? Wähle die richtige Person.",
+    "nameMatchOpen": "Ähnliche Namen vorhanden — prüfen",
+    "useThis": "Diesen Kunden verwenden",
+    "keepNew": "Neu anlegen",
+    "restore": "Wiederherstellen & verwenden",
+    "createNew": "Neu anlegen",
+    "softBlocked": "Duplikat zuerst beheben",
+    "lastBooked": "Letzte Buchung {{year}}",
+    "deletedOn": "Gelöscht am {{date}}"
+  },
   "trip": {
     "pickLabel": "Reise auswählen",
     "available": "Plätze frei",
-    "full": "Ausgebucht"
+    "full": "Ausgebucht",
+    "changeConfirmTitle": "Reise wechseln?",
+    "changeConfirm": "Ja, wechseln",
+    "changeCancel": "Abbrechen"
   },
   "seat": {
     "pickLabel": "Platz auswählen"
   },
+  "seats": {
+    "title": "Sitzplätze",
+    "waiting": "Reisende ohne Platz ({{count}})",
+    "seated": "Reisende mit Platz ({{count}})",
+    "activePassenger": "Aktiv: {{name}}",
+    "assigned": "Zugewiesen",
+    "lapInfant": "(auf dem Schoß)",
+    "autoAssign": "Auto-Zuweisung",
+    "seatTogether": "Zusammen",
+    "noBlockFound": "Kein {{n}}-Platz-Block verfügbar — bitte manuell wählen",
+    "swapConfirmTitle": "Plätze tauschen?",
+    "swapConfirmBody": "Platz {{seat}} von {{name}} übernehmen?",
+    "swapConfirmYes": "Tauschen",
+    "swapConfirmNo": "Abbrechen",
+    "soldToast": "Dieser Platz ist bereits verkauft",
+    "helpHint": "← / → zum Wechseln • Enter für nächsten freien • Cmd+Shift+S für gemeinsame Plätze"
+  },
   "hotel": {
     "pickHotel": "Hotel auswählen",
-    "pickRoom": "Zimmertyp"
+    "pickRoom": "Zimmertyp",
+    "skipHotel": "Ohne Hotel",
+    "noHotel": "Ohne Hotel",
+    "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
+    "undoSkip": "Hotel auswählen"
+  },
+  "rooms": {
+    "title": "Hotel & Zimmer",
+    "hotelLabel": "Hotel",
+    "skipHotel": "Ohne Hotel — nur Bus",
+    "skipAll": "Hotel für alle überspringen",
+    "undoSkip": "Hotel auswählen",
+    "unassigned": "Nicht zugewiesene Reisende",
+    "declineHotel": "Hotel ablehnen",
+    "addRoom": "+ Zimmer hinzufügen",
+    "removeRoom": "Zimmer entfernen",
+    "roomLabel": "Zimmer {{n}}",
+    "roomType": {
+      "single": "Einzelzimmer",
+      "double": "Doppelzimmer",
+      "triple": "Dreibettzimmer",
+      "family": "Familienzimmer"
+    },
+    "familySoldOut": "Für diese Daten ausgebucht",
+    "lapInfantTag": "(auf dem Schoß, kostenlos)",
+    "pricePerNight": "{{amount}} €/Nacht",
+    "tripHasNoHotel": "Diese Reise hat kein Hotel.",
+    "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
+    "confirmRemoveRoom": "Zimmer mit zugewiesenen Reisenden entfernen?",
+    "priceNights": "{{nights}} Nacht × {{price}} €",
+    "totalPerPax": "{{amount}} € / Person",
+    "assignedElsewhere": "in anderem Zimmer",
+    "noPassengers": "Noch keine Reisenden"
   },
   "pricing": {
     "basePrice": "Reisegrundpreis",
@@ -41,12 +140,119 @@
   "summary": {
     "title": "Daten prüfen",
     "confirmCta": "Buchung bestätigen",
-    "toast": "Buchung erstellt! 🎉"
+    "toast": "Buchung {{bookingNumber}} erstellt! 🎉"
+  },
+  "review": {
+    "title": "Bestätigung",
+    "passengerTable": {
+      "name": "Name",
+      "kind": "Typ",
+      "seat": "Platz",
+      "room": "Zimmer",
+      "price": "Preis"
+    },
+    "subtotal": "Zwischensumme",
+    "commission": "Provision (10%)",
+    "total": "Gesamt",
+    "confirm": "Buchung bestätigen",
+    "notes": "Notizen (optional)",
+    "notesPlaceholder": "Interne Notizen zu dieser Buchung…",
+    "success": "Buchung #{{number}} erstellt",
+    "kindAdult": "Erwachsener",
+    "kindChild": "Kind",
+    "kindInfant": "Kleinkind",
+    "noHotel": "kein Hotel",
+    "lapInfant": "auf dem Schoß",
+    "roomLabel": "Zimmer {{n}}: {{type}} @ {{hotel}}"
   },
   "validation": {
     "selectClient": "Kunden auswählen oder neu anlegen",
     "pickTrip": "Reise auswählen",
     "pickSeat": "Freien Platz auswählen",
     "pickHotel": "Hotel auswählen"
+  },
+  "detail": {
+    "back": "Zum Dashboard",
+    "statusChanged": "Status geändert: {{status}}",
+    "notFound": "Buchung nicht gefunden",
+    "sections": {
+      "status": "Status",
+      "passengers": "Reisende",
+      "payments": "Zahlungen"
+    },
+    "fields": {
+      "booking": "Buchung",
+      "contract": "Vertrag",
+      "total": "Gesamt",
+      "paid": "Bezahlt",
+      "outstanding": "Ausstehend",
+      "client": "Kunde"
+    },
+    "passengers": {
+      "name": "Name",
+      "kind": "Typ",
+      "seat": "Platz",
+      "hotel": "Hotel",
+      "room": "Zimmer",
+      "price": "Preis",
+      "adult": "Erwachsener",
+      "child": "Kind",
+      "infant": "Kleinkind"
+    },
+    "payments": {
+      "date": "Datum",
+      "amount": "Betrag",
+      "method": "Zahlungsart",
+      "reference": "Referenz",
+      "recordedBy": "Erfasst von",
+      "empty": "Noch keine Zahlungen",
+      "cash": "Bargeld",
+      "bank_transfer": "Banküberweisung",
+      "card": "Karte",
+      "record": "Zahlung erfassen",
+      "success": "Zahlung erfasst",
+      "successRefund": "Rückerstattung erfasst",
+      "dialog": {
+        "title": "Zahlung erfassen",
+        "titleRefund": "Rückerstattung",
+        "outstanding": "Ausstehend: {{amount}}",
+        "submit": "Speichern",
+        "submitRefund": "Rückerstattung erfassen"
+      },
+      "fields": {
+        "amount": "Betrag (€)",
+        "method": "Zahlungsart",
+        "receivedAt": "Eingangsdatum",
+        "reference": "Referenz",
+        "notes": "Notizen"
+      },
+      "methods": {
+        "cash": "Bargeld",
+        "bank_transfer": "Banküberweisung",
+        "card": "Karte"
+      },
+      "errors": {
+        "amount": "Bitte einen Betrag ungleich null eingeben"
+      }
+    },
+    "transitions": {
+      "confirm": "Bestätigen",
+      "markPartiallyPaid": "Teilweise bezahlt",
+      "markPaid": "Bezahlt",
+      "cancel": "Stornieren",
+      "markNoShow": "Nicht erschienen"
+    },
+    "cancelDialog": {
+      "title": "Buchung stornieren?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Die Buchung wird als «Storniert» markiert.",
+      "confirm": "Ja, stornieren",
+      "abort": "Nein, behalten"
+    },
+    "noShowDialog": {
+      "title": "Als «Nicht erschienen» markieren?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Der Reisende wird als nicht erschienen markiert.",
+      "confirm": "Ja, markieren",
+      "abort": "Nein, behalten"
+    }
   }
 }

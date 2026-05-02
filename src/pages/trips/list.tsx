@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router"
+import { Plus } from "lucide-react"
 
 import { DataTable } from "@/components/data-table/data-table"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -10,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { trips } from "@/data"
+import { TripFormDialog } from "@/components/trips/trip-form-dialog"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { ALL_TRIP_STATUSES } from "@/lib/trip-status"
 
 import { useTripColumns } from "./columns"
@@ -22,10 +25,13 @@ export default function TripsListPage() {
 
   const [destination, setDestination] = useState<string>("all")
   const [status, setStatus] = useState<string>("all")
+  const [createOpen, setCreateOpen] = useState(false)
+
+  const { data: trips = [] } = useTrips()
 
   const destinations = useMemo(
     () => [...new Set(trips.map((tr) => tr.destination))].sort(),
-    [],
+    [trips],
   )
 
   const filtered = useMemo(
@@ -35,17 +41,29 @@ export default function TripsListPage() {
           (destination === "all" || tr.destination === destination) &&
           (status === "all" || tr.status === status),
       ),
-    [destination, status],
+    [trips, destination, status],
   )
 
   const columns = useTripColumns()
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Plus className="size-4" />
+          {t("createCta")}
+        </Button>
       </div>
+
+      <TripFormDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        mode="create"
+      />
 
       <DataTable
         columns={columns}

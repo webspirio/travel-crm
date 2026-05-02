@@ -51,3 +51,6 @@ supabase/seed.local.sql
 # Generated DB types (regenerated via `npm run db:types`)
 src/types/database.ts
 src/types/database.ts.tmp
+
+# Local git worktrees (per-developer, never commit)
+.worktrees/

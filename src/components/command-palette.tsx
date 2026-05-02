@@ -21,7 +21,10 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command"
-import { clients, hotels, managers, trips } from "@/data"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { usePaletteStore } from "@/stores/palette-store"
 
 export function CommandPalette() {
@@ -42,6 +45,11 @@ export function CommandPalette() {
     return () => window.removeEventListener("keydown", handler)
   }, [toggle])
 
+  const { data: trips = [] } = useTrips()
+  const { data: clients = [] } = useClients()
+  const { data: hotels = [] } = useHotels()
+  const { data: managers = [] } = useManagers()
+
   const tripItems = useMemo(
     () =>
       trips.map((tr) => ({
@@ -51,7 +59,7 @@ export function CommandPalette() {
         value: `trip ${tr.name} ${tr.origin} ${tr.destination}`.toLowerCase(),
         onSelect: () => navigate(`/trips/${tr.id}`),
       })),
-    [navigate],
+    [trips, navigate],
   )
   const clientItems = useMemo(
     () =>
@@ -62,7 +70,7 @@ export function CommandPalette() {
         value: `client ${c.firstName} ${c.lastName} ${c.email}`.toLowerCase(),
         onSelect: () => navigate(`/clients/${c.id}`),
       })),
-    [navigate],
+    [clients, navigate],
   )
   const hotelItems = useMemo(
     () =>
@@ -73,7 +81,7 @@ export function CommandPalette() {
         value: `hotel ${h.name} ${h.city} ${h.country}`.toLowerCase(),
         onSelect: () => navigate(`/hotels/${h.id}`),
       })),
-    [navigate],
+    [hotels, navigate],
   )
   const managerItems = useMemo(
     () =>
@@ -84,7 +92,7 @@ export function CommandPalette() {
         value: `manager ${m.name} ${m.email}`.toLowerCase(),
         onSelect: () => navigate(`/managers/${m.id}`),
       })),
-    [navigate],
+    [managers, navigate],
   )
 
   const go = (path: string) => () => navigate(path)

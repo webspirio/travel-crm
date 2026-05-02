@@ -30,28 +30,49 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { bookings, clients, managers, trips } from "@/data"
-import { getManagerStats } from "@/data/stats"
+import { useBookings } from "@/hooks/queries/use-bookings"
+import { useClients } from "@/hooks/queries/use-clients"
+import { useHotels } from "@/hooks/queries/use-hotels"
+import { useManagers } from "@/hooks/queries/use-managers"
+import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { computeDashboardStats, getManagerStats } from "@/lib/stats"
 import type { Locale } from "@/types"
-
-const TODAY = new Date("2026-04-23")
-const IN_30_DAYS = new Date(TODAY.getTime() + 30 * 24 * 60 * 60 * 1000)
 
 export default function FinancePage() {
   const { t, i18n } = useTranslation("finance")
   const { t: tc } = useTranslation()
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [])
-  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [])
+  const { data: trips = [] } = useTrips()
+  const { data: clients = [] } = useClients()
+  const { data: hotels = [] } = useHotels()
+  const { data: managers = [] } = useManagers()
+  const { data: bookings = [] } = useBookings()
+
+  // Computed once, reused for the leaderboard, KPI strips, and the
+  // RevenueChart component (no double-aggregation).
+  const dashboardStats = useMemo(
+    () => computeDashboardStats(trips, bookings, hotels, managers),
+    [trips, bookings, hotels, managers],
+  )
+
+  // Stable identity across renders.
+  const today = useMemo(() => new Date(), [])
+  const in30Days = useMemo(
+    () => new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000),
+    [today],
+  )
+
+  const tripById = useMemo(() => new Map(trips.map((tr) => [tr.id, tr])), [trips])
+  const clientById = useMemo(() => new Map(clients.map((c) => [c.id, c])), [clients])
 
   const totals = useMemo(() => {
     let revenue = 0
     let outstanding = 0
     let commission = 0
     let paidThisMonth = 0
-    const thisMonth = TODAY.toISOString().slice(0, 7)
+    const thisMonth = today.toISOString().slice(0, 7)
     for (const b of bookings) {
       revenue += b.totalPrice
       outstanding += Math.max(0, b.totalPrice - b.paidAmount)
@@ -62,7 +83,7 @@ export default function FinancePage() {
       }
     }
     return { revenue, outstanding, commission, paidThisMonth }
-  }, [tripById])
+  }, [bookings, tripById])
 
   const paidVsOutstanding = useMemo(() => {
     const map = new Map<string, { paid: number; outstanding: number }>()
@@ -82,14 +103,14 @@ export default function FinancePage() {
         paid: v.paid,
         outstanding: v.outstanding,
       }))
-  }, [tripById])
+  }, [bookings, tripById])
 
   const leaderboard = useMemo(
     () =>
       managers
         .map((m) => ({ manager: m, ...getManagerStats(m.id, trips, bookings) }))
         .sort((a, b) => b.commission - a.commission),
-    [],
+    [managers, trips, bookings],
   )
 
   const upcoming = useMemo(
@@ -98,12 +119,12 @@ export default function FinancePage() {
         .filter(
           (b) =>
             b.paidAmount < b.totalPrice &&
-            b.dueDate >= TODAY &&
-            b.dueDate <= IN_30_DAYS &&
+            b.dueDate >= today &&
+            b.dueDate <= in30Days &&
             b.status !== "cancelled",
         )
         .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime()),
-    [],
+    [bookings, today, in30Days],
   )
 
   return (
@@ -145,7 +166,7 @@ export default function FinancePage() {
             <CardDescription>{t("charts.revenueSubtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <RevenueChart />
+            <RevenueChart data={dashboardStats.revenueByMonth} managers={managers} />
           </CardContent>
         </Card>
 
@@ -299,9 +320,11 @@ export default function FinancePage() {
                           {formatCurrency(b.totalPrice - b.paidAmount, locale)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">
-                            {tc(`bookingStatus.${b.status}`)}
-                          </Badge>
+                          <Link to={`/bookings/${b.id}`} className="hover:underline">
+                            <Badge variant="outline">
+                              {tc(`bookingStatus.${b.status}`)}
+                            </Badge>
+                          </Link>
                         </TableCell>
                       </TableRow>
                     )
