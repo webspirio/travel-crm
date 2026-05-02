@@ -78,10 +78,24 @@ as $$
 declare
   uid uuid := pg_catalog.gen_random_uuid();
 begin
-  insert into auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
-  values (uid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', _email,
-          extensions.crypt('test-password', extensions.gen_salt('bf')),
-          pg_catalog.now(), pg_catalog.now(), pg_catalog.now());
+  -- GoTrue's Go scanner cannot read NULL into its string-typed token
+  -- columns; bypassing the API to insert directly leaves them NULL by
+  -- default and breaks /token (sign-in) with "Database error querying
+  -- schema". Set them to empty strings to match what GoTrue's own
+  -- migrations write for users created via its API.
+  insert into auth.users (
+    id, instance_id, aud, role, email, encrypted_password,
+    email_confirmed_at, created_at, updated_at,
+    confirmation_token, recovery_token,
+    email_change_token_new, email_change_token_current, email_change,
+    reauthentication_token, phone_change, phone_change_token
+  )
+  values (
+    uid, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', _email,
+    extensions.crypt('test-password', extensions.gen_salt('bf')),
+    pg_catalog.now(), pg_catalog.now(), pg_catalog.now(),
+    '', '', '', '', '', '', '', ''
+  );
 
   insert into public.tenant_users (tenant_id, user_id, role, is_active)
   values (_tenant_id, uid, _role, _is_active);
