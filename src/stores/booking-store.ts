@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
+import { defaultCountryFor, toE164 } from "@/lib/phone"
 import type { PassengerKind, RoomType } from "@/types"
 
 // ─── Core draft shapes ────────────────────────────────────────────────────────
@@ -236,13 +237,24 @@ export const useBookingStore = create<BookingStore>()(
     }),
     {
       name: "anytour-booking-draft",
-      version: 2,
+      // v3: re-parse phoneRaw as E.164 (libphonenumber). Earlier migrate
+      // copied legacy national-format phone (e.g. "015124130699") directly,
+      // which made react-phone-number-input warn on every render.
+      version: 3,
       migrate: (persisted: unknown, fromVersion: number) => {
+        let state: unknown = persisted
+
         if (fromVersion < 2) {
-          const p = persisted as Record<string, unknown> | null | undefined
+          const p = state as Record<string, unknown> | null | undefined
           try {
             const nc = p?.newClient as Record<string, unknown> | undefined
             const pricingRaw = p?.pricing as Record<string, unknown> | undefined
+            const nationality: "UA" | "DE" | null =
+              nc?.nationality === "UA" || nc?.nationality === "DE" ? nc.nationality : null
+            const legacyPhone = typeof nc?.phone === "string" ? nc.phone : ""
+            const e164 = legacyPhone
+              ? toE164(legacyPhone, defaultCountryFor(nationality))
+              : null
             const primary: PassengerDraft = {
               localId: crypto.randomUUID(),
               isPrimary: true,
@@ -251,10 +263,9 @@ export const useBookingStore = create<BookingStore>()(
               lastName: typeof nc?.lastName === "string" ? nc.lastName : "",
               birthDate: null,
               email: typeof nc?.email === "string" ? nc.email : "",
-              phoneRaw: typeof nc?.phone === "string" ? nc.phone : "",
-              phoneE164: null,
-              nationality:
-                nc?.nationality === "UA" || nc?.nationality === "DE" ? nc.nationality : null,
+              phoneRaw: e164 ?? "",
+              phoneE164: e164,
+              nationality,
               clientId: typeof p?.clientId === "string" ? p.clientId : null,
               matchIgnored: false,
               promoteToClient: false,
@@ -277,7 +288,7 @@ export const useBookingStore = create<BookingStore>()(
                   ]
                 : []
             if (rooms.length === 1) primary.roomGroupId = rooms[0].localId
-            return {
+            state = {
               ...EMPTY,
               passengers: [primary],
               tripId: typeof p?.tripId === "string" ? p.tripId : null,
@@ -286,10 +297,25 @@ export const useBookingStore = create<BookingStore>()(
             }
           } catch {
             localStorage.setItem("anytour-booking-draft-reset-toast", "1")
-            return { ...EMPTY, passengers: [makeEmptyPrimary()] }
+            state = { ...EMPTY, passengers: [makeEmptyPrimary()] }
           }
         }
-        return persisted as BookingDraft
+
+        if (fromVersion < 3) {
+          // v2 → v3: scrub any phoneRaw that isn't E.164. Re-parse using
+          // the passenger's nationality as country hint; drop unparseable.
+          const draft = state as BookingDraft | null
+          if (draft?.passengers?.length) {
+            draft.passengers = draft.passengers.map((p) => {
+              if (!p.phoneRaw || p.phoneE164) return p
+              const e164 = toE164(p.phoneRaw, defaultCountryFor(p.nationality))
+              return { ...p, phoneRaw: e164 ?? "", phoneE164: e164 }
+            })
+            state = draft
+          }
+        }
+
+        return state as BookingDraft
       },
       storage: createJSONStorage(() => localStorage),
     },
