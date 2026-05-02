@@ -1,6 +1,9 @@
 import type { TFunction } from "i18next"
+import { Pencil } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DESTRUCTIVE_STATUSES } from "@/lib/booking-status"
 import type { Booking, Hotel, Passenger, RoomType } from "@/types"
 
 interface Props {
@@ -8,6 +11,8 @@ interface Props {
   hotels: Hotel[]
   t: TFunction<"booking">
   tc: TFunction
+  /** When provided AND status is non-terminal, renders an Edit button. */
+  onEdit?: () => void
 }
 
 interface Group {
@@ -23,8 +28,9 @@ interface Group {
  * and other passengers without a hotel are collected into a "No hotel" tail
  * group so nobody is silently dropped.
  */
-export function HotelsRoomsCard({ booking, hotels, t, tc }: Props) {
+export function HotelsRoomsCard({ booking, hotels, t, tc, onEdit }: Props) {
   const hotelById = new Map(hotels.map((h) => [h.id, h]))
+  const editable = onEdit && !DESTRUCTIVE_STATUSES.has(booking.status)
 
   // Stable, insertion-ordered grouping keyed by composite.
   const groupMap = new Map<string, Group>()
@@ -48,8 +54,14 @@ export function HotelsRoomsCard({ booking, hotels, t, tc }: Props) {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t("detail.sections.hotelsRooms")}</CardTitle>
+        {editable && (
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Pencil className="size-3.5" />
+            {t("detail.edit.edit")}
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {ordered.length === 0 ? (

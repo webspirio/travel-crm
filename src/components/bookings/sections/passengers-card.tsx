@@ -1,5 +1,7 @@
 import type { TFunction } from "i18next"
+import { Pencil } from "lucide-react"
 
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Table,
@@ -9,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { DESTRUCTIVE_STATUSES } from "@/lib/booking-status"
 import { formatCurrency, formatDate } from "@/lib/format"
 import type { Booking, Hotel, Locale } from "@/types"
 
@@ -18,19 +21,29 @@ interface Props {
   t: TFunction<"booking">
   tc: TFunction
   locale: Locale
+  /** When provided AND status is non-terminal, renders an Edit button. */
+  onEdit?: () => void
 }
 
 /**
  * Passengers table — name, kind, birth date, seat#, hotel, room, price,
- * special notes. Read-only; T10 brings sensitive-edit affordances.
+ * special notes. T10 attaches the sensitive-edit sheet via `onEdit`.
+ * Edit is hidden on terminal statuses (cancelled / no_show).
  */
-export function PassengersCard({ booking, hotels, t, tc, locale }: Props) {
+export function PassengersCard({ booking, hotels, t, tc, locale, onEdit }: Props) {
+  const editable = onEdit && !DESTRUCTIVE_STATUSES.has(booking.status)
   const hotelById = new Map(hotels.map((h) => [h.id, h]))
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t("detail.sections.passengers")}</CardTitle>
+        {editable && (
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Pencil className="size-3.5" />
+            {t("detail.edit.edit")}
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <Table>

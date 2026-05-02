@@ -307,6 +307,19 @@
       "contactLastName": "Nachname",
       "contactEmail": "E-Mail",
       "contactPhone": "Telefon",
+      "reason": "Grund",
+      "reasonPlaceholder": "Grund der Änderung (bei bestätigten Buchungen erforderlich)...",
+      "passengersTitle": "Passagiere bearbeiten",
+      "passengersDescription": "Namen, Geburtsdaten, Sitzplätze, Notizen.",
+      "hotelsRoomsTitle": "Hotels & Zimmer bearbeiten",
+      "hotelsRoomsDescription": "Hotel- und Zimmerzuweisungen.",
+      "pricingTitle": "Preise bearbeiten",
+      "pricingDescription": "Preis pro Passagier und Gesamtsumme.",
+      "noChanges": "Keine Änderungen",
+      "pricingPassenger": "Passagier",
+      "pricingPrice": "Preis (€)",
+      "pricingSubtotal": "Passagiersumme",
+      "pricingTotal": "Buchungssumme (€)",
       "errors": {
         "firstName": "Vorname ist erforderlich",
         "lastName": "Nachname ist erforderlich",
@@ -317,6 +330,9 @@
     "toast": {
       "notesUpdated": "Notizen aktualisiert",
       "contactUpdated": "Kontakt aktualisiert",
+      "passengersUpdated": "Passagiere aktualisiert",
+      "hotelsRoomsUpdated": "Hotels/Zimmer aktualisiert",
+      "pricingUpdated": "Preise aktualisiert",
       "updateFailed": "Speichern fehlgeschlagen"
     }
   }

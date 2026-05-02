@@ -1,4 +1,4 @@
-import { create } from "zustand"
+import { create, createStore, type StateCreator, type StoreApi } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 import { defaultCountryFor, toE164 } from "@/lib/phone"
@@ -105,16 +105,19 @@ const EMPTY: BookingDraft = {
   notes: "",
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
+// ─── Reusable store creator ───────────────────────────────────────────────────
+//
+// Extracted as a `StateCreator` so it can be wrapped with `persist` for the
+// wizard's localStorage-backed singleton AND used standalone (no persist)
+// for the per-edit-sheet isolated stores in T10. Both share identical action
+// semantics — please keep this single definition rather than duplicating it.
 
-export const useBookingStore = create<BookingStore>()(
-  persist(
-    (set) => ({
-      ...EMPTY,
-      passengers: [makeEmptyPrimary()],
+const createBookingStoreSlice: StateCreator<BookingStore> = (set) => ({
+  ...EMPTY,
+  passengers: [makeEmptyPrimary()],
 
-      // Step navigation
-      setStep: (step) => set({ step }),
+  // Step navigation
+  setStep: (step) => set({ step }),
 
       // Passenger CRUD
       addPassenger: (kind) =>
@@ -233,8 +236,14 @@ export const useBookingStore = create<BookingStore>()(
           passengers: [makeEmptyPrimary()],
         }),
 
-      update: (patch) => set((state) => ({ ...state, ...patch })),
-    }),
+  update: (patch) => set((state) => ({ ...state, ...patch })),
+})
+
+// ─── Wizard singleton (persisted) ─────────────────────────────────────────────
+
+export const useBookingStore = create<BookingStore>()(
+  persist(
+    createBookingStoreSlice,
     {
       name: "anytour-booking-draft",
       // v3: re-parse phoneRaw as E.164 (libphonenumber). Earlier migrate
@@ -321,3 +330,27 @@ export const useBookingStore = create<BookingStore>()(
     },
   ),
 )
+
+// ─── Isolated stores (no persist) ─────────────────────────────────────────────
+
+/**
+ * Build a fresh, non-persisted Zustand store seeded with `initial`.
+ *
+ * Used by the booking-detail edit sheets (T10) so each open sheet gets its
+ * own draft state isolated from the wizard singleton. Shares the action
+ * creator above — so add/update/remove semantics stay byte-identical.
+ *
+ * Caller is responsible for keeping the returned StoreApi for the lifetime
+ * of the sheet (typically `useState(() => createIsolatedBookingDraftStore(...))`).
+ */
+export function createIsolatedBookingDraftStore(
+  initial: BookingDraft,
+): StoreApi<BookingStore> {
+  return createStore<BookingStore>()((set, get, api) => {
+    const slice = createBookingStoreSlice(set, get, api)
+    return {
+      ...slice,
+      ...initial,
+    }
+  })
+}

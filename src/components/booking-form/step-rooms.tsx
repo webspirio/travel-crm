@@ -70,7 +70,8 @@ interface RoomCardProps {
   nights: number
   /** Allotment remaining for (hotelId, roomType) — undefined = unknown / no data */
   allotmentRemaining: Map<string, number>
-  onRemove: (localId: string) => void
+  /** When undefined, the per-room remove button is hidden (edit mode). */
+  onRemove?: (localId: string) => void
   onAssign: (passengerLocalId: string, roomLocalId: string | null) => void
   onChangeType: (localId: string, roomType: RoomType) => void
 }
@@ -102,6 +103,7 @@ function RoomCard({
   }
 
   function handleRemoveRoom() {
+    if (!onRemove) return
     const hasAssigned = roomPassengers.length > 0
     if (hasAssigned) {
       if (!window.confirm(t("rooms.confirmRemoveRoom"))) return
@@ -151,14 +153,16 @@ function RoomCard({
               </Badge>
             )}
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive"
-              onClick={handleRemoveRoom}
-            >
-              {t("rooms.removeRoom")}
-            </Button>
+            {onRemove && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={handleRemoveRoom}
+              >
+                {t("rooms.removeRoom")}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -222,7 +226,7 @@ function RoomCard({
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export function StepRooms() {
+export function StepRooms({ editMode = false }: { editMode?: boolean } = {}) {
   const { t } = useTranslation("booking")
 
   // Store slices
@@ -425,7 +429,7 @@ export function StepRooms() {
                   passengers={passengers}
                   nights={nights}
                   allotmentRemaining={allotmentRemaining}
-                  onRemove={handleRemoveRoom}
+                  onRemove={editMode ? undefined : handleRemoveRoom}
                   onAssign={assignToRoom}
                   onChangeType={handleChangeRoomType}
                 />
@@ -433,10 +437,12 @@ export function StepRooms() {
             </div>
           )}
 
-          {/* Add room */}
-          <Button variant="outline" size="sm" onClick={handleAddRoom}>
-            {t("rooms.addRoom")}
-          </Button>
+          {/* Add room — hidden in edit mode (T10: add/remove out of scope v1) */}
+          {!editMode && (
+            <Button variant="outline" size="sm" onClick={handleAddRoom}>
+              {t("rooms.addRoom")}
+            </Button>
+          )}
 
           {/* Unassigned panel */}
           {notInRoom.length > 0 && (

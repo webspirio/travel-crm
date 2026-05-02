@@ -307,6 +307,19 @@
       "contactLastName": "Прізвище",
       "contactEmail": "Email",
       "contactPhone": "Телефон",
+      "reason": "Причина",
+      "reasonPlaceholder": "Причина зміни (обов'язково для підтверджених бронювань)...",
+      "passengersTitle": "Редагувати пасажирів",
+      "passengersDescription": "Імена, дати народження, місця, нотатки.",
+      "hotelsRoomsTitle": "Редагувати готелі та номери",
+      "hotelsRoomsDescription": "Призначення готелів і номерів.",
+      "pricingTitle": "Редагувати ціни",
+      "pricingDescription": "Ціна за пасажира та загальна сума.",
+      "noChanges": "Немає змін",
+      "pricingPassenger": "Пасажир",
+      "pricingPrice": "Ціна (€)",
+      "pricingSubtotal": "Сума пасажирів",
+      "pricingTotal": "Загальна сума бронювання (€)",
       "errors": {
         "firstName": "Ім'я обов'язкове",
         "lastName": "Прізвище обов'язкове",
@@ -317,6 +330,9 @@
     "toast": {
       "notesUpdated": "Нотатки оновлено",
       "contactUpdated": "Контакт оновлено",
+      "passengersUpdated": "Пасажирів оновлено",
+      "hotelsRoomsUpdated": "Готелі/номери оновлено",
+      "pricingUpdated": "Ціни оновлено",
       "updateFailed": "Не вдалося зберегти"
     }
   }

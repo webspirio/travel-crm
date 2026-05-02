@@ -30,7 +30,7 @@ import type { Locale, PassengerKind } from "@/types"
  *   • Soft-blocks "Continue" when a live email match is present and the
  *     manager hasn't either picked an existing client or pressed "Keep new".
  */
-export function StepTravelers() {
+export function StepTravelers({ editMode = false }: { editMode?: boolean } = {}) {
   const { t, i18n } = useTranslation("booking")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
@@ -233,17 +233,21 @@ export function StepTravelers() {
                   expanded={expandedIds.has(p.localId)}
                   onToggleExpand={() => toggleExpand(p.localId)}
                   onUpdate={(patch) => updatePassenger(p.localId, patch)}
-                  onPromote={() => setPromotingId(p.localId)}
-                  onMakePrimary={() => setPrimary(p.localId)}
-                  onRemove={() => {
-                    removePassenger(p.localId)
-                    setExpandedIds((prev) => {
-                      const next = new Set(prev)
-                      next.delete(p.localId)
-                      return next
-                    })
-                    if (promotingId === p.localId) setPromotingId(null)
-                  }}
+                  onPromote={editMode ? undefined : () => setPromotingId(p.localId)}
+                  onMakePrimary={editMode ? undefined : () => setPrimary(p.localId)}
+                  onRemove={
+                    editMode
+                      ? undefined
+                      : () => {
+                          removePassenger(p.localId)
+                          setExpandedIds((prev) => {
+                            const next = new Set(prev)
+                            next.delete(p.localId)
+                            return next
+                          })
+                          if (promotingId === p.localId) setPromotingId(null)
+                        }
+                  }
                 />
                 {promotingId === p.localId && (
                   <SaveAsClientForm
@@ -264,28 +268,30 @@ export function StepTravelers() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => handleAdd("adult")}
-              title="Alt+N"
-            >
-              <Plus className="size-4" />
-              {t("travelers.add")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={handleFamilyOfFour}
-              title="Alt+F"
-            >
-              <Users className="size-4" />
-              {t("travelers.familyOfFour")}
-            </Button>
-          </div>
+          {!editMode && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => handleAdd("adult")}
+                title="Alt+N"
+              >
+                <Plus className="size-4" />
+                {t("travelers.add")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={handleFamilyOfFour}
+                title="Alt+F"
+              >
+                <Users className="size-4" />
+                {t("travelers.familyOfFour")}
+              </Button>
+            </div>
+          )}
         </section>
       </div>
 

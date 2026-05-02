@@ -1,6 +1,9 @@
 import { useMemo, useState } from "react"
 import { ContactEditSheet } from "@/components/bookings/edit-sheets/contact-edit-sheet"
+import { HotelsRoomsEditSheet } from "@/components/bookings/edit-sheets/hotels-rooms-edit-sheet"
 import { NotesEditSheet } from "@/components/bookings/edit-sheets/notes-edit-sheet"
+import { PassengersEditSheet } from "@/components/bookings/edit-sheets/passengers-edit-sheet"
+import { PricingEditSheet } from "@/components/bookings/edit-sheets/pricing-edit-sheet"
 import { PaymentFormDialog } from "@/components/bookings/payment-form-dialog"
 import { ClientCard } from "@/components/bookings/sections/client-card"
 import { HeaderCard } from "@/components/bookings/sections/header-card"
@@ -64,6 +67,11 @@ export default function BookingDetailPage() {
   // Frictionless edit sheets (T9).
   const [notesEditOpen, setNotesEditOpen] = useState(false)
   const [contactEditOpen, setContactEditOpen] = useState(false)
+
+  // Sensitive edit sheets (T10).
+  const [passengersEditOpen, setPassengersEditOpen] = useState(false)
+  const [hotelsRoomsEditOpen, setHotelsRoomsEditOpen] = useState(false)
+  const [pricingEditOpen, setPricingEditOpen] = useState(false)
 
   const managerById = useMemo(
     () => new Map(managers.map((m) => [m.id, m])),
@@ -183,9 +191,21 @@ export default function BookingDetailPage() {
             t={t}
             tc={tc}
             locale={locale}
+            onEdit={() => setPassengersEditOpen(true)}
           />
-          <HotelsRoomsCard booking={booking} hotels={hotels} t={t} tc={tc} />
-          <PricingCard booking={booking} t={t} locale={locale} />
+          <HotelsRoomsCard
+            booking={booking}
+            hotels={hotels}
+            t={t}
+            tc={tc}
+            onEdit={() => setHotelsRoomsEditOpen(true)}
+          />
+          <PricingCard
+            booking={booking}
+            t={t}
+            locale={locale}
+            onEdit={() => setPricingEditOpen(true)}
+          />
           <NotesCard
             booking={booking}
             t={t}
@@ -238,6 +258,26 @@ export default function BookingDetailPage() {
           client={client}
         />
       )}
+
+      {/* Sensitive edit sheets (T10) — passengers, hotels & rooms, pricing */}
+      <PassengersEditSheet
+        open={passengersEditOpen}
+        onOpenChange={setPassengersEditOpen}
+        booking={booking}
+        hotels={hotels}
+      />
+      <HotelsRoomsEditSheet
+        open={hotelsRoomsEditOpen}
+        onOpenChange={setHotelsRoomsEditOpen}
+        booking={booking}
+        hotels={hotels}
+      />
+      <PricingEditSheet
+        open={pricingEditOpen}
+        onOpenChange={setPricingEditOpen}
+        booking={booking}
+        locale={locale}
+      />
 
       {/* Confirmation dialog for destructive transitions — stays outside Tabs */}
       <Dialog
