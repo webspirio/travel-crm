@@ -180,7 +180,53 @@
       "history": "Історія"
     },
     "history": {
-      "placeholder": "Історія появиться тут після завершення бекенду."
+      "loadMore": "Завантажити ще",
+      "loadingMore": "Завантаження...",
+      "endOfHistory": "Кінець історії",
+      "empty": "Записів історії немає",
+      "actionInsert": "Створено",
+      "actionUpdate": "Оновлено",
+      "actionDelete": "Видалено",
+      "entityBooking": "Бронювання",
+      "entityPassenger": "Пасажир: {{name}}",
+      "entityPayment": "Платіж",
+      "fields": {
+        "bookings": {
+          "notes": "Нотатки",
+          "dueDate": "Дата оплати",
+          "totalPriceEur": "Сума",
+          "paidAmountEur": "Оплачено",
+          "status": "Статус",
+          "operatorRef": "Реф. оператора",
+          "invoiceNumber": "Номер інвойсу",
+          "commissionEur": "Комісія",
+          "contractNumber": "Номер договору",
+          "clientId": "Клієнт",
+          "tripId": "Тур",
+          "soldByManagerId": "Менеджер"
+        },
+        "passengers": {
+          "firstName": "Ім'я",
+          "lastName": "Прізвище",
+          "birthDate": "Дата народження",
+          "seatNumber": "Місце",
+          "hotelId": "Готель",
+          "roomType": "Тип номера",
+          "priceTotalEur": "Ціна",
+          "priceBreakdown": "Розбивка ціни",
+          "specialNotes": "Особливі побажання",
+          "kind": "Тип пасажира",
+          "clientId": "Клієнт"
+        },
+        "payments": {
+          "amountEur": "Сума",
+          "method": "Спосіб",
+          "receivedAt": "Дата",
+          "reference": "Реф.",
+          "notes": "Нотатки",
+          "receivedByManagerId": "Прийняв"
+        }
+      }
     },
     "sections": {
       "status": "Статус",

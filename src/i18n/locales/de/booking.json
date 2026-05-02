@@ -180,7 +180,53 @@
       "history": "Verlauf"
     },
     "history": {
-      "placeholder": "Verlauf wird hier nach Backend-Fertigstellung angezeigt."
+      "loadMore": "Mehr laden",
+      "loadingMore": "Lädt...",
+      "endOfHistory": "Ende des Verlaufs",
+      "empty": "Keine Verlaufseinträge",
+      "actionInsert": "Erstellt",
+      "actionUpdate": "Aktualisiert",
+      "actionDelete": "Gelöscht",
+      "entityBooking": "Buchung",
+      "entityPassenger": "Passagier: {{name}}",
+      "entityPayment": "Zahlung",
+      "fields": {
+        "bookings": {
+          "notes": "Notizen",
+          "dueDate": "Fälligkeitsdatum",
+          "totalPriceEur": "Gesamtbetrag",
+          "paidAmountEur": "Bezahlt",
+          "status": "Status",
+          "operatorRef": "Operator-Ref.",
+          "invoiceNumber": "Rechnungsnummer",
+          "commissionEur": "Provision",
+          "contractNumber": "Vertragsnummer",
+          "clientId": "Kunde",
+          "tripId": "Reise",
+          "soldByManagerId": "Manager"
+        },
+        "passengers": {
+          "firstName": "Vorname",
+          "lastName": "Nachname",
+          "birthDate": "Geburtsdatum",
+          "seatNumber": "Sitzplatz",
+          "hotelId": "Hotel",
+          "roomType": "Zimmertyp",
+          "priceTotalEur": "Preis",
+          "priceBreakdown": "Preisaufschlüsselung",
+          "specialNotes": "Besondere Hinweise",
+          "kind": "Passagiertyp",
+          "clientId": "Kunde"
+        },
+        "payments": {
+          "amountEur": "Betrag",
+          "method": "Methode",
+          "receivedAt": "Datum",
+          "reference": "Ref.",
+          "notes": "Notizen",
+          "receivedByManagerId": "Empfangen von"
+        }
+      }
     },
     "sections": {
       "status": "Status",

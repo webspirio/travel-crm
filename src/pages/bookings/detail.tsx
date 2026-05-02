@@ -4,6 +4,7 @@ import { HotelsRoomsEditSheet } from "@/components/bookings/edit-sheets/hotels-r
 import { NotesEditSheet } from "@/components/bookings/edit-sheets/notes-edit-sheet"
 import { PassengersEditSheet } from "@/components/bookings/edit-sheets/passengers-edit-sheet"
 import { PricingEditSheet } from "@/components/bookings/edit-sheets/pricing-edit-sheet"
+import { HistoryTab } from "@/components/bookings/history-tab"
 import { PaymentFormDialog } from "@/components/bookings/payment-form-dialog"
 import { ClientCard } from "@/components/bookings/sections/client-card"
 import { HeaderCard } from "@/components/bookings/sections/header-card"
@@ -77,6 +78,21 @@ export default function BookingDetailPage() {
     () => new Map(managers.map((m) => [m.id, m])),
     [managers],
   )
+
+  /**
+   * Passenger UUID → display name, fed to the History tab so booking_passengers
+   * audit rows render as "Passenger: First Last" instead of a raw uuid. Uses
+   * the current passenger snapshot — historical names (i.e. before a rename)
+   * still appear in the FieldDiff for that row, so the entity badge being
+   * "current" rather than "as-of-event" is acceptable.
+   */
+  const passengerNamesById = useMemo(() => {
+    const out: Record<string, string> = {}
+    for (const p of booking?.passengers ?? []) {
+      out[p.id] = `${p.firstName} ${p.lastName}`.trim() || "—"
+    }
+    return out
+  }, [booking?.passengers])
 
   function handleTransition(target: BookingStatus) {
     if (DESTRUCTIVE_STATUSES.has(target)) {
@@ -221,16 +237,10 @@ export default function BookingDetailPage() {
         </TabsContent>
 
         <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("detail.tabs.history")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {t("detail.history.placeholder")}
-              </p>
-            </CardContent>
-          </Card>
+          <HistoryTab
+            bookingId={booking.id}
+            passengerNamesById={passengerNamesById}
+          />
         </TabsContent>
       </Tabs>
 
