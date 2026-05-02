@@ -38,6 +38,13 @@
     "next": "Nächste",
     "last": "Letzte Seite"
   },
+  "dataTable": {
+    "loading": "Lädt…",
+    "noResults": "Keine Ergebnisse.",
+    "facetedNoResults": "Keine Optionen gefunden.",
+    "facetedClearFilters": "Filter zurücksetzen",
+    "facetedNSelected": "{{count}} ausgewählt"
+  },
   "palette": {
     "placeholder": "Reisen, Kunden, Hotels suchen...",
     "trigger": "Suchen",

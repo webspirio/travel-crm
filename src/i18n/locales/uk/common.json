@@ -38,6 +38,13 @@
     "next": "Наступна",
     "last": "Остання"
   },
+  "dataTable": {
+    "loading": "Завантаження…",
+    "noResults": "Немає результатів.",
+    "facetedNoResults": "Опцій не знайдено.",
+    "facetedClearFilters": "Скинути фільтри",
+    "facetedNSelected": "Вибрано: {{count}}"
+  },
   "palette": {
     "placeholder": "Пошук турів, клієнтів, готелів...",
     "trigger": "Пошук",

@@ -12,6 +12,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   Table,
@@ -57,7 +58,7 @@ export function DataTable<TData, TValue>({
   searchPlaceholder,
   toolbarExtra,
   onRowClick,
-  emptyMessage = "No results.",
+  emptyMessage,
   isLoading,
   manualPagination,
   manualSorting,
@@ -69,6 +70,7 @@ export function DataTable<TData, TValue>({
   onColumnFiltersChange,
   onPaginationChange,
 }: Props<TData, TValue>) {
+  const { t } = useTranslation()
   // Local fallback state — always declared so hook order stays stable.
   const [localSorting, setLocalSorting] = useState<SortingState>([])
   const [localColumnFilters, setLocalColumnFilters] = useState<ColumnFiltersState>([])
@@ -132,7 +134,11 @@ export function DataTable<TData, TValue>({
       >
         {toolbarExtra}
       </DataTableToolbar>
-      <div className="rounded-md border">
+      <div
+        className="rounded-md border transition-opacity data-[busy=true]:opacity-60"
+        aria-busy={isLoading || undefined}
+        data-busy={isLoading || undefined}
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
@@ -148,13 +154,13 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {isLoading && rows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
                   className="h-24 text-center text-sm text-muted-foreground"
                 >
-                  Loading…
+                  {t("dataTable.loading")}
                 </TableCell>
               </TableRow>
             ) : rows.length ? (
@@ -175,7 +181,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {emptyMessage}
+                  {emptyMessage ?? t("dataTable.noResults")}
                 </TableCell>
               </TableRow>
             )}
