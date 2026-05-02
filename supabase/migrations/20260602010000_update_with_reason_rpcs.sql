@@ -89,6 +89,7 @@ begin
 
   -- 3. Whitelist enforcement. Raise on the first non-allowed key so the
   --    client surfaces the typo immediately rather than silently dropping it.
+  -- Must match the SET list below.
   for v_key in select key from jsonb_each(p_patch) loop
     if v_key not in (
       'notes', 'due_date', 'total_price_eur',
@@ -99,14 +100,24 @@ begin
     end if;
   end loop;
 
-  -- 4. Set the audit.reason GUC for the duration of this transaction.
+  -- 4. Empty-patch short-circuit. If no whitelisted keys are present, skip
+  --    the UPDATE entirely. Otherwise the BEFORE-UPDATE touch_updated_at
+  --    trigger would bump updated_at and the AFTER-UPDATE audit trigger
+  --    would write a phantom audit row whose only delta is updated_at.
+  -- Must match the SET list below.
+  if not (p_patch ?| array['notes','due_date','total_price_eur','operator_ref','invoice_number','commission_eur']) then
+    select * into v_row from public.bookings where id = p_id;
+    return v_row;
+  end if;
+
+  -- 5. Set the audit.reason GUC for the duration of this transaction.
   --    is_local=true is mandatory; see header comment.
   perform pg_catalog.set_config('audit.reason', p_reason, true);
 
-  -- 5. Apply the patch. Each whitelisted column is preserved when absent
+  -- 6. Apply the patch. Each whitelisted column is preserved when absent
   --    from the patch and overwritten with the cast value when present.
   update public.bookings set
-    notes           = case when p_patch ? 'notes'           then p_patch->>'notes'                          else notes end,
+    notes           = case when p_patch ? 'notes'           then nullif(p_patch->>'notes', '')              else notes end,
     due_date        = case when p_patch ? 'due_date'        then nullif(p_patch->>'due_date', '')::date     else due_date end,
     total_price_eur = case when p_patch ? 'total_price_eur' then (p_patch->>'total_price_eur')::numeric     else total_price_eur end,
     operator_ref    = case when p_patch ? 'operator_ref'    then nullif(p_patch->>'operator_ref', '')       else operator_ref end,
@@ -153,6 +164,7 @@ begin
     raise exception 'access denied' using errcode = '42501';
   end if;
 
+  -- Must match the SET list below.
   for v_key in select key from jsonb_each(p_patch) loop
     if v_key not in (
       'first_name', 'last_name', 'birth_date', 'seat_number',
@@ -163,6 +175,13 @@ begin
         using errcode = '22023';
     end if;
   end loop;
+
+  -- Empty-patch short-circuit (see update_booking_with_reason for rationale).
+  -- Must match the SET list below.
+  if not (p_patch ?| array['first_name','last_name','birth_date','seat_number','hotel_id','room_type','price_total_eur','price_breakdown','special_notes']) then
+    select * into v_row from public.booking_passengers where id = p_id;
+    return v_row;
+  end if;
 
   perform pg_catalog.set_config('audit.reason', p_reason, true);
 
@@ -177,7 +196,7 @@ begin
     room_type       = case when p_patch ? 'room_type'       then nullif(p_patch->>'room_type', '')::public.room_type     else room_type end,
     price_total_eur = case when p_patch ? 'price_total_eur' then (p_patch->>'price_total_eur')::numeric                  else price_total_eur end,
     price_breakdown = case when p_patch ? 'price_breakdown' then coalesce(p_patch->'price_breakdown', '{}'::jsonb)       else price_breakdown end,
-    special_notes   = case when p_patch ? 'special_notes'   then p_patch->>'special_notes'                               else special_notes end
+    special_notes   = case when p_patch ? 'special_notes'   then nullif(p_patch->>'special_notes', '')                   else special_notes end
   where id = p_id
   returning * into v_row;
 
@@ -219,6 +238,7 @@ begin
     raise exception 'access denied' using errcode = '42501';
   end if;
 
+  -- Must match the SET list below.
   for v_key in select key from jsonb_each(p_patch) loop
     if v_key not in ('notes', 'reference') then
       raise exception 'column % not allowed for update_payment_with_reason', v_key
@@ -226,10 +246,17 @@ begin
     end if;
   end loop;
 
+  -- Empty-patch short-circuit (see update_booking_with_reason for rationale).
+  -- Must match the SET list below.
+  if not (p_patch ?| array['notes','reference']) then
+    select * into v_row from public.payments where id = p_id;
+    return v_row;
+  end if;
+
   perform pg_catalog.set_config('audit.reason', p_reason, true);
 
   update public.payments set
-    notes     = case when p_patch ? 'notes'     then p_patch->>'notes'                          else notes end,
+    notes     = case when p_patch ? 'notes'     then nullif(p_patch->>'notes', '')              else notes end,
     reference = case when p_patch ? 'reference' then nullif(p_patch->>'reference', '')          else reference end
   where id = p_id
   returning * into v_row;
