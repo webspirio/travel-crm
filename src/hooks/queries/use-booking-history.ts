@@ -7,17 +7,18 @@ import { supabase } from "@/lib/supabase"
  *
  * Reads via the `public.get_booking_audit` RPC, which unions audit_log rows
  * for the booking + its passengers + its payments and joins the actor
- * display_name from public.managers. Server-side cursor pagination on
- * `created_at` (exclusive `before` parameter, NULL on first page).
+ * display_name from public.managers. Server-side cursor pagination on the
+ * lexicographic tuple `(created_at, id)` (exclusive; NULL on first page).
  *
- * Why infinite-query with a timestamp cursor (not a numeric offset):
- *   - audit_log writes are append-only and ordered by created_at desc, so a
- *     timestamp cursor stays correct under concurrent edits — new rows that
- *     land while the user paginates show up on the next refetch, never
- *     shift the existing pages.
- *   - Picking the OLDEST created_at in the last page as the next cursor
- *     keeps "load more" working with the strictly-less-than predicate the
- *     RPC enforces (`a.created_at < p_before`).
+ * Why a tuple cursor (not just a timestamp):
+ *   - audit_log rows written in the same transaction (e.g. create_booking
+ *     + N booking_passengers in one INSERT) share created_at exactly,
+ *     because the trigger captures `now()` once per transaction snapshot.
+ *   - A strict `<` predicate on created_at alone drops the tie row when the
+ *     boundary lands inside such a group. Pairing it with the bigint
+ *     identity column `audit_log.id` (monotonic, unique) breaks the tie
+ *     deterministically — Postgres evaluates `(ts, id) < (ts0, id0)`
+ *     lexicographically.
  *   - getNextPageParam returns undefined when the last page came back
  *     short of PAGE_SIZE → useInfiniteQuery flips hasNextPage=false and
  *     the UI hides the "Load more" button.
@@ -42,6 +43,9 @@ export interface BookingAuditRow {
   created_at: string
 }
 
+/** Lexicographic page cursor: (created_at, id). null on the first page. */
+type Cursor = { ts: string; id: number } | null
+
 export const bookingHistoryKeys = {
   all: ["booking-history"] as const,
   detail: (bookingId: string) => [...bookingHistoryKeys.all, "detail", bookingId] as const,
@@ -55,26 +59,40 @@ export function useBookingHistory(bookingId: string | undefined) {
     Error,
     InfiniteData<BookingAuditRow[]>,
     readonly unknown[],
-    string | null
+    Cursor
   >({
     queryKey: bookingHistoryKeys.detail(bookingId ?? ""),
     enabled: !!bookingId,
-    initialPageParam: null,
+    initialPageParam: null as Cursor,
     queryFn: async ({ pageParam }) => {
       if (!bookingId) return []
-      const { data, error } = await supabase.rpc("get_booking_audit", {
+      // Build args explicitly so the cursor keys are only present on
+      // subsequent pages — avoids relying on supabase-js's undefined-skip
+      // behaviour and keeps the wire payload tidy on the first page.
+      const args: {
+        p_booking_id: string
+        p_limit: number
+        p_before_ts?: string
+        p_before_id?: number
+      } = {
         p_booking_id: bookingId,
         p_limit: PAGE_SIZE,
-        // null on first page; oldest created_at in the previous page on subsequent pages.
-        p_before: pageParam ?? undefined,
-      })
+      }
+      if (pageParam) {
+        args.p_before_ts = pageParam.ts
+        args.p_before_id = pageParam.id
+      }
+      const { data, error } = await supabase.rpc("get_booking_audit", args)
       if (error) throw error
       return (data ?? []) as unknown as BookingAuditRow[]
     },
-    getNextPageParam: (lastPage) => {
+    getNextPageParam: (lastPage): Cursor | undefined => {
       if (lastPage.length < PAGE_SIZE) return undefined // exhausted
-      // Oldest row in this page becomes the strict upper bound for the next page.
-      return lastPage[lastPage.length - 1].created_at
+      // Oldest row in this page becomes the strict upper bound for the next
+      // page — paired with its id so a created_at tie at the boundary does
+      // not drop the matching row.
+      const oldest = lastPage[lastPage.length - 1]
+      return { ts: oldest.created_at, id: oldest.id }
     },
   })
 }
