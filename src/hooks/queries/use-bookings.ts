@@ -53,8 +53,13 @@ function toBooking(row: BookingRow & { booking_passengers: BookingPassengerRow[]
 
 export const bookingsKeys = {
   all: ["bookings"] as const,
+  // Prefix key — any list-shape query (legacy or paginated) starts with this.
+  // Mutations invalidating this prefix bust both `lists()` and `list(params)`
+  // because React Query uses prefix-matching on query keys.
   lists: () => [...bookingsKeys.all, "list"] as const,
-  list: (params: BookingsListParams) => [...bookingsKeys.all, "list-paged", params] as const,
+  // Parameterized server-driven list. queryKey is a SUPERSET of `lists()` —
+  // sharing the "list" discriminator ensures `lists()` invalidations cascade.
+  list: (params: BookingsListParams) => [...bookingsKeys.all, "list", params] as const,
   detail: (id: string) => [...bookingsKeys.all, "detail", id] as const,
   byTrip: (tripId: string) => [...bookingsKeys.all, "by-trip", tripId] as const,
   byClient: (clientId: string) => [...bookingsKeys.all, "by-client", clientId] as const,

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { supabase } from "@/lib/supabase"
+import { bookingsKeys } from "@/hooks/queries/use-bookings"
 import { clientsKeys } from "@/hooks/queries/use-clients"
 import { useAuthStore } from "@/stores/auth-store"
 import type { CreateClientInput } from "./use-create-client"
@@ -23,7 +24,11 @@ export interface UpdateClientInput {
  * Only the fields present in `patch` are sent to the DB; undefined fields
  * are omitted entirely.
  *
- * On success: invalidates clientsKeys.detail(id) and clientsKeys.lists().
+ * On success: invalidates clientsKeys.detail(id), clientsKeys.lists(), and
+ * bookingsKeys.all — the bookings list joins client first/last names into
+ * client_full_name on bookings_search_view, so any name edit must refresh
+ * booking-related queries. Low-frequency mutation, so the broad .all prefix
+ * is acceptable over-invalidation.
  */
 export function useUpdateClient() {
   const queryClient = useQueryClient()
@@ -62,6 +67,9 @@ export function useUpdateClient() {
     onSuccess: (_data, { id }) => {
       void queryClient.invalidateQueries({ queryKey: clientsKeys.detail(id) })
       void queryClient.invalidateQueries({ queryKey: clientsKeys.lists() })
+      // bookings_search_view joins client first/last → client_full_name; any
+      // name edit must refresh booking lists/details that display this column.
+      void queryClient.invalidateQueries({ queryKey: bookingsKeys.all })
     },
   })
 }
