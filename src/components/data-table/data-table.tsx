@@ -7,9 +7,12 @@ import {
   useReactTable,
   type ColumnDef,
   type ColumnFiltersState,
+  type OnChangeFn,
+  type PaginationState,
   type SortingState,
 } from "@tanstack/react-table"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import {
   Table,
@@ -31,6 +34,21 @@ interface Props<TData, TValue> {
   toolbarExtra?: React.ReactNode
   onRowClick?: (row: TData) => void
   emptyMessage?: string
+  isLoading?: boolean
+  // --- server-side mode ---
+  manualPagination?: boolean
+  manualSorting?: boolean
+  manualFiltering?: boolean
+  pageCount?: number
+  rowCount?: number
+  state?: {
+    sorting?: SortingState
+    columnFilters?: ColumnFiltersState
+    pagination?: PaginationState
+  }
+  onSortingChange?: OnChangeFn<SortingState>
+  onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
+  onPaginationChange?: OnChangeFn<PaginationState>
 }
 
 export function DataTable<TData, TValue>({
@@ -40,23 +58,72 @@ export function DataTable<TData, TValue>({
   searchPlaceholder,
   toolbarExtra,
   onRowClick,
-  emptyMessage = "No results.",
+  emptyMessage,
+  isLoading,
+  manualPagination,
+  manualSorting,
+  manualFiltering,
+  pageCount,
+  rowCount,
+  state,
+  onSortingChange,
+  onColumnFiltersChange,
+  onPaginationChange,
 }: Props<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const { t } = useTranslation()
+  // Local fallback state — always declared so hook order stays stable.
+  const [localSorting, setLocalSorting] = useState<SortingState>([])
+  const [localColumnFilters, setLocalColumnFilters] = useState<ColumnFiltersState>([])
+  const [localPagination, setLocalPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  })
+
+  const sortingControlled = state?.sorting !== undefined
+  const filtersControlled = state?.columnFilters !== undefined
+  const paginationControlled = state?.pagination !== undefined
+
+  const effectiveSorting = sortingControlled ? state!.sorting! : localSorting
+  const effectiveFilters = filtersControlled
+    ? state!.columnFilters!
+    : localColumnFilters
+  const effectivePagination = paginationControlled
+    ? state!.pagination!
+    : localPagination
+
+  const handleSortingChange: OnChangeFn<SortingState> = onSortingChange
+    ? onSortingChange
+    : setLocalSorting
+  const handleFiltersChange: OnChangeFn<ColumnFiltersState> = onColumnFiltersChange
+    ? onColumnFiltersChange
+    : setLocalColumnFilters
+  const handlePaginationChange: OnChangeFn<PaginationState> = onPaginationChange
+    ? onPaginationChange
+    : setLocalPagination
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, columnFilters },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    state: {
+      sorting: effectiveSorting,
+      columnFilters: effectiveFilters,
+      pagination: effectivePagination,
+    },
+    onSortingChange: handleSortingChange,
+    onColumnFiltersChange: handleFiltersChange,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 10 } },
+    manualPagination,
+    manualSorting,
+    manualFiltering,
+    pageCount,
+    rowCount,
   })
+
+  const rows = table.getRowModel().rows
 
   return (
     <div className="space-y-3">
@@ -67,7 +134,11 @@ export function DataTable<TData, TValue>({
       >
         {toolbarExtra}
       </DataTableToolbar>
-      <div className="rounded-md border">
+      <div
+        className="rounded-md border transition-opacity data-[busy=true]:opacity-60"
+        aria-busy={isLoading || undefined}
+        data-busy={isLoading || undefined}
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((hg) => (
@@ -83,8 +154,17 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
+            {isLoading && rows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center text-sm text-muted-foreground"
+                >
+                  {t("dataTable.loading")}
+                </TableCell>
+              </TableRow>
+            ) : rows.length ? (
+              rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
@@ -101,7 +181,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {emptyMessage}
+                  {emptyMessage ?? t("dataTable.noResults")}
                 </TableCell>
               </TableRow>
             )}

@@ -12,7 +12,7 @@ import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
 import { useDebouncedValue } from "@/lib/use-debounced-value"
 import { useAuthStore } from "@/stores/auth-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft, useBookingDraftStore } from "@/lib/booking-draft-context"
 import type { Locale, PassengerKind } from "@/types"
 
 /**
@@ -30,18 +30,19 @@ import type { Locale, PassengerKind } from "@/types"
  *   • Soft-blocks "Continue" when a live email match is present and the
  *     manager hasn't either picked an existing client or pressed "Keep new".
  */
-export function StepTravelers() {
+export function StepTravelers({ editMode = false }: { editMode?: boolean } = {}) {
   const { t, i18n } = useTranslation("booking")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
   const tenantId = useAuthStore((s) => s.tenant?.id ?? null)
 
-  const passengers = useBookingStore((s) => s.passengers)
-  const tripId = useBookingStore((s) => s.tripId)
-  const addPassenger = useBookingStore((s) => s.addPassenger)
-  const removePassenger = useBookingStore((s) => s.removePassenger)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
-  const setPrimary = useBookingStore((s) => s.setPrimary)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const addPassenger = useBookingDraft((s) => s.addPassenger)
+  const removePassenger = useBookingDraft((s) => s.removePassenger)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
+  const setPrimary = useBookingDraft((s) => s.setPrimary)
+  const draftStore = useBookingDraftStore()
 
   const { data: trip = null } = useTripById(tripId ?? undefined)
 
@@ -88,7 +89,7 @@ export function StepTravelers() {
     // store will append it; we rely on the focus-on-mount effect inside
     // TravelerCard to handle keyboard focus.
     requestAnimationFrame(() => {
-      const latest = useBookingStore.getState().passengers
+      const latest = draftStore.getState().passengers
       const newest = latest[latest.length - 1]
       if (newest) {
         setExpandedIds((prev) => new Set(prev).add(newest.localId))
@@ -104,7 +105,7 @@ export function StepTravelers() {
     addPassenger("child")
     addPassenger("child")
     requestAnimationFrame(() => {
-      const latest = useBookingStore.getState().passengers
+      const latest = draftStore.getState().passengers
       const added = latest.slice(-3)
       added.forEach((p) => {
         if (ln) updatePassenger(p.localId, { lastName: ln })
@@ -232,17 +233,21 @@ export function StepTravelers() {
                   expanded={expandedIds.has(p.localId)}
                   onToggleExpand={() => toggleExpand(p.localId)}
                   onUpdate={(patch) => updatePassenger(p.localId, patch)}
-                  onPromote={() => setPromotingId(p.localId)}
-                  onMakePrimary={() => setPrimary(p.localId)}
-                  onRemove={() => {
-                    removePassenger(p.localId)
-                    setExpandedIds((prev) => {
-                      const next = new Set(prev)
-                      next.delete(p.localId)
-                      return next
-                    })
-                    if (promotingId === p.localId) setPromotingId(null)
-                  }}
+                  onPromote={editMode ? undefined : () => setPromotingId(p.localId)}
+                  onMakePrimary={editMode ? undefined : () => setPrimary(p.localId)}
+                  onRemove={
+                    editMode
+                      ? undefined
+                      : () => {
+                          removePassenger(p.localId)
+                          setExpandedIds((prev) => {
+                            const next = new Set(prev)
+                            next.delete(p.localId)
+                            return next
+                          })
+                          if (promotingId === p.localId) setPromotingId(null)
+                        }
+                  }
                 />
                 {promotingId === p.localId && (
                   <SaveAsClientForm
@@ -263,28 +268,30 @@ export function StepTravelers() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => handleAdd("adult")}
-              title="Alt+N"
-            >
-              <Plus className="size-4" />
-              {t("travelers.add")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={handleFamilyOfFour}
-              title="Alt+F"
-            >
-              <Users className="size-4" />
-              {t("travelers.familyOfFour")}
-            </Button>
-          </div>
+          {!editMode && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => handleAdd("adult")}
+                title="Alt+N"
+              >
+                <Plus className="size-4" />
+                {t("travelers.add")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={handleFamilyOfFour}
+                title="Alt+F"
+              >
+                <Users className="size-4" />
+                {t("travelers.familyOfFour")}
+              </Button>
+            </div>
+          )}
         </section>
       </div>
 

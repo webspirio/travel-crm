@@ -4,6 +4,8 @@
     "tagline": "Busreisen — Italien, Spanien und weitere Ziele"
   },
   "loading": "Wird geladen…",
+  "yes": "Ja",
+  "no": "Nein",
   "nav": {
     "dashboard": "Dashboard",
     "trips": "Reisen",
@@ -37,6 +39,13 @@
     "previous": "Vorherige",
     "next": "Nächste",
     "last": "Letzte Seite"
+  },
+  "dataTable": {
+    "loading": "Lädt…",
+    "noResults": "Keine Ergebnisse.",
+    "facetedNoResults": "Keine Optionen gefunden.",
+    "facetedClearFilters": "Filter zurücksetzen",
+    "facetedNSelected": "{{count}} ausgewählt"
   },
   "palette": {
     "placeholder": "Reisen, Kunden, Hotels suchen...",

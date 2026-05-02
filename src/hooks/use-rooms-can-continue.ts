@@ -1,4 +1,4 @@
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 
 /**
  * Returns whether the Rooms step is complete enough to advance.
@@ -14,9 +14,9 @@ import { useBookingStore } from "@/stores/booking-store"
  * assigned passengers).
  */
 export function useRoomsCanContinue(): boolean {
-  const passengers = useBookingStore((s) => s.passengers)
-  const rooms = useBookingStore((s) => s.rooms)
-  const noHotel = useBookingStore((s) => s.noHotel)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const rooms = useBookingDraft((s) => s.rooms)
+  const noHotel = useBookingDraft((s) => s.noHotel)
 
   // Booking-wide skip: everyone is implicitly OK
   if (noHotel) return true

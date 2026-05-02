@@ -22,7 +22,7 @@ export function DataTablePagination<TData>({ table }: Props<TData>) {
       <div className="text-sm text-muted-foreground">
         {t("pagination.rowsSelected", {
           selected: table.getFilteredSelectedRowModel().rows.length,
-          total: table.getFilteredRowModel().rows.length,
+          total: table.getRowCount(),
         })}
       </div>
       <div className="flex items-center gap-4">

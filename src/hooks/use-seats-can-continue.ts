@@ -1,4 +1,4 @@
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 
 /**
  * Returns whether the Seats step is complete enough to advance.
@@ -10,7 +10,7 @@ import { useBookingStore } from "@/stores/booking-store"
  * the wizard can advance without being blocked.
  */
 export function useSeatsCanContinue(): boolean {
-  const passengers = useBookingStore((s) => s.passengers)
+  const passengers = useBookingDraft((s) => s.passengers)
 
   const seatable = passengers.filter(
     (p) => !(p.kind === "infant" && p.seatNumber === null),

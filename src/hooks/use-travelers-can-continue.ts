@@ -3,7 +3,7 @@ import { isValidPhoneNumber } from "libphonenumber-js"
 import { useClientMatches } from "@/hooks/queries/use-client-matches"
 import { useDebouncedValue } from "@/lib/use-debounced-value"
 import { useAuthStore } from "@/stores/auth-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 
 /**
  * Returns whether the Travelers step is complete enough to advance.
@@ -21,7 +21,7 @@ import { useBookingStore } from "@/stores/booking-store"
  * (react-refresh/only-export-components) stays happy.
  */
 export function useTravelersCanContinue(): boolean {
-  const passengers = useBookingStore((s) => s.passengers)
+  const passengers = useBookingDraft((s) => s.passengers)
   const tenantId = useAuthStore((s) => s.tenant?.id ?? null)
 
   const primary = passengers[0]

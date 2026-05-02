@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button"
 import { useTrips } from "@/hooks/queries/use-trips"
 import { formatCurrency, formatDate } from "@/lib/format"
 import { cn } from "@/lib/utils"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 import type { Locale } from "@/types"
 
 export function StepTrip() {
@@ -24,11 +24,11 @@ export function StepTrip() {
   const { t: tt } = useTranslation("trips")
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
-  const tripId = useBookingStore((s) => s.tripId)
-  const passengers = useBookingStore((s) => s.passengers)
-  const rooms = useBookingStore((s) => s.rooms)
-  const update = useBookingStore((s) => s.update)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const rooms = useBookingDraft((s) => s.rooms)
+  const update = useBookingDraft((s) => s.update)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
 
   const { data: trips = [] } = useTrips()
 

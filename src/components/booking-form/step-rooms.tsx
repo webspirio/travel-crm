@@ -26,7 +26,7 @@ import { useHotelBlocks } from "@/hooks/queries/use-hotel-blocks"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useTripById } from "@/hooks/queries/use-trips"
 import type { PassengerDraft, RoomDraft } from "@/stores/booking-store"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft } from "@/lib/booking-draft-context"
 import type { RoomType } from "@/types"
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -70,7 +70,8 @@ interface RoomCardProps {
   nights: number
   /** Allotment remaining for (hotelId, roomType) — undefined = unknown / no data */
   allotmentRemaining: Map<string, number>
-  onRemove: (localId: string) => void
+  /** When undefined, the per-room remove button is hidden (edit mode). */
+  onRemove?: (localId: string) => void
   onAssign: (passengerLocalId: string, roomLocalId: string | null) => void
   onChangeType: (localId: string, roomType: RoomType) => void
 }
@@ -102,6 +103,7 @@ function RoomCard({
   }
 
   function handleRemoveRoom() {
+    if (!onRemove) return
     const hasAssigned = roomPassengers.length > 0
     if (hasAssigned) {
       if (!window.confirm(t("rooms.confirmRemoveRoom"))) return
@@ -151,14 +153,16 @@ function RoomCard({
               </Badge>
             )}
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:text-destructive"
-              onClick={handleRemoveRoom}
-            >
-              {t("rooms.removeRoom")}
-            </Button>
+            {onRemove && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={handleRemoveRoom}
+              >
+                {t("rooms.removeRoom")}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -222,19 +226,19 @@ function RoomCard({
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
-export function StepRooms() {
+export function StepRooms({ editMode = false }: { editMode?: boolean } = {}) {
   const { t } = useTranslation("booking")
 
   // Store slices
-  const tripId = useBookingStore((s) => s.tripId)
-  const passengers = useBookingStore((s) => s.passengers)
-  const rooms = useBookingStore((s) => s.rooms)
-  const noHotel = useBookingStore((s) => s.noHotel)
-  const addRoom = useBookingStore((s) => s.addRoom)
-  const removeRoom = useBookingStore((s) => s.removeRoom)
-  const assignToRoom = useBookingStore((s) => s.assignToRoom)
-  const updatePassenger = useBookingStore((s) => s.updatePassenger)
-  const update = useBookingStore((s) => s.update)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const rooms = useBookingDraft((s) => s.rooms)
+  const noHotel = useBookingDraft((s) => s.noHotel)
+  const addRoom = useBookingDraft((s) => s.addRoom)
+  const removeRoom = useBookingDraft((s) => s.removeRoom)
+  const assignToRoom = useBookingDraft((s) => s.assignToRoom)
+  const updatePassenger = useBookingDraft((s) => s.updatePassenger)
+  const update = useBookingDraft((s) => s.update)
 
   // Data fetches
   const { data: trip } = useTripById(tripId ?? undefined)
@@ -379,9 +383,11 @@ export function StepRooms() {
     return (
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">{t("rooms.tripHasNoHotel")}</p>
-        <Button variant="outline" size="sm" onClick={handleSkipAll}>
-          {t("rooms.skipHotel")}
-        </Button>
+        {!editMode && (
+          <Button variant="outline" size="sm" onClick={handleSkipAll}>
+            {t("rooms.skipHotel")}
+          </Button>
+        )}
       </div>
     )
   }
@@ -425,7 +431,7 @@ export function StepRooms() {
                   passengers={passengers}
                   nights={nights}
                   allotmentRemaining={allotmentRemaining}
-                  onRemove={handleRemoveRoom}
+                  onRemove={editMode ? undefined : handleRemoveRoom}
                   onAssign={assignToRoom}
                   onChangeType={handleChangeRoomType}
                 />
@@ -433,10 +439,12 @@ export function StepRooms() {
             </div>
           )}
 
-          {/* Add room */}
-          <Button variant="outline" size="sm" onClick={handleAddRoom}>
-            {t("rooms.addRoom")}
-          </Button>
+          {/* Add room — hidden in edit mode (T10: add/remove out of scope v1) */}
+          {!editMode && (
+            <Button variant="outline" size="sm" onClick={handleAddRoom}>
+              {t("rooms.addRoom")}
+            </Button>
+          )}
 
           {/* Unassigned panel */}
           {notInRoom.length > 0 && (
@@ -501,11 +509,15 @@ export function StepRooms() {
         </>
       )}
 
-      {/* Skip hotel for everyone */}
-      <Separator />
-      <Button variant="ghost" size="sm" onClick={handleSkipAll}>
-        {t("rooms.skipAll")}
-      </Button>
+      {/* Skip hotel for everyone — hidden in edit mode (would wipe assignments) */}
+      {!editMode && (
+        <>
+          <Separator />
+          <Button variant="ghost" size="sm" onClick={handleSkipAll}>
+            {t("rooms.skipAll")}
+          </Button>
+        </>
+      )}
     </div>
   )
 }

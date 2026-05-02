@@ -175,10 +175,71 @@
     "back": "До панелі",
     "statusChanged": "Статус змінено: {{status}}",
     "notFound": "Бронювання не знайдено",
+    "tabs": {
+      "overview": "Огляд",
+      "history": "Історія"
+    },
+    "history": {
+      "loading": "Завантаження історії",
+      "loadMore": "Завантажити ще",
+      "loadingMore": "Завантаження...",
+      "endOfHistory": "Кінець історії",
+      "empty": "Записів історії немає",
+      "reasonLabel": "Причина",
+      "reasonAriaLabel": "Причина: {{reason}}",
+      "actionInsert": "Створено",
+      "actionUpdate": "Оновлено",
+      "actionDelete": "Видалено",
+      "entityBooking": "Бронювання",
+      "entityPassenger": "Пасажир: {{name}}",
+      "entityPayment": "Платіж",
+      "fields": {
+        "bookings": {
+          "notes": "Нотатки",
+          "dueDate": "Дата оплати",
+          "totalPriceEur": "Сума",
+          "paidAmountEur": "Оплачено",
+          "status": "Статус",
+          "operatorRef": "Реф. оператора",
+          "invoiceNumber": "Номер інвойсу",
+          "commissionEur": "Комісія",
+          "contractNumber": "Номер договору",
+          "clientId": "Клієнт",
+          "tripId": "Тур",
+          "soldByManagerId": "Менеджер"
+        },
+        "passengers": {
+          "firstName": "Ім'я",
+          "lastName": "Прізвище",
+          "birthDate": "Дата народження",
+          "seatNumber": "Місце",
+          "hotelId": "Готель",
+          "roomType": "Тип номера",
+          "priceTotalEur": "Ціна",
+          "priceBreakdown": "Розбивка ціни",
+          "specialNotes": "Особливі побажання",
+          "kind": "Тип пасажира",
+          "clientId": "Клієнт"
+        },
+        "payments": {
+          "amountEur": "Сума",
+          "method": "Спосіб",
+          "receivedAt": "Дата",
+          "reference": "Реф.",
+          "notes": "Нотатки",
+          "receivedByManagerId": "Прийняв"
+        }
+      }
+    },
     "sections": {
       "status": "Статус",
       "passengers": "Пасажири",
-      "payments": "Платежі"
+      "payments": "Платежі",
+      "client": "Клієнт",
+      "trip": "Тур",
+      "hotelsRooms": "Готелі та номери",
+      "pricing": "Ціна",
+      "notes": "Нотатки"
     },
     "fields": {
       "booking": "Бронювання",
@@ -187,6 +248,31 @@
       "paid": "Оплачено",
       "outstanding": "До оплати",
       "client": "Клієнт"
+    },
+    "client": {
+      "name": "Ім'я",
+      "email": "Email",
+      "phone": "Телефон",
+      "nationality": "Громадянство",
+      "openProfile": "Відкрити профіль"
+    },
+    "trip": {
+      "departure": "Виїзд",
+      "return": "Повернення",
+      "route": "Маршрут",
+      "soldBy": "Продав менеджер"
+    },
+    "hotelsRooms": {
+      "noHotel": "Без готелю",
+      "passengers": "Пасажирів"
+    },
+    "pricing": {
+      "subtotal": "Сума пасажирів",
+      "paid": "Оплачено",
+      "balance": "Залишок"
+    },
+    "notes": {
+      "empty": "Немає нотаток"
     },
     "passengers": {
       "name": "Ім'я",
@@ -197,7 +283,9 @@
       "price": "Ціна",
       "adult": "Дорослий",
       "child": "Дитина",
-      "infant": "Немовля"
+      "infant": "Немовля",
+      "birthDate": "Дата народження",
+      "specialNotes": "Особливі побажання"
     },
     "payments": {
       "date": "Дата",
@@ -253,6 +341,48 @@
       "description": "Ця дія незворотна. Пасажир буде відзначений як такий, що не з'явився.",
       "confirm": "Так, позначити",
       "abort": "Ні, залишити"
+    },
+    "edit": {
+      "edit": "Редагувати",
+      "cancel": "Скасувати",
+      "save": "Зберегти",
+      "saving": "Збереження...",
+      "notesTitle": "Редагувати нотатки",
+      "notesDescription": "Внутрішні нотатки до бронювання.",
+      "notesPlaceholder": "Внутрішні нотатки...",
+      "contactTitle": "Контактна інформація",
+      "contactDescription": "Основний контакт бронювання.",
+      "contactFirstName": "Ім'я",
+      "contactLastName": "Прізвище",
+      "contactEmail": "Email",
+      "contactPhone": "Телефон",
+      "reason": "Причина",
+      "reasonPlaceholder": "Причина зміни (обов'язково для підтверджених бронювань)...",
+      "passengersTitle": "Редагувати пасажирів",
+      "passengersDescription": "Імена, дати народження, місця, нотатки.",
+      "hotelsRoomsTitle": "Редагувати готелі та номери",
+      "hotelsRoomsDescription": "Призначення готелів і номерів.",
+      "pricingTitle": "Редагувати ціни",
+      "pricingDescription": "Ціна за пасажира та загальна сума.",
+      "noChanges": "Немає змін",
+      "pricingPassenger": "Пасажир",
+      "pricingPrice": "Ціна (€)",
+      "pricingSubtotal": "Сума пасажирів",
+      "pricingTotal": "Загальна сума бронювання (€)",
+      "errors": {
+        "firstName": "Ім'я обов'язкове",
+        "lastName": "Прізвище обов'язкове",
+        "email": "Введіть коректний email",
+        "phone": "Телефон обов'язковий"
+      }
+    },
+    "toast": {
+      "notesUpdated": "Нотатки оновлено",
+      "contactUpdated": "Контакт оновлено",
+      "passengersUpdated": "Пасажирів оновлено",
+      "hotelsRoomsUpdated": "Готелі/номери оновлено",
+      "pricingUpdated": "Ціни оновлено",
+      "updateFailed": "Не вдалося зберегти"
     }
   }
 }

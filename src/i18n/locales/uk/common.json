@@ -4,6 +4,8 @@
     "tagline": "Автобусні тури — Італія, Іспанія та інші напрямки"
   },
   "loading": "Завантаження…",
+  "yes": "Так",
+  "no": "Ні",
   "nav": {
     "dashboard": "Дашборд",
     "trips": "Тури",
@@ -37,6 +39,13 @@
     "previous": "Попередня",
     "next": "Наступна",
     "last": "Остання"
+  },
+  "dataTable": {
+    "loading": "Завантаження…",
+    "noResults": "Немає результатів.",
+    "facetedNoResults": "Опцій не знайдено.",
+    "facetedClearFilters": "Скинути фільтри",
+    "facetedNSelected": "Вибрано: {{count}}"
   },
   "palette": {
     "placeholder": "Пошук турів, клієнтів, готелів...",

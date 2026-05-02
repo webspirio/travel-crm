@@ -175,10 +175,71 @@
     "back": "Zum Dashboard",
     "statusChanged": "Status geändert: {{status}}",
     "notFound": "Buchung nicht gefunden",
+    "tabs": {
+      "overview": "Übersicht",
+      "history": "Verlauf"
+    },
+    "history": {
+      "loading": "Verlauf wird geladen",
+      "loadMore": "Mehr laden",
+      "loadingMore": "Lädt...",
+      "endOfHistory": "Ende des Verlaufs",
+      "empty": "Keine Verlaufseinträge",
+      "reasonLabel": "Grund",
+      "reasonAriaLabel": "Grund: {{reason}}",
+      "actionInsert": "Erstellt",
+      "actionUpdate": "Aktualisiert",
+      "actionDelete": "Gelöscht",
+      "entityBooking": "Buchung",
+      "entityPassenger": "Passagier: {{name}}",
+      "entityPayment": "Zahlung",
+      "fields": {
+        "bookings": {
+          "notes": "Notizen",
+          "dueDate": "Fälligkeitsdatum",
+          "totalPriceEur": "Gesamtbetrag",
+          "paidAmountEur": "Bezahlt",
+          "status": "Status",
+          "operatorRef": "Operator-Ref.",
+          "invoiceNumber": "Rechnungsnummer",
+          "commissionEur": "Provision",
+          "contractNumber": "Vertragsnummer",
+          "clientId": "Kunde",
+          "tripId": "Reise",
+          "soldByManagerId": "Manager"
+        },
+        "passengers": {
+          "firstName": "Vorname",
+          "lastName": "Nachname",
+          "birthDate": "Geburtsdatum",
+          "seatNumber": "Sitzplatz",
+          "hotelId": "Hotel",
+          "roomType": "Zimmertyp",
+          "priceTotalEur": "Preis",
+          "priceBreakdown": "Preisaufschlüsselung",
+          "specialNotes": "Besondere Hinweise",
+          "kind": "Passagiertyp",
+          "clientId": "Kunde"
+        },
+        "payments": {
+          "amountEur": "Betrag",
+          "method": "Methode",
+          "receivedAt": "Datum",
+          "reference": "Ref.",
+          "notes": "Notizen",
+          "receivedByManagerId": "Empfangen von"
+        }
+      }
+    },
     "sections": {
       "status": "Status",
       "passengers": "Reisende",
-      "payments": "Zahlungen"
+      "payments": "Zahlungen",
+      "client": "Kunde",
+      "trip": "Reise",
+      "hotelsRooms": "Hotels & Zimmer",
+      "pricing": "Preis",
+      "notes": "Notizen"
     },
     "fields": {
       "booking": "Buchung",
@@ -187,6 +248,31 @@
       "paid": "Bezahlt",
       "outstanding": "Ausstehend",
       "client": "Kunde"
+    },
+    "client": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "nationality": "Staatsangehörigkeit",
+      "openProfile": "Profil öffnen"
+    },
+    "trip": {
+      "departure": "Abreise",
+      "return": "Rückkehr",
+      "route": "Route",
+      "soldBy": "Verkauft von"
+    },
+    "hotelsRooms": {
+      "noHotel": "Ohne Hotel",
+      "passengers": "Passagiere"
+    },
+    "pricing": {
+      "subtotal": "Passagier-Summe",
+      "paid": "Bezahlt",
+      "balance": "Saldo"
+    },
+    "notes": {
+      "empty": "Keine Notizen"
     },
     "passengers": {
       "name": "Name",
@@ -197,7 +283,9 @@
       "price": "Preis",
       "adult": "Erwachsener",
       "child": "Kind",
-      "infant": "Kleinkind"
+      "infant": "Kleinkind",
+      "birthDate": "Geburtsdatum",
+      "specialNotes": "Besondere Hinweise"
     },
     "payments": {
       "date": "Datum",
@@ -253,6 +341,48 @@
       "description": "Diese Aktion kann nicht rückgängig gemacht werden. Der Reisende wird als nicht erschienen markiert.",
       "confirm": "Ja, markieren",
       "abort": "Nein, behalten"
+    },
+    "edit": {
+      "edit": "Bearbeiten",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichert...",
+      "notesTitle": "Notizen bearbeiten",
+      "notesDescription": "Interne Notizen zur Buchung.",
+      "notesPlaceholder": "Interne Notizen...",
+      "contactTitle": "Kontaktdaten",
+      "contactDescription": "Hauptkontakt der Buchung.",
+      "contactFirstName": "Vorname",
+      "contactLastName": "Nachname",
+      "contactEmail": "E-Mail",
+      "contactPhone": "Telefon",
+      "reason": "Grund",
+      "reasonPlaceholder": "Grund der Änderung (bei bestätigten Buchungen erforderlich)...",
+      "passengersTitle": "Passagiere bearbeiten",
+      "passengersDescription": "Namen, Geburtsdaten, Sitzplätze, Notizen.",
+      "hotelsRoomsTitle": "Hotels & Zimmer bearbeiten",
+      "hotelsRoomsDescription": "Hotel- und Zimmerzuweisungen.",
+      "pricingTitle": "Preise bearbeiten",
+      "pricingDescription": "Preis pro Passagier und Gesamtsumme.",
+      "noChanges": "Keine Änderungen",
+      "pricingPassenger": "Passagier",
+      "pricingPrice": "Preis (€)",
+      "pricingSubtotal": "Passagiersumme",
+      "pricingTotal": "Buchungssumme (€)",
+      "errors": {
+        "firstName": "Vorname ist erforderlich",
+        "lastName": "Nachname ist erforderlich",
+        "email": "Gültige E-Mail-Adresse eingeben",
+        "phone": "Telefonnummer ist erforderlich"
+      }
+    },
+    "toast": {
+      "notesUpdated": "Notizen aktualisiert",
+      "contactUpdated": "Kontakt aktualisiert",
+      "passengersUpdated": "Passagiere aktualisiert",
+      "hotelsRoomsUpdated": "Hotels/Zimmer aktualisiert",
+      "pricingUpdated": "Preise aktualisiert",
+      "updateFailed": "Speichern fehlgeschlagen"
     }
   }
 }

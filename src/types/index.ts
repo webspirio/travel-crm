@@ -116,6 +116,10 @@ export interface Passenger {
   roomType: RoomType
   price: number
   extraFee?: number
+  /** Date of birth, when known. */
+  birthDate: Date | null
+  /** Free-form per-passenger remarks (allergies, accessibility, etc.). */
+  specialNotes: string | null
 }
 
 export interface Booking {
@@ -132,6 +136,8 @@ export interface Booking {
   status: "draft" | "confirmed" | "partially_paid" | "paid" | "cancelled" | "no_show"
   managerId: string
   createdAt: Date
+  /** Internal booking-level notes (manager-facing). */
+  notes: string | null
 }
 
 export interface DashboardStats {

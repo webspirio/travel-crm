@@ -19,7 +19,7 @@ import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
 import { formatCurrency, formatDateRange } from "@/lib/format"
 import { defaultPriceFor } from "@/lib/passenger-pricing"
 import { translatePgError } from "@/lib/translate-pg-error"
-import { useBookingStore } from "@/stores/booking-store"
+import { useBookingDraft, useBookingDraftStore } from "@/lib/booking-draft-context"
 import type { PassengerDraft, RoomDraft } from "@/stores/booking-store"
 import type { Locale, Trip } from "@/types"
 
@@ -80,13 +80,14 @@ export function StepReview() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
   const navigate = useNavigate()
 
-  const tripId = useBookingStore((s) => s.tripId)
-  const passengers = useBookingStore((s) => s.passengers)
-  const rooms = useBookingStore((s) => s.rooms)
-  const noHotel = useBookingStore((s) => s.noHotel)
-  const notes = useBookingStore((s) => s.notes)
-  const update = useBookingStore((s) => s.update)
-  const reset = useBookingStore((s) => s.reset)
+  const tripId = useBookingDraft((s) => s.tripId)
+  const passengers = useBookingDraft((s) => s.passengers)
+  const rooms = useBookingDraft((s) => s.rooms)
+  const noHotel = useBookingDraft((s) => s.noHotel)
+  const notes = useBookingDraft((s) => s.notes)
+  const update = useBookingDraft((s) => s.update)
+  const reset = useBookingDraft((s) => s.reset)
+  const draftStore = useBookingDraftStore()
 
   const { data: trips = [] } = useTrips()
   const { data: hotels = [] } = useHotels()
@@ -122,7 +123,7 @@ export function StepReview() {
 
   // ── Submit ───────────────────────────────────────────────────────────
   const handleConfirm = () => {
-    const state = useBookingStore.getState()
+    const state = draftStore.getState()
     // Inject computed prices into each passenger before submission so the
     // server-side subtotal equals trip fare + hotel share (unless overridden).
     const pricedPassengers = state.passengers.map((p, i) => ({
