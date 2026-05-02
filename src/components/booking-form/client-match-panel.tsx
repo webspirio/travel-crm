@@ -26,8 +26,6 @@ export interface ClientMatchPanelProps {
   onRestore: (clientId: string) => void
   /** True while a restore is in flight (disables the Restore button). */
   isRestoring?: boolean
-  /** Gates the Restore action — only owners may un-soft-delete. */
-  isOwner: boolean
   className?: string
 }
 
@@ -63,7 +61,6 @@ export function ClientMatchPanel({
   onIgnore,
   onRestore,
   isRestoring = false,
-  isOwner,
   className,
 }: ClientMatchPanelProps) {
   const { t } = useTranslation("booking")
@@ -109,10 +106,8 @@ export function ClientMatchPanel({
       {softDeletedEmail.length > 0 && (
         <SoftDeletedSection
           matches={softDeletedEmail}
-          isOwner={isOwner}
           isRestoring={isRestoring}
           onRestore={onRestore}
-          onIgnore={onIgnore}
         />
       )}
 
@@ -209,16 +204,12 @@ function EmailMatchSection({
 
 function SoftDeletedSection({
   matches,
-  isOwner,
   isRestoring,
   onRestore,
-  onIgnore,
 }: {
   matches: ClientMatch[]
-  isOwner: boolean
   isRestoring: boolean
   onRestore: (clientId: string) => void
-  onIgnore: () => void
 }) {
   const { t } = useTranslation("booking")
   return (
@@ -247,26 +238,15 @@ function SoftDeletedSection({
                 {t("match.deletedOn", { date: formatDeletedDate(m.deletedAt) })}
               </div>
             </div>
-            {isOwner ? (
-              <Button
-                size="sm"
-                type="button"
-                disabled={isRestoring}
-                onClick={() => onRestore(m.id)}
-              >
-                {isRestoring && <Loader2 className="size-3.5 animate-spin" />}
-                {t("match.restore")}
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="outline"
-                type="button"
-                onClick={onIgnore}
-              >
-                {t("match.createNew")}
-              </Button>
-            )}
+            <Button
+              size="sm"
+              type="button"
+              disabled={isRestoring}
+              onClick={() => onRestore(m.id)}
+            >
+              {isRestoring && <Loader2 className="size-3.5 animate-spin" />}
+              {t("match.restore")}
+            </Button>
           </li>
         ))}
       </ul>

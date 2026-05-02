@@ -127,7 +127,9 @@
     "noHotelConfirmed": "Готель не обрано. Бронювання без готелю.",
     "confirmRemoveRoom": "Видалити номер з призначеними пасажирами?",
     "priceNights": "{{nights}} ніч × {{price}} €",
-    "totalPerPax": "{{amount}} € / особу"
+    "totalPerPax": "{{amount}} € / особу",
+    "assignedElsewhere": "в іншій кімнаті",
+    "noPassengers": "Поки що немає пасажирів"
   },
   "pricing": {
     "basePrice": "Базова ціна туру",

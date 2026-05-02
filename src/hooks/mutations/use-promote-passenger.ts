@@ -97,8 +97,8 @@ export function usePromotePassenger(): UseMutationResult<
           tenant_id: tenant.id,
           first_name: input.firstName,
           last_name: input.lastName,
-          email: input.email ?? "",
-          phone: input.phone ?? input.phoneE164 ?? "",
+          email: input.email || null,
+          phone: input.phone || input.phoneE164 || null,
           nationality: input.nationality ?? undefined,
           ...(input.birthDate !== null ? { birth_date: input.birthDate } : {}),
         })

@@ -48,6 +48,7 @@ export function useCreateBooking(): UseMutationResult<
       const payload = {
         tenantId,
         tripId: draft.tripId,
+        notes: draft.notes ?? null,
         primaryClientId: primary.clientId ?? null,
         // Only send `primary` block when we are creating a new clients row.
         primary: primary.clientId

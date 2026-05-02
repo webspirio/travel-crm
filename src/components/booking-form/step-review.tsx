@@ -17,9 +17,57 @@ import { useTrips } from "@/hooks/queries/use-trips"
 import { useHotels } from "@/hooks/queries/use-hotels"
 import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
 import { formatCurrency, formatDateRange } from "@/lib/format"
+import { defaultPriceFor } from "@/lib/passenger-pricing"
 import { translatePgError } from "@/lib/translate-pg-error"
 import { useBookingStore } from "@/stores/booking-store"
-import type { Locale } from "@/types"
+import type { PassengerDraft, RoomDraft } from "@/stores/booking-store"
+import type { Locale, Trip } from "@/types"
+
+// ─── Pricing helpers ─────────────────────────────────────────────────────────
+
+/** Nights between departure and return (minimum 1). */
+function tripNights(trip: Pick<Trip, "departureDate" | "returnDate">): number {
+  const ms = trip.returnDate.getTime() - trip.departureDate.getTime()
+  return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)))
+}
+
+/** Hotel share for one non-lap passenger in their room (0 when unassigned or lap). */
+function hotelShareFor(
+  p: PassengerDraft,
+  rooms: RoomDraft[],
+  nights: number,
+  passengers: PassengerDraft[],
+): number {
+  if (!p.roomGroupId) return 0
+  const isLapInfant = p.kind === "infant" && p.seatNumber === null
+  if (isLapInfant) return 0
+  const room = rooms.find((r) => r.localId === p.roomGroupId)
+  if (!room) return 0
+  const nonLapInRoom = passengers.filter(
+    (q) => q.roomGroupId === room.localId && !(q.kind === "infant" && q.seatNumber === null),
+  )
+  if (nonLapInRoom.length === 0) return 0
+  return Math.round((room.pricePerNight * nights) / nonLapInRoom.length)
+}
+
+/**
+ * Compute the effective priceEur for a passenger at submit time.
+ *
+ * When `priceOverridden === true` the manager has explicitly set a custom
+ * price — honour it exactly. Otherwise derive: trip fare + hotel share.
+ */
+function computePassengerPrice(
+  p: PassengerDraft,
+  trip: Pick<Trip, "basePrice" | "childPrice" | "infantPrice" | "departureDate" | "returnDate"> | null,
+  rooms: RoomDraft[],
+  passengers: PassengerDraft[],
+  noHotel: boolean,
+): number {
+  if (p.priceOverridden) return p.priceEur
+  const tripCost = defaultPriceFor(trip, p.kind)
+  const hotelCost = noHotel ? 0 : hotelShareFor(p, rooms, trip ? tripNights(trip) : 0, passengers)
+  return tripCost + hotelCost
+}
 
 /**
  * Read-only summary of the entire booking. The "Confirm booking" button
@@ -46,8 +94,14 @@ export function StepReview() {
 
   const createBooking = useCreateBooking()
 
+  // ── Per-passenger effective prices (single source of truth at review time) ──
+  // priceOverridden passengers keep their manual value; others get trip + hotel.
+  const effectivePrices = passengers.map((p) =>
+    computePassengerPrice(p, trip, rooms, passengers, noHotel),
+  )
+
   // ── Totals ──────────────────────────────────────────────────────────
-  const subtotal = passengers.reduce((sum, p) => sum + p.priceEur, 0)
+  const subtotal = effectivePrices.reduce((sum, price) => sum + price, 0)
   const commission = Math.round(subtotal * 0.1)
 
   // ── Room label helper ────────────────────────────────────────────────
@@ -68,8 +122,15 @@ export function StepReview() {
 
   // ── Submit ───────────────────────────────────────────────────────────
   const handleConfirm = () => {
+    const state = useBookingStore.getState()
+    // Inject computed prices into each passenger before submission so the
+    // server-side subtotal equals trip fare + hotel share (unless overridden).
+    const pricedPassengers = state.passengers.map((p, i) => ({
+      ...p,
+      priceEur: effectivePrices[i] ?? p.priceEur,
+    }))
     createBooking.mutate(
-      { draft: useBookingStore.getState() },
+      { draft: { ...state, passengers: pricedPassengers } },
       {
         onSuccess: ({ bookingId, bookingNumber }) => {
           toast.success(t("review.success", { number: bookingNumber }))
@@ -108,7 +169,7 @@ export function StepReview() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {passengers.map((p) => {
+            {passengers.map((p, idx) => {
               const isLapInfant = p.kind === "infant" && p.seatNumber === null
               const kindLabel =
                 p.kind === "adult"
@@ -138,7 +199,7 @@ export function StepReview() {
                   <TableCell>{seatLabel}</TableCell>
                   <TableCell className="max-w-[180px] truncate">{roomLabel}</TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatCurrency(p.priceEur, locale)}
+                    {formatCurrency(effectivePrices[idx] ?? p.priceEur, locale)}
                   </TableCell>
                 </TableRow>
               )

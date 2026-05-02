@@ -32,7 +32,6 @@ export interface TravelerCardProps {
   /** Match list — primary only; null for extras. */
   matches: ClientMatch[] | null
   isMatchesLoading: boolean
-  isOwner: boolean
   expanded: boolean
   onToggleExpand: () => void
   onUpdate: (patch: Partial<PassengerDraft>) => void
@@ -76,7 +75,6 @@ export function TravelerCard({
   trip,
   matches,
   isMatchesLoading,
-  isOwner,
   expanded,
   onToggleExpand,
   onUpdate,
@@ -405,7 +403,6 @@ export function TravelerCard({
                 onIgnore={onIgnoreMatch}
                 onRestore={onRestoreMatch}
                 isRestoring={isRestoring}
-                isOwner={isOwner}
               />
             )}
 

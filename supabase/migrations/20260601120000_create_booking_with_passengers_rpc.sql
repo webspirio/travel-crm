@@ -16,6 +16,7 @@
 --     .phone          text?
 --     .nationality    char(2)?
 --     .birthDate      text?   (ISO-8601)
+--   notes             text?    — internal booking notes
 --   passengers        array    — at least one element
 --     [].kind         text     — 'adult' | 'child' | 'infant'
 --     [].firstName    text
@@ -132,7 +133,8 @@ begin
     sold_by_manager_id,
     booking_number,
     total_price_eur,
-    commission_eur
+    commission_eur,
+    notes
   ) values (
     _tenant_id,
     _client_id,
@@ -140,7 +142,8 @@ begin
     _manager_id,
     '',
     _server_subtotal,
-    _server_commission
+    _server_commission,
+    nullif(_payload->>'notes', '')
   )
   returning id, public.bookings.booking_number into _booking_id, _bn;
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Plus, Users } from "lucide-react"
 
@@ -10,7 +10,6 @@ import { useRestoreClient } from "@/hooks/mutations/use-restore-client"
 import { useClientMatches } from "@/hooks/queries/use-client-matches"
 import { useTripById } from "@/hooks/queries/use-trips"
 import { formatCurrency } from "@/lib/format"
-import { defaultPriceFor } from "@/lib/passenger-pricing"
 import { useDebouncedValue } from "@/lib/use-debounced-value"
 import { useAuthStore } from "@/stores/auth-store"
 import { useBookingStore } from "@/stores/booking-store"
@@ -36,8 +35,6 @@ export function StepTravelers() {
   const locale = (i18n.resolvedLanguage ?? "uk") as Locale
 
   const tenantId = useAuthStore((s) => s.tenant?.id ?? null)
-  const role = useAuthStore((s) => s.role)
-  const isOwner = role === "owner"
 
   const passengers = useBookingStore((s) => s.passengers)
   const tripId = useBookingStore((s) => s.tripId)
@@ -85,24 +82,6 @@ export function StepTravelers() {
   // Track which extra is currently in promote-to-client form.
   const [promotingId, setPromotingId] = useState<string | null>(null)
 
-  // When the trip changes, recompute default prices for any passenger that
-  // hasn't been manually overridden. Owned by this step until Task 9 lifts
-  // it to the page-level orchestrator.
-  useEffect(() => {
-    if (!trip) return
-    for (const p of passengers) {
-      if (p.priceOverridden) continue
-      const def = defaultPriceFor(trip, p.kind)
-      if (def !== p.priceEur) {
-        updatePassenger(p.localId, { priceEur: def })
-      }
-    }
-    // Intentionally not including `passengers` — that would re-run on every
-    // edit and clobber user input. We only react to trip changes; per-row
-    // price-on-kind-change is handled inside TravelerCard.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trip?.id])
-
   const handleAdd = (kind: PassengerKind = "adult") => {
     addPassenger(kind)
     // Open the freshly-added card. The new id isn't in state yet, but the
@@ -137,23 +116,6 @@ export function StepTravelers() {
       })
     })
   }
-
-  // Keyboard shortcuts: Alt+N → add traveler, Alt+F → quick family-of-4.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (!e.altKey) return
-      if (e.key === "n" || e.key === "N") {
-        e.preventDefault()
-        handleAdd()
-      } else if (e.key === "f" || e.key === "F") {
-        e.preventDefault()
-        handleFamilyOfFour()
-      }
-    }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [primary?.lastName, passengers.length])
 
   if (!primary) {
     // Defensive — the store always seeds a primary, but guard against
@@ -191,7 +153,6 @@ export function StepTravelers() {
             trip={trip}
             matches={matchesQuery.data ?? []}
             isMatchesLoading={matchesQuery.isFetching}
-            isOwner={isOwner}
             expanded={expandedIds.has(primary.localId)}
             onToggleExpand={() => toggleExpand(primary.localId)}
             onUpdate={(patch) => updatePassenger(primary.localId, patch)}
@@ -250,7 +211,6 @@ export function StepTravelers() {
                   )
                 }
                 isRestoring={restoreClient.isPending}
-                isOwner={isOwner}
               />
             )}
         </section>
@@ -269,7 +229,6 @@ export function StepTravelers() {
                   trip={trip}
                   matches={null}
                   isMatchesLoading={false}
-                  isOwner={isOwner}
                   expanded={expandedIds.has(p.localId)}
                   onToggleExpand={() => toggleExpand(p.localId)}
                   onUpdate={(patch) => updatePassenger(p.localId, patch)}

@@ -1,6 +1,6 @@
 -- Phase 2.5 — multi-passenger booking + client-match RPC tests.
 --
--- Covers (22 assertions):
+-- Covers (23 assertions):
 --   1.  4-passenger booking (1 lap-infant) inserts cleanly.
 --   2.  bookings.total_price_eur equals sum of passenger prices.
 --   3.  bookings.commission_eur = round(total * 0.10, 2).
@@ -37,7 +37,7 @@
 
 begin;
 
-select plan(22);
+select plan(23);
 
 -- ============================================================
 -- Fixtures (all run as postgres, no RLS)
@@ -345,6 +345,43 @@ select results_eq(
        and email = 'hanna.bondar.rpc@test.local'$$,
   $$values (1)$$,
   'RPC happy-path: new clients row created for inline primary block'
+);
+
+-- ============================================================
+-- 5i. notes are persisted in bookings.notes.
+--     The happy-path call above passed notes implicitly as null — here we
+--     create a second booking via the RPC with an explicit notes value and
+--     confirm it lands in the bookings row.
+-- ============================================================
+
+select tests.impersonate_user('mpb-owner@test.local');
+
+create temp table _rpc_notes_result (booking_id uuid, booking_number text);
+grant select, insert on _rpc_notes_result to authenticated;
+
+insert into _rpc_notes_result
+  select r.booking_id, r.booking_number
+    from public.create_booking_with_passengers(
+      jsonb_build_object(
+        'tenantId',  (select v from _ids where k='tid_a'),
+        'tripId',    (select v from _ids where k='trip_a'),
+        'primaryClientId', (select v from _ids where k='client_a'),
+        'notes',     'test notes',
+        'passengers', jsonb_build_array(
+          jsonb_build_object('kind','adult','firstName','Notes','lastName','Test',
+                             'seatNumber','10','priceEur',500)
+        )
+      )
+    ) r;
+
+reset role; reset request.jwt.claims;
+
+select results_eq(
+  $$select notes
+      from public.bookings
+     where id = (select booking_id from _rpc_notes_result)$$,
+  $$values ('test notes'::text)$$,
+  'RPC: notes field is persisted in bookings.notes'
 );
 
 -- ============================================================

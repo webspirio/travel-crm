@@ -6,7 +6,7 @@
  * counted toward room capacity and carry no hotel charge.
  */
 
-import { useEffect, useMemo } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -267,26 +267,6 @@ export function StepRooms() {
     }
     return map
   }, [hotelBlocks])
-
-  // ── Pricing effect: recompute priceEur for non-overridden passengers ──────────
-  useEffect(() => {
-    if (noHotel || nights === 0) return
-
-    for (const room of rooms) {
-      const nonLapInRoom = passengers.filter(
-        (p) => p.roomGroupId === room.localId && !isLapInfant(p),
-      )
-      if (nonLapInRoom.length === 0) continue
-      const hotelCostPerPax = Math.round(
-        (room.pricePerNight * nights) / nonLapInRoom.length,
-      )
-      for (const p of nonLapInRoom) {
-        if (!p.priceOverridden) {
-          updatePassenger(p.localId, { priceEur: hotelCostPerPax })
-        }
-      }
-    }
-  }, [rooms, passengers, noHotel, nights, updatePassenger])
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 

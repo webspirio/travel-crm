@@ -104,7 +104,7 @@
     "undoSkip": "Hotel auswählen"
   },
   "rooms": {
-    "title": "Hotel &amp; Zimmer",
+    "title": "Hotel & Zimmer",
     "hotelLabel": "Hotel",
     "skipHotel": "Ohne Hotel — nur Bus",
     "skipAll": "Hotel für alle überspringen",
@@ -127,7 +127,9 @@
     "noHotelConfirmed": "Kein Hotel gewählt. Buchung ohne Hotel.",
     "confirmRemoveRoom": "Zimmer mit zugewiesenen Reisenden entfernen?",
     "priceNights": "{{nights}} Nacht × {{price}} €",
-    "totalPerPax": "{{amount}} € / Person"
+    "totalPerPax": "{{amount}} € / Person",
+    "assignedElsewhere": "in anderem Zimmer",
+    "noPassengers": "Noch keine Reisenden"
   },
   "pricing": {
     "basePrice": "Reisegrundpreis",
