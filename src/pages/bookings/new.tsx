@@ -1,13 +1,11 @@
-import { ArrowLeft, ArrowRight, Check, RotateCcw } from "lucide-react"
-import { useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
+import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router"
 import { toast } from "sonner"
 
-import { StepPricing } from "@/components/booking-form/step-pricing"
+import { StepReview } from "@/components/booking-form/step-review"
 import { StepRooms } from "@/components/booking-form/step-rooms"
 import { StepSeats } from "@/components/booking-form/step-seats"
-import { StepSummary } from "@/components/booking-form/step-summary"
 import { StepTravelers } from "@/components/booking-form/step-travelers"
 import { StepTrip } from "@/components/booking-form/step-trip"
 import { STEPS, Stepper } from "@/components/booking-form/stepper"
@@ -16,87 +14,141 @@ import { useSeatsCanContinue } from "@/hooks/use-seats-can-continue"
 import { useRoomsCanContinue } from "@/hooks/use-rooms-can-continue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useCreateBooking } from "@/hooks/mutations/use-create-booking"
-import { useBookingStore, useLegacyBookingDraft } from "@/stores/booking-store"
+import { useBookingStore } from "@/stores/booking-store"
+
+// Step indices for the 5-step wizard:
+//   0 = Trip
+//   1 = Travelers
+//   2 = Seats
+//   3 = Rooms
+//   4 = Review  (Confirm button lives inside the step; outer Next is hidden)
+const LAST_STEP = STEPS.length - 1
+
+/** Returns true when the event target is an editable element (input/textarea/ce). */
+function isEditable(target: EventTarget | null): boolean {
+  if (!target || !(target instanceof HTMLElement)) return false
+  const tag = target.tagName.toLowerCase()
+  return (
+    tag === "input" ||
+    tag === "textarea" ||
+    tag === "select" ||
+    target.isContentEditable
+  )
+}
 
 export default function NewBookingPage() {
   const { t } = useTranslation("booking")
   const { t: tc } = useTranslation()
-  const navigate = useNavigate()
-  // Legacy selector drives all UI state in this page until Tasks 6-9 rewrite
-  // the step components. The mutation receives the NEW BookingDraft shape via
-  // useBookingStore.getState() at submit time. TODO(Task 9): migrate fully.
-  const state = useLegacyBookingDraft()
-  const { step, setStep, reset } = state
 
-  const createBooking = useCreateBooking()
+  const step = useBookingStore((s) => s.step)
+  const setStep = useBookingStore((s) => s.setStep)
+  const reset = useBookingStore((s) => s.reset)
 
-  // Travelers step (index 0) gates via the new multi-passenger draft. The
-  // hook subscribes to the new store + runs the duplicate-detection query
-  // unconditionally, so we always get a fresh boolean even when the user is
-  // on a later step. Other steps still read from the legacy compatibility
-  // selector — Tasks 7-10 will migrate them.
+  // ── Per-step canContinue gates ─────────────────────────────────────
+  const tripId = useBookingStore((s) => s.tripId)
   const travelersOk = useTravelersCanContinue()
   const seatsOk = useSeatsCanContinue()
   const roomsOk = useRoomsCanContinue()
 
-  const canContinue = useMemo(() => {
+  const canContinue = useMemo((): boolean => {
     switch (step) {
-      case 0:
-        return travelersOk
-      case 1:
-        return Boolean(state.tripId)
-      case 2:
-        return seatsOk
-      case 3:
-        return roomsOk
-      case 4:
-        return Boolean(state.pricing)
-      default:
-        return true
+      case 0: return Boolean(tripId)
+      case 1: return travelersOk
+      case 2: return seatsOk
+      case 3: return roomsOk
+      case 4: return true   // Review: Confirm button inside the step gates submission
+      default: return true
     }
-  }, [step, state, travelersOk, seatsOk, roomsOk])
+  }, [step, tripId, travelersOk, seatsOk, roomsOk])
 
+  // ── Hydration reset-toast ──────────────────────────────────────────
+  // The persist migrate (Task 4) sets this flag when it cannot migrate
+  // a corrupted v1 draft. Show once and clear.
+  useEffect(() => {
+    if (localStorage.getItem("anytour-booking-draft-reset-toast") === "1") {
+      localStorage.removeItem("anytour-booking-draft-reset-toast")
+      toast.info(t("travelers.draftReset"))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Stepper ref (Esc focuses it) ───────────────────────────────────
+  const stepperRef = useRef<HTMLOListElement>(null)
+
+  // ── Global hotkeys ─────────────────────────────────────────────────
+  // - Cmd/Ctrl+Enter  → advance step when canContinue (noop on review step)
+  // - Esc             → focus stepper
+  // - Alt+N           → add adult traveler (only on Travelers step)
+  // - Alt+F           → family-of-4 sequence (only on Travelers step)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Don't steal keys from inputs/textareas.
+      if (isEditable(e.target)) return
+
+      // Cmd/Ctrl+Enter → advance
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault()
+        if (step < LAST_STEP && canContinue) {
+          setStep(step + 1)
+        }
+        // On the review step the Confirm button inside StepReview handles submission.
+        return
+      }
+
+      // Esc → focus stepper (allow back-nav by Tab/click)
+      if (e.key === "Escape") {
+        e.preventDefault()
+        stepperRef.current?.focus()
+        return
+      }
+
+      if (!e.altKey) return
+
+      // Alt+N → add adult traveler
+      if ((e.key === "n" || e.key === "N") && step === 1) {
+        e.preventDefault()
+        useBookingStore.getState().addPassenger("adult")
+        return
+      }
+
+      // Alt+F → family-of-4 (1 adult + 2 children, share primary lastName)
+      if ((e.key === "f" || e.key === "F") && step === 1) {
+        e.preventDefault()
+        const state = useBookingStore.getState()
+        const primary = state.passengers[0]
+        if (!primary) return
+        const ln = primary.lastName
+        state.addPassenger("adult")
+        state.addPassenger("child")
+        state.addPassenger("child")
+        // Copy lastName to the 3 new passengers on the next tick (store async).
+        requestAnimationFrame(() => {
+          const fresh = useBookingStore.getState()
+          const added = fresh.passengers.slice(-3)
+          added.forEach((p) => {
+            if (ln) fresh.updatePassenger(p.localId, { lastName: ln })
+          })
+        })
+      }
+    }
+
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [step, canContinue, setStep])
+
+  // ── Step render ────────────────────────────────────────────────────
   const renderStep = () => {
     switch (step) {
-      case 0:
-        return <StepTravelers />
-      case 1:
-        return <StepTrip />
-      case 2:
-        return <StepSeats />
-      case 3:
-        return <StepRooms />
-      case 4:
-        return <StepPricing />
-      case 5:
-        return <StepSummary />
-      default:
-        return null
+      case 0: return <StepTrip />
+      case 1: return <StepTravelers />
+      case 2: return <StepSeats />
+      case 3: return <StepRooms />
+      case 4: return <StepReview />
+      default: return null
     }
   }
 
-  const onNext = () => {
-    if (step < STEPS.length - 1) {
-      setStep(step + 1)
-      return
-    }
-
-    // Last step — submit the booking using the new BookingDraft shape.
-    createBooking.mutate(
-      { draft: useBookingStore.getState() },
-      {
-        onSuccess: ({ bookingId, bookingNumber }) => {
-          toast.success(t("summary.toast", { bookingNumber }))
-          reset()
-          void navigate(`/bookings/${bookingId}`)
-        },
-        onError: (err) => {
-          toast.error(err.message)
-        },
-      },
-    )
-  }
+  const isReviewStep = step === LAST_STEP
 
   return (
     <div className="space-y-6">
@@ -111,7 +163,11 @@ export default function NewBookingPage() {
         </Button>
       </div>
 
-      <Stepper current={step} />
+      {/* The `ref` needs to land on the <ol> rendered by Stepper. We pass it via a
+          wrapper div since Stepper doesn't forward refs yet. */}
+      <div ref={(el) => { stepperRef.current = el?.querySelector("ol") ?? null }}>
+        <Stepper current={step} />
+      </div>
 
       <Card>
         <CardHeader>
@@ -120,6 +176,7 @@ export default function NewBookingPage() {
         <CardContent>{renderStep()}</CardContent>
       </Card>
 
+      {/* Bottom nav: hide Next on review step (Confirm lives inside StepReview) */}
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
@@ -129,19 +186,13 @@ export default function NewBookingPage() {
           <ArrowLeft className="size-4" />
           {tc("actions.back")}
         </Button>
-        <Button onClick={onNext} disabled={!canContinue || createBooking.isPending}>
-          {step === STEPS.length - 1 ? (
-            <>
-              <Check className="size-4" />
-              {t("summary.confirmCta")}
-            </>
-          ) : (
-            <>
-              {tc("actions.next")}
-              <ArrowRight className="size-4" />
-            </>
-          )}
-        </Button>
+
+        {!isReviewStep && (
+          <Button onClick={() => setStep(step + 1)} disabled={!canContinue}>
+            {tc("actions.next")}
+            <ArrowRight className="size-4" />
+          </Button>
+        )}
       </div>
     </div>
   )

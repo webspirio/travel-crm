@@ -1,13 +1,12 @@
 {
   "title": "Neue Buchung",
-  "subtitle": "Buchung in 6 Schritten anlegen",
+  "subtitle": "Buchung in 5 Schritten anlegen",
   "steps": {
-    "client": "Kunde",
     "trip": "Reise",
-    "seat": "Platz",
-    "hotel": "Hotel",
-    "pricing": "Preis",
-    "summary": "Bestätigung"
+    "travelers": "Reisende",
+    "seats": "Sitzplätze",
+    "rooms": "Hotel",
+    "review": "Bestätigung"
   },
   "client": {
     "searchLabel": "Kunde suchen",
@@ -42,7 +41,8 @@
     "priceLabel": "Preis (€)",
     "priceDefault": "Standard {{amount}} €",
     "dobLabel": "Geburtsdatum",
-    "tripChangeConfirm": "Bei Reisewechsel werden {{count}} Sitzplatzzuweisungen zurückgesetzt. Fortfahren?",
+    "tripChangeConfirm": "Bei Reisewechsel werden {{count}} Sitzplatz-/Zimmerzuweisungen zurückgesetzt. Fortfahren?",
+    "draftReset": "Der Entwurf wurde aufgrund einer inkompatiblen gespeicherten Version zurückgesetzt.",
     "liveTotal": "Aktuelle Summe",
     "subtotal": "Zwischensumme",
     "commission": "Provision (10%)",
@@ -70,7 +70,10 @@
   "trip": {
     "pickLabel": "Reise auswählen",
     "available": "Plätze frei",
-    "full": "Ausgebucht"
+    "full": "Ausgebucht",
+    "changeConfirmTitle": "Reise wechseln?",
+    "changeConfirm": "Ja, wechseln",
+    "changeCancel": "Abbrechen"
   },
   "seat": {
     "pickLabel": "Platz auswählen"
@@ -136,6 +139,29 @@
     "title": "Daten prüfen",
     "confirmCta": "Buchung bestätigen",
     "toast": "Buchung {{bookingNumber}} erstellt! 🎉"
+  },
+  "review": {
+    "title": "Bestätigung",
+    "passengerTable": {
+      "name": "Name",
+      "kind": "Typ",
+      "seat": "Platz",
+      "room": "Zimmer",
+      "price": "Preis"
+    },
+    "subtotal": "Zwischensumme",
+    "commission": "Provision (10%)",
+    "total": "Gesamt",
+    "confirm": "Buchung bestätigen",
+    "notes": "Notizen (optional)",
+    "notesPlaceholder": "Interne Notizen zu dieser Buchung…",
+    "success": "Buchung #{{number}} erstellt",
+    "kindAdult": "Erwachsener",
+    "kindChild": "Kind",
+    "kindInfant": "Kleinkind",
+    "noHotel": "kein Hotel",
+    "lapInfant": "auf dem Schoß",
+    "roomLabel": "Zimmer {{n}}: {{type}} @ {{hotel}}"
   },
   "validation": {
     "selectClient": "Kunden auswählen oder neu anlegen",

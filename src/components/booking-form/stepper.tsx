@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 
-export const STEPS = ["client", "trip", "seat", "hotel", "pricing", "summary"] as const
+export const STEPS = ["trip", "travelers", "seats", "rooms", "review"] as const
 export type StepId = (typeof STEPS)[number]
 
 interface StepperProps {
