@@ -27,6 +27,8 @@ function toPassenger(row: BookingPassengerRow): Passenger {
     hotelId: row.hotel_id ?? "",
     roomType: (row.room_type ?? "double") as RoomType,
     price: Number(row.price_total_eur),
+    birthDate: row.birth_date ? new Date(row.birth_date) : null,
+    specialNotes: row.special_notes ?? null,
   }
 }
 
@@ -45,6 +47,7 @@ function toBooking(row: BookingRow & { booking_passengers: BookingPassengerRow[]
     status: row.status,
     managerId: row.sold_by_manager_id,
     createdAt: new Date(row.created_at),
+    notes: row.notes ?? null,
   }
 }
 

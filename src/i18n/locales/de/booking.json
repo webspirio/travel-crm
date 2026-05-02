@@ -175,10 +175,22 @@
     "back": "Zum Dashboard",
     "statusChanged": "Status geändert: {{status}}",
     "notFound": "Buchung nicht gefunden",
+    "tabs": {
+      "overview": "Übersicht",
+      "history": "Verlauf"
+    },
+    "history": {
+      "placeholder": "Verlauf wird hier nach Backend-Fertigstellung angezeigt."
+    },
     "sections": {
       "status": "Status",
       "passengers": "Reisende",
-      "payments": "Zahlungen"
+      "payments": "Zahlungen",
+      "client": "Kunde",
+      "trip": "Reise",
+      "hotelsRooms": "Hotels & Zimmer",
+      "pricing": "Preis",
+      "notes": "Notizen"
     },
     "fields": {
       "booking": "Buchung",
@@ -187,6 +199,31 @@
       "paid": "Bezahlt",
       "outstanding": "Ausstehend",
       "client": "Kunde"
+    },
+    "client": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "nationality": "Staatsangehörigkeit",
+      "openProfile": "Profil öffnen"
+    },
+    "trip": {
+      "departure": "Abreise",
+      "return": "Rückkehr",
+      "route": "Route",
+      "soldBy": "Verkauft von"
+    },
+    "hotelsRooms": {
+      "noHotel": "Ohne Hotel",
+      "passengers": "Passagiere"
+    },
+    "pricing": {
+      "subtotal": "Passagier-Summe",
+      "paid": "Bezahlt",
+      "balance": "Saldo"
+    },
+    "notes": {
+      "empty": "Keine Notizen"
     },
     "passengers": {
       "name": "Name",
@@ -197,7 +234,9 @@
       "price": "Preis",
       "adult": "Erwachsener",
       "child": "Kind",
-      "infant": "Kleinkind"
+      "infant": "Kleinkind",
+      "birthDate": "Geburtsdatum",
+      "specialNotes": "Besondere Hinweise"
     },
     "payments": {
       "date": "Datum",

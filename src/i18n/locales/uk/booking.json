@@ -175,10 +175,22 @@
     "back": "До панелі",
     "statusChanged": "Статус змінено: {{status}}",
     "notFound": "Бронювання не знайдено",
+    "tabs": {
+      "overview": "Огляд",
+      "history": "Історія"
+    },
+    "history": {
+      "placeholder": "Історія появиться тут після завершення бекенду."
+    },
     "sections": {
       "status": "Статус",
       "passengers": "Пасажири",
-      "payments": "Платежі"
+      "payments": "Платежі",
+      "client": "Клієнт",
+      "trip": "Тур",
+      "hotelsRooms": "Готелі та номери",
+      "pricing": "Ціна",
+      "notes": "Нотатки"
     },
     "fields": {
       "booking": "Бронювання",
@@ -187,6 +199,31 @@
       "paid": "Оплачено",
       "outstanding": "До оплати",
       "client": "Клієнт"
+    },
+    "client": {
+      "name": "Ім'я",
+      "email": "Email",
+      "phone": "Телефон",
+      "nationality": "Громадянство",
+      "openProfile": "Відкрити профіль"
+    },
+    "trip": {
+      "departure": "Виїзд",
+      "return": "Повернення",
+      "route": "Маршрут",
+      "soldBy": "Продав менеджер"
+    },
+    "hotelsRooms": {
+      "noHotel": "Без готелю",
+      "passengers": "Пасажирів"
+    },
+    "pricing": {
+      "subtotal": "Сума пасажирів",
+      "paid": "Оплачено",
+      "balance": "Залишок"
+    },
+    "notes": {
+      "empty": "Немає нотаток"
     },
     "passengers": {
       "name": "Ім'я",
@@ -197,7 +234,9 @@
       "price": "Ціна",
       "adult": "Дорослий",
       "child": "Дитина",
-      "infant": "Немовля"
+      "infant": "Немовля",
+      "birthDate": "Дата народження",
+      "specialNotes": "Особливі побажання"
     },
     "payments": {
       "date": "Дата",
