@@ -1,24 +1,35 @@
 import type { TFunction } from "i18next"
-import { Mail, Phone } from "lucide-react"
+import { Mail, Pencil, Phone } from "lucide-react"
 import { Link } from "react-router"
 
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Client } from "@/types"
 
 interface Props {
   client: Client | null | undefined
   t: TFunction<"booking">
+  /** When provided AND the client is loaded, renders an Edit button in the header. */
+  onEdit?: () => void
 }
 
 /**
  * Client section — name (link to record), email (mailto), phone (tel),
- * nationality. Pure display; T9 attaches the inline-edit affordance.
+ * nationality. T9 attaches the frictionless inline-edit affordance via the
+ * optional `onEdit` callback. Contact edits are always allowed regardless
+ * of booking status.
  */
-export function ClientCard({ client, t }: Props) {
+export function ClientCard({ client, t, onEdit }: Props) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t("detail.sections.client")}</CardTitle>
+        {onEdit && client && (
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            <Pencil className="size-3.5" />
+            {t("detail.edit.edit")}
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         {!client ? (

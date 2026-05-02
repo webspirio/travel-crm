@@ -292,6 +292,26 @@
       "description": "Diese Aktion kann nicht rückgängig gemacht werden. Der Reisende wird als nicht erschienen markiert.",
       "confirm": "Ja, markieren",
       "abort": "Nein, behalten"
+    },
+    "edit": {
+      "edit": "Bearbeiten",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichert...",
+      "notesTitle": "Notizen bearbeiten",
+      "notesDescription": "Interne Notizen zur Buchung.",
+      "notesPlaceholder": "Interne Notizen...",
+      "contactTitle": "Kontaktdaten",
+      "contactDescription": "Hauptkontakt der Buchung.",
+      "contactFirstName": "Vorname",
+      "contactLastName": "Nachname",
+      "contactEmail": "E-Mail",
+      "contactPhone": "Telefon"
+    },
+    "toast": {
+      "notesUpdated": "Notizen aktualisiert",
+      "contactUpdated": "Kontakt aktualisiert",
+      "updateFailed": "Speichern fehlgeschlagen"
     }
   }
 }

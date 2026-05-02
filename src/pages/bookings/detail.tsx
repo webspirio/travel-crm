@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react"
+import { ContactEditSheet } from "@/components/bookings/edit-sheets/contact-edit-sheet"
+import { NotesEditSheet } from "@/components/bookings/edit-sheets/notes-edit-sheet"
 import { PaymentFormDialog } from "@/components/bookings/payment-form-dialog"
 import { ClientCard } from "@/components/bookings/sections/client-card"
 import { HeaderCard } from "@/components/bookings/sections/header-card"
@@ -58,6 +60,10 @@ export default function BookingDetailPage() {
 
   // Payment dialog state.
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+
+  // Frictionless edit sheets (T9).
+  const [notesEditOpen, setNotesEditOpen] = useState(false)
+  const [contactEditOpen, setContactEditOpen] = useState(false)
 
   const managerById = useMemo(
     () => new Map(managers.map((m) => [m.id, m])),
@@ -165,7 +171,11 @@ export default function BookingDetailPage() {
             </Card>
           )}
 
-          <ClientCard client={client} t={t} />
+          <ClientCard
+            client={client}
+            t={t}
+            onEdit={() => setContactEditOpen(true)}
+          />
           <TripCard trip={trip} manager={manager} t={t} locale={locale} />
           <PassengersCard
             booking={booking}
@@ -176,7 +186,11 @@ export default function BookingDetailPage() {
           />
           <HotelsRoomsCard booking={booking} hotels={hotels} t={t} tc={tc} />
           <PricingCard booking={booking} t={t} locale={locale} />
-          <NotesCard booking={booking} t={t} />
+          <NotesCard
+            booking={booking}
+            t={t}
+            onEdit={() => setNotesEditOpen(true)}
+          />
           <PaymentsCard
             payments={payments}
             managerById={managerById}
@@ -208,6 +222,22 @@ export default function BookingDetailPage() {
         bookingTotal={booking.totalPrice}
         bookingPaidAmount={booking.paidAmount}
       />
+
+      {/* Notes edit sheet (frictionless, no reason) */}
+      <NotesEditSheet
+        open={notesEditOpen}
+        onOpenChange={setNotesEditOpen}
+        booking={booking}
+      />
+
+      {/* Contact edit sheet (frictionless, no reason) — only when client loaded */}
+      {client && (
+        <ContactEditSheet
+          open={contactEditOpen}
+          onOpenChange={setContactEditOpen}
+          client={client}
+        />
+      )}
 
       {/* Confirmation dialog for destructive transitions — stays outside Tabs */}
       <Dialog

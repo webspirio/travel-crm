@@ -292,6 +292,26 @@
       "description": "Ця дія незворотна. Пасажир буде відзначений як такий, що не з'явився.",
       "confirm": "Так, позначити",
       "abort": "Ні, залишити"
+    },
+    "edit": {
+      "edit": "Редагувати",
+      "cancel": "Скасувати",
+      "save": "Зберегти",
+      "saving": "Збереження...",
+      "notesTitle": "Редагувати нотатки",
+      "notesDescription": "Внутрішні нотатки до бронювання.",
+      "notesPlaceholder": "Внутрішні нотатки...",
+      "contactTitle": "Контактна інформація",
+      "contactDescription": "Основний контакт бронювання.",
+      "contactFirstName": "Ім'я",
+      "contactLastName": "Прізвище",
+      "contactEmail": "Email",
+      "contactPhone": "Телефон"
+    },
+    "toast": {
+      "notesUpdated": "Нотатки оновлено",
+      "contactUpdated": "Контакт оновлено",
+      "updateFailed": "Не вдалося зберегти"
     }
   }
 }
